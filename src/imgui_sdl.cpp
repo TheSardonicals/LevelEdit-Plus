@@ -515,11 +515,9 @@ namespace
 
 namespace ImGuiSDL
 {
-	void Initialize(SDL_Renderer* renderer, int windowWidth, int windowHeight)
+	void Initialize(SDL_Renderer* renderer)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize.x = static_cast<float>(windowWidth);
-		io.DisplaySize.y = static_cast<float>(windowHeight);
 
 		ImGui::GetStyle().WindowRounding = 0.0f;
 		ImGui::GetStyle().AntiAliasedFill = false;
