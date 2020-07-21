@@ -1,4 +1,5 @@
-#include <SDL2/SDL.h>
+#pragma once
+#include "headers.h"
 
 #ifndef Camera_h
 #define Camera_h
@@ -9,7 +10,7 @@ class Camera{
     ~Camera();
 
     void init(int width, int height, int speed, int cs = 40);
-    void Show(SDL_Renderer* renderer);
+    void Show(SDL_Renderer*);
 
     private:
     int xpos;
@@ -19,4 +20,4 @@ class Camera{
 
 };
 
-#endif
+#endif /* Camera_h */

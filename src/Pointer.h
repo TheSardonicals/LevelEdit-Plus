@@ -1,4 +1,6 @@
-#include <SDL2/SDL.h>
+#pragma once
+#include "headers.h"
+
 #ifndef Pointer_h
 #define Pointer_h
 

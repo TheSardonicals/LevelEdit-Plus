@@ -1,3 +1,6 @@
+#pragma once
+#include "headers.h"
+
 #ifndef Game_h
 #define Game_h
 

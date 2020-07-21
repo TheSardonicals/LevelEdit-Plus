@@ -1,3 +1,6 @@
+#pragma once
+#include "headers.h"
+
 #ifndef GameTile_h
 #define GameTile_h
 

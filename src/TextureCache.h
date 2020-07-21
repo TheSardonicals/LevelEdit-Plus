@@ -1,18 +1,22 @@
-#include <SDL2/SDL.h>
+#pragma once
+#include "headers.h"
 
 #ifndef TextureCache_h
 #define TextureCache_h
 
 class TextureCache{
     public:
-        TextureCache();
+        TextureCache(SDL_Renderer *);
         ~TextureCache();
 
-        void init(SDL_Renderer* renderer);
+        void init(SDL_Renderer * );
+        map<string, string> LoadTexture(string);
 
         
     private:
-        //cache holder here
+    map<string, SDL_Texture *> _cache;
+    SDL_Renderer * renderer;
+
 
 };
 #endif

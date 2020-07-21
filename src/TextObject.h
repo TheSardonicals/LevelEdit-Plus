@@ -1,8 +1,5 @@
-#include <iostream>
-#include <SDL2/SDL.h>
-#include <vector>
-
-using namespace std;
+#pragma once
+#include "headers.h"
 
 #ifndef TextObject_h
 #define TextObject_h
