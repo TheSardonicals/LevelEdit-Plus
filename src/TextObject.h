@@ -10,7 +10,7 @@ class TextObject{
         ~TextObject();
 
         void init(SDL_Renderer* renderer, string text, int width, int height, vector<int> color, vector<int> location, int font_size);
-        void Render();
+        void Render(int, int, int);
         
 };
 #endif

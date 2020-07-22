@@ -9,7 +9,7 @@ class Camera{
     Camera();
     ~Camera();
 
-    void init(int width, int height, int speed, int cs = 40);
+    void init(int width, int height, int speed, int cs = 3);
     void Show(SDL_Renderer*);
 
     private:

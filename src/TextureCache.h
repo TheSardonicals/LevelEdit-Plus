@@ -10,7 +10,7 @@ class TextureCache{
         ~TextureCache();
 
         void init(SDL_Renderer * );
-        map<string, string> LoadTexture(string);
+        map<string, SDL_Texture*> LoadTexture(string);
 
         
     private:
