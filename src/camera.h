@@ -1,8 +1,8 @@
 #pragma once
 #include "headers.h"
 
-#ifndef Camera_h
-#define Camera_h
+#ifndef camera_h
+#define camera_h
 
 class Camera{
     public:

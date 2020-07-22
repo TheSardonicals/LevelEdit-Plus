@@ -1,7 +1,7 @@
 #include "headers.h"
 
-#ifndef Handler_h
-#define Handler_h
+#ifndef handler_h
+#define handler_h
 
 class Handler{
     public:

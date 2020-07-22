@@ -1,4 +1,4 @@
-#include "TextureCache.h"
+#include "texturecache.h"
 
 TextureCache::TextureCache(SDL_Renderer* target){
     renderer = target;

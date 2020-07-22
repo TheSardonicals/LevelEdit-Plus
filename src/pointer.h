@@ -1,8 +1,8 @@
 #pragma once
 #include "headers.h"
 
-#ifndef Pointer_h
-#define Pointer_h
+#ifndef pointer_h
+#define pointer_h
 
 class Pointer{
     public:

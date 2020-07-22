@@ -1,8 +1,8 @@
 #pragma once
 #include "headers.h"
 
-#ifndef TextureCache_h
-#define TextureCache_h
+#ifndef texturecache_h
+#define texturecache_h
 
 class TextureCache{
     public:

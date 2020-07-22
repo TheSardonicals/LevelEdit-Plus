@@ -14,10 +14,10 @@ using namespace std;
 #include <filesystem>
 #include <tuple>
 
-#include "Pointer.h"
-#include "Editor.h"
-#include "TextObject.h"
-#include "TextureCache.h"
-#include "Submenu.h"
-#include "GameTile.h"
-#include "Camera.h"
+#include "pointer.h"
+#include "editor.h"
+#include "textobject.h"
+#include "texturecache.h"
+#include "submenu.h"
+#include "gametile.h"
+#include "camera.h"

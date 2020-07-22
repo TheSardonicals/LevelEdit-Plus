@@ -1,7 +1,7 @@
 #include "headers.h"
 
-#ifndef Editor_h
-#define Editor_h
+#ifndef editor_h
+#define editor_h
 
 class Editor{
 

@@ -1,8 +1,8 @@
 #pragma once
 #include "headers.h"
 
-#ifndef TextObject_h
-#define TextObject_h
+#ifndef textobject_h
+#define textobject_h
 
 class TextObject{
     public:

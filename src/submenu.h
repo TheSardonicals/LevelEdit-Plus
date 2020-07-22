@@ -1,7 +1,7 @@
 #include "headers.h"
 
-#ifndef Submenu_h
-#define Submenu_h
+#ifndef submenu_h
+#define submenu_h
 
 class Submenu{
     public:

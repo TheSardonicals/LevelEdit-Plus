@@ -1,8 +1,8 @@
 #pragma once
 #include "headers.h"
 
-#ifndef GameTile_h
-#define GameTile_h
+#ifndef gametile_h
+#define gametile_h
 
 class GameTile{
     public:

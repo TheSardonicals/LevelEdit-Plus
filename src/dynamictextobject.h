@@ -1,7 +1,7 @@
 #include "headers.h"
 
-#ifndef DynamicTextObject_h
-#define DynamicTextObject_h
+#ifndef dynamictextobject_h
+#define dynamicTextobject_h
 
 class DynamicTextObject{
 
