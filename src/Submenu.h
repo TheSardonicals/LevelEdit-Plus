@@ -8,8 +8,8 @@ class Submenu{
         Submenu();
         ~Submenu();
 
-        void init(TextureCache*, vector<string, tuple<int, int>>, tuple<int, int>, tuple<int, int>, tuple<int, int, int>,
-        int, bool, tuple<int, int, int>);
+        void init(TextureCache*, vector<string, array<int, 2>>, array<int, 2>, array<int, 2>, array<int, 3>,
+        int, bool, array<int, 3>);
     
     private:
         map<string, TextObject*> menu_item;
@@ -18,7 +18,7 @@ class Submenu{
 
         SDL_Rect* area;
 
-        tuple<int, int, int> scroll_color;
+        array<int, 3> scroll_color;
 
         int boundary_x, boundary_y;
 

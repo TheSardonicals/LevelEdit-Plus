@@ -9,10 +9,10 @@ class GameTile{
         GameTile(TextureCache*, string, int, int, int, int);
         ~GameTile();
 
-        void Render(tuple<int, int>, int);
+        void Render(array<int, 2>, int);
         void SetPos(int, int);
-        vector<int> GetPos();
-        vector<int> GetInfo();
+        array<int, 2> GetPos();
+        array<int, 4> GetInfo();
     
     private:
         TextureCache* cache;
