@@ -15,10 +15,10 @@ class GameTile{
         vector<int> GetInfo();
     
     private:
-    TextureCache* cache;
-    string name;
-    int x, y, w, h;
-    SDL_Rect* rect;
+        TextureCache* cache;
+        string name;
+        int x, y, w, h;
+        SDL_Rect* rect;
 
 
         
