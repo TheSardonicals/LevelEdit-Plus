@@ -21,3 +21,4 @@ using namespace std;
 #include "submenu.h"
 #include "gametile.h"
 #include "camera.h"
+#include "functions.h"

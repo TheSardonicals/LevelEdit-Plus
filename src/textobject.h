@@ -6,10 +6,8 @@
 
 class TextObject{
     public:
-        TextObject();
+        TextObject(SDL_Renderer*, string, int, int, array<string, 2>, array<int, 3>, array<int, 2>, int);
         ~TextObject();
-
-        void init(SDL_Renderer* renderer, string text, int width, int height, vector<int> color, vector<int> location, int font_size);
         void Render(int, int, int);
         
 };
