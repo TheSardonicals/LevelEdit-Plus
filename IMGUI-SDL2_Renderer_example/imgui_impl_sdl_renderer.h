@@ -1,4 +1,12 @@
-﻿#pragma once
+﻿// Render Binding for SDL2 using "dear imgui".
+// (Info: SDL2 is a cross-platform general purpose library for handling windows, inputs, graphics context creation, etc. These are bindings for the renderer it provides.)
+
+// Implemented features:
+//  [X] Renderer: User texture binding. Use 'SDL_Texture *' SDL_Renderer texture identifier as void*/ImTextureID. Read the imgui FAQ about ImTextureID!
+// Missing features:
+//  [ ] Renderer: Support for large meshes (64k+ vertices) with 16-bit indices.
+
+#pragma once
 #include "imgui.h"
 
 struct ImDrawData;
