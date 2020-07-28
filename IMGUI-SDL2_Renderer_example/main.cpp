@@ -71,8 +71,8 @@ int main(int argc, char ** argv)
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
-    SDL_Color clear_color = {114, 144, 154, 255};
-    ImVec4 imgui_clear_color = ImVec4(clear_color.r/255, clear_color.g/255, clear_color.b/255, clear_color.a/255); // ImGui represents colors differently, so we have to do this.
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f); 
+    SDL_Color r_clear_color{};
 
     // Main loop
     bool done = false;
@@ -113,7 +113,7 @@ int main(int argc, char ** argv)
             ImGui::Checkbox("Another Window", &show_another_window);
 
             ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&imgui_clear_color); // Edit 3 floats representing a color
+            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
             if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
                 counter++;
@@ -136,15 +136,15 @@ int main(int argc, char ** argv)
 
         // 4. Convert the color data between ImGui and SDL_Renderer.
         { 
-            clear_color.r = imgui_clear_color.x * 255;
-            clear_color.g = imgui_clear_color.y * 255;
-            clear_color.b = imgui_clear_color.z * 255;
-            clear_color.a = imgui_clear_color.w * 255;
+            r_clear_color.r = clear_color.x * 255;
+            r_clear_color.g = clear_color.y * 255;
+            r_clear_color.b = clear_color.z * 255;
+            r_clear_color.a = clear_color.w * 255;
         }
 
         // Rendering
         ImGui::Render();
-        SDL_SetRenderDrawColor(renderer, clear_color.r, clear_color.g, clear_color.b, clear_color.a);
+        SDL_SetRenderDrawColor(renderer, r_clear_color.r, r_clear_color.g, r_clear_color.b, r_clear_color.a);
         SDL_RenderClear(renderer);
         ImGuiSDL::Render(ImGui::GetDrawData()); // Render the GUI to the screen with the primitives created from ImGui using SDL_Renderer.
                                                 // Equivalent to ImGui_ImplOpenGL3_RenderDrawData
