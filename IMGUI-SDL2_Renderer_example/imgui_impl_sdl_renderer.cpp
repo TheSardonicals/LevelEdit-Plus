@@ -487,8 +487,8 @@ namespace
 			const SDL_Rect source = {
 				static_cast<int>(bounding.MinU * textureWidth),
 				static_cast<int>(bounding.MinV * textureHeight),
-				static_cast<int>((bounding.MaxU - bounding.MinU) * textureWidth),
-				static_cast<int>((bounding.MaxV - bounding.MinV) * textureHeight)
+				static_cast<int>(bounding.MaxU * textureWidth) - static_cast<int>(bounding.MinU * textureWidth),
+				static_cast<int>(bounding.MaxV * textureHeight) - static_cast<int>(bounding.MinV * textureHeight)
 			};
 
 			const SDL_RendererFlip flip = static_cast<SDL_RendererFlip>((doHorizontalFlip ? SDL_FLIP_HORIZONTAL : 0) | (doVerticalFlip ? SDL_FLIP_VERTICAL : 0));
