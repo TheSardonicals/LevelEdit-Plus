@@ -1,8 +1,8 @@
-﻿// Render Binding for SDL2 using "dear imgui".
+﻿// dear imgui (https://github.com/ocornut/imgui) Render Binding for SDL2.
 // (Info: SDL2 is a cross-platform general purpose library for handling windows, inputs, graphics context creation, etc. These are bindings for the renderer it provides.)
 
 // Implemented features:
-//  [X] Renderer: User texture binding. Use 'SDL_Texture *' SDL_Renderer texture identifier as void*/ImTextureID. Read the imgui FAQ about ImTextureID!
+//  [X] Renderer: User texture binding. Use 'SDL_Texture *' SDL_Renderer texture identifier as void*/ImTextureID. Read the imgui FAQ about ImTextureID! (https://github.com/ocornut/imgui/blob/master/docs/FAQ.md#q-how-can-i-display-an-image-what-is-imtextureid-how-does-it-work)
 // Missing features:
 //  [ ] Renderer: Support for large meshes (64k+ vertices) with 16-bit indices.
 
