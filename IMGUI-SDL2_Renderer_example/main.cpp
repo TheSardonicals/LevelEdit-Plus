@@ -72,6 +72,7 @@ int main(int argc, char ** argv)
     bool show_demo_window = true;
     bool show_another_window = false;
     SDL_Color clear_color = {114, 144, 154, 255};
+    ImVec4 imgui_clear_color = ImVec4(clear_color.r/255, clear_color.g/255, clear_color.b/255, clear_color.a/255); // ImGui represents colors differently, so we have to do this.
 
     // Main loop
     bool done = false;
@@ -112,7 +113,7 @@ int main(int argc, char ** argv)
             ImGui::Checkbox("Another Window", &show_another_window);
 
             ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+            ImGui::ColorEdit3("clear color", (float*)&imgui_clear_color); // Edit 3 floats representing a color
 
             if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
                 counter++;
@@ -131,6 +132,14 @@ int main(int argc, char ** argv)
             if (ImGui::Button("Close Me"))
                 show_another_window = false;
             ImGui::End();
+        }
+
+        // 4. Convert the color data between ImGui and SDL_Renderer.
+        { 
+            clear_color.r = imgui_clear_color.x * 255;
+            clear_color.g = imgui_clear_color.y * 255;
+            clear_color.b = imgui_clear_color.z * 255;
+            clear_color.a = imgui_clear_color.w * 255;
         }
 
         // Rendering
