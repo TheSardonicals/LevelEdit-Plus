@@ -17,6 +17,7 @@
 
 // CHANGELOG
 // (minor and older changes stripped away, please see git history for details)
+//  2020-05-25: Misc: Report a zero display-size when window is minimized, to be consistent with other backends.
 //  2020-02-20: Inputs: Fixed mapping for ImGuiKey_KeyPadEnter (using SDL_SCANCODE_KP_ENTER instead of SDL_SCANCODE_RETURN2).
 //  2019-12-17: Inputs: On Wayland, use SDL_GetMouseState (because there is no global mouse state).
 //  2019-12-05: Inputs: Added support for ImGuiMouseCursor_NotAllowed mouse cursor.
@@ -356,6 +357,8 @@ void ImGui_ImplSDL2_NewFrame(SDL_Window* window)
     int w, h;
     int display_w, display_h;
     SDL_GetWindowSize(window, &w, &h);
+    if (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED)
+        w = h = 0;
     #ifdef SDL_HAS_VULKAN
     if (SDL_GetWindowFlags(window) & SDL_WINDOW_VULKAN){
         SDL_Vulkan_GetDrawableSize(window, &display_w, &display_h);
@@ -365,7 +368,7 @@ void ImGui_ImplSDL2_NewFrame(SDL_Window* window)
     #else
         SDL_GL_GetDrawableSize(window, &display_w, &display_h);
     #endif
-   
+    
     io.DisplaySize = ImVec2((float)w, (float)h);
     if (w > 0 && h > 0)
         io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);
