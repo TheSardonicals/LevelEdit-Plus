@@ -12,7 +12,7 @@
                 "-Wdisabled-optimization",
                 "src/*.cpp",
                 "-o",
-                "${workspaceFolder}/bin/LeveleEdit++DEBUG.x86_64",
+                "${workspaceFolder}/bin/LevelEdit++DEBUG.x86_64",
                 "-lSDL2",
             ],
             "group": "build",
@@ -57,7 +57,7 @@
             "command": "chmod",
             "args": [
                 "a+x",
-                "VKEngine.sh"
+                "LevelEdit++.sh"
             ],
             "dependsOn": [
                 "build executable"
