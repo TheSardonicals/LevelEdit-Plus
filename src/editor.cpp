@@ -23,7 +23,7 @@ int Editor::Start(int argc, char** argv){
     ImGuiIO& io = ImGui::GetIO(); (void) io;
     io.Fonts->AddFontFromFileTTF("../misc/fonts/joystix.ttf", 16.0f);
 
-    ImGui::StyleColorsDark();
+    ImGui::StyleColorsClassic();
 
     //if (!window){
       //  ShowError("LevelEdit Plus Error!", "Couldn't create window: ", "Window creation failed!: ", true);
