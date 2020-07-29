@@ -56,6 +56,7 @@ class Editor{
 
         vector<string> tile_stack;
 
+        void SetupImGuiStyleColor(float alpha_ = 1);
         void Process();
 
         MyGui gui;
