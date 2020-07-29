@@ -25,16 +25,16 @@ int Editor::Start(int argc, char** argv){
 
     ImGui::StyleColorsClassic();
 
-    //if (!window){
-      //  ShowError("LevelEdit Plus Error!", "Couldn't create window: ", "Window creation failed!: ", true);
-        //return 0;
-    //}
+    if (!window){
+        ShowError("LevelEdit Plus Error!", "Couldn't create window: ", "Window creation failed!: ", true);
+        return 0;
+    }
 
     
-    //if(!renderer){
-      //  ShowError("LevelEdit Plus Error!", "Couldn't create renderer: ", "Renderer creation failed!: ", true);
-        //return 0;
-    //}
+    if(!renderer){
+        ShowError("LevelEdit Plus Error!", "Couldn't create renderer: ", "Renderer creation failed!: ", true);
+        return 0;
+    }
 
     ImGui_ImplSDL2_InitStandalone(window);
     ImGuiSDL::Initialize(renderer);
@@ -58,7 +58,7 @@ void Editor::Loop(){
 void Editor::Process()
 {
     //mouse->Process();
-    bool show_demo_window = true;
+    bool show_window = true;
     bool show_another_window = false;
 
     //while(running)
@@ -102,8 +102,8 @@ void Editor::Process()
                 ImGui::NewFrame();
 
                 // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-                if (show_demo_window)
-                    ImGui::ShowDemoWindow(&show_demo_window);
+                if (show_window)
+                    gui.ShowWindow(&show_window);
 
                 // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
                 {
@@ -113,7 +113,7 @@ void Editor::Process()
                     ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
                     ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-                    ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+                    ImGui::Checkbox("Demo Window", &show_window);      // Edit bools storing our window open/close state
                     ImGui::Checkbox("Another Window", &show_another_window);
 
                     ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f

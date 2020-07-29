@@ -22,7 +22,6 @@ class Editor{
 
         int current_width = SCREEN_WIDTH, current_height = SCREEN_HEIGHT;
 
-
     private:
         SDL_Window* window;
         SDL_Renderer* renderer;
@@ -57,6 +56,9 @@ class Editor{
         vector<string> tile_stack;
 
         void Process();
+
+        MyGui gui;
+
 
 
 

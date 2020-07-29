@@ -6,7 +6,7 @@
 
 class GameTile{
     public:
-        GameTile(TextureCache*, string, int, int, int, int);
+        GameTile(string, int, int, int, int);
         ~GameTile();
 
         string name;
@@ -14,7 +14,7 @@ class GameTile{
         SDL_Rect rect = {};
         SDL_Texture* texture = NULL;
 
-        TextureCache* _cache;
+
 
         void Render(array<int, 2>, int);
         void SetPos(int, int);

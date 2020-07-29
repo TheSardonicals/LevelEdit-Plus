@@ -1,9 +1,8 @@
 #include "headers.h"
 
-GameTile::GameTile(TextureCache* cache, string filepath, int xpos, int ypos, int w, int h){
+GameTile::GameTile(string filepath, int xpos, int ypos, int w, int h){
     string name = split(filepath, '.bmp')[0];
 
-    this->_cache = cache;
     //texture = _cache.LoadTexture(filepath);
     
     this->rect.x = xpos;

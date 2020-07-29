@@ -8,7 +8,7 @@ class Submenu{
         Submenu();
         ~Submenu();
 
-        void init(TextureCache*, vector<string, array<int, 2>>, array<int, 2>, array<int, 2>, array<int, 3>,
+        void init(vector<string, array<int, 2>>, array<int, 2>, array<int, 2>, array<int, 3>,
         int, bool, array<int, 3>);
     
     private:
@@ -24,7 +24,6 @@ class Submenu{
         bool scrolling = true;
         bool activated = false;
 
-        Pointer* mouse = NULL;
         
 };
 
