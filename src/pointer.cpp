@@ -34,20 +34,20 @@ void Pointer::Process(){
     pointer_rect.y = (ypos - int(pointer_rect.h / 2));
 }
 
-bool Pointer::Is_Clicking(SDL_Rect* rect){
-    return Is_Touching(rect) && clicking;
+bool Pointer::IsClicking(SDL_Rect* rect){
+    return IsTouching(rect) && clicking;
 }
 
-bool Pointer::Is_R_Clicking(SDL_Rect* rect){
-    return Is_Touching(rect) && r_clicking;
+bool Pointer::IsRClicking(SDL_Rect* rect){
+    return IsTouching(rect) && r_clicking;
 }
 
-bool Pointer::Is_Touching(SDL_Rect* rect){
+bool Pointer::IsTouching(SDL_Rect* rect){
     return SDL_HasIntersection(&pointer_rect, rect);
 }
 
-bool Pointer::Has_Clicked(SDL_Rect* rect){
-    return Is_Touching(rect) && has_clicked;
+bool Pointer::HasClicked(SDL_Rect* rect){
+    return IsTouching(rect) && has_clicked;
 }
 
 void Pointer::Render(SDL_Renderer* renderer){

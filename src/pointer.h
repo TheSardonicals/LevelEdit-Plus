@@ -15,12 +15,12 @@ class Pointer{
 
         void Set_Cursor(SDL_Cursor*);
         
-        bool Is_Touching_Rect(SDL_Rect* rect);
-        bool Is_Clicking_Rect(SDL_Rect* rect);
-        bool Is_Touching(SDL_Rect* rect);
-        bool Is_Clicking(SDL_Rect*);
-        bool Is_R_Clicking(SDL_Rect*);
-        bool Has_Clicked(SDL_Rect*);
+        bool IsTouchingRect(SDL_Rect* rect);
+        bool IsClickingRect(SDL_Rect* rect);
+        bool IsTouching(SDL_Rect* rect);
+        bool IsClicking(SDL_Rect*);
+        bool IsRClicking(SDL_Rect*);
+        bool HasClicked(SDL_Rect*);
 
         void Render(SDL_Renderer*);
 

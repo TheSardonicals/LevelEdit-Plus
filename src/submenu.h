@@ -12,8 +12,7 @@ class Submenu{
         int, bool, array<int, 3>);
     
     private:
-        map<string, TextObject*> menu_item;
-        map<string, GameTile*> icons;
+        //map<string, GameTile*> icons;
         map<string, bool> selectable;
 
         SDL_Rect* area;
