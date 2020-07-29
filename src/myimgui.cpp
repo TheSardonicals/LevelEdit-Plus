@@ -1,6 +1,7 @@
 #include "myimgui.h"
 
 void MyGui::ShowWindow(bool* p_open){
+    bool show_edit_window = true;
     IM_ASSERT(ImGui::GetCurrentContext() != NULL && "Missing dear imgui context. Refer to examples app!");
 
     if(!ImGui::Begin("LevelEdit-Plus", p_open)){
@@ -10,7 +11,34 @@ void MyGui::ShowWindow(bool* p_open){
 
     ImGui::Text("LevelEdit-Plus");
     ImGui::Spacing();
+    
+    //Menu's Collapsing Headers
+    ShowAppHelp();
+    ShowAppObjects();
 
+    ImGui::End();
+
+}
+
+void MyGui::ShowAppObjects(){
+    if (!ImGui::CollapsingHeader("Objects"))
+    {
+        return;
+    }
+    if(ImGui::TreeNode("Terrain")){
+    ImGui::TreePop();   
+    }
+
+    if (ImGui::TreeNode("Sprite Spawns")){
+        ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNode("Shapes")){
+        ImGui::TreePop();
+    }
+ 
+}
+void MyGui::ShowAppHelp(){
     if(ImGui::CollapsingHeader("Help"))
     {
         ImGui::Text("ABOUT THIS DEMO:");
@@ -32,16 +60,6 @@ void MyGui::ShowWindow(bool* p_open){
         ImGui::Text("USER GUIDE:");
         ImGui::ShowUserGuide();
     }
-    
-
-    ImGui::End();
-
-}
-void MyGui::ShowAppDocuments(bool* p_open){
-
-}
-void MyGui::ShowAppMainMenuBar(){
-
 }
 void MyGui::ShowAppConsole(bool* p_open){
 
@@ -70,9 +88,9 @@ void MyGui::ShowAppSimpleOverlay(bool* p_open){
 void MyGui::ShowAppWindowTitles(bool* p_open){
 
 }
-void ShowAppCustomRendering(bool* p_open){
+void MyGui::ShowAppCustomRendering(bool* p_open){
 
 }
-void ShowMenuFile(){
+void MyGui::ShowMenuFile(){
 
 }

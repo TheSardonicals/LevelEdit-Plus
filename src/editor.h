@@ -15,6 +15,7 @@ class Editor{
         void LoadFromFile(string, map<string, SDL_Texture*>, SDL_Renderer*);
         void Render();
         void Loop();
+        void SetColors();
 
         int Start(int argc, char* args[]);
         ImVec4 clear_color;
