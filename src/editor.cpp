@@ -160,4 +160,7 @@ void Editor::SetColors(){
     r_clear_color.a = clear_color.w * 255;
 }
 
-Editor::~Editor(){}
+Editor::~Editor(){
+    delete renderer;
+    delete window;
+}
