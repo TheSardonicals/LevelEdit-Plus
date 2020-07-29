@@ -19,7 +19,7 @@ using namespace std;
 //IMGUI INCLUDES
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
-#include "imgui_sdl.h"
+#include "imgui_impl_sdl_renderer.h"
 #include "myimgui.h"
 
 //HEADER INCLUDES

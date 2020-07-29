@@ -1,8 +1,6 @@
-#include "imgui_sdl.h"
+#include "imgui_impl_sdl_renderer.h"
 
 #include <SDL2/SDL.h>
-
-#include "imgui.h"
 
 #include <map>
 #include <list>
@@ -489,8 +487,8 @@ namespace
 			const SDL_Rect source = {
 				static_cast<int>(bounding.MinU * textureWidth),
 				static_cast<int>(bounding.MinV * textureHeight),
-				static_cast<int>((bounding.MaxU - bounding.MinU) * textureWidth),
-				static_cast<int>((bounding.MaxV - bounding.MinV) * textureHeight)
+				static_cast<int>(bounding.MaxU * textureWidth) - static_cast<int>(bounding.MinU * textureWidth),
+				static_cast<int>(bounding.MaxV * textureHeight) - static_cast<int>(bounding.MinV * textureHeight)
 			};
 
 			const SDL_RendererFlip flip = static_cast<SDL_RendererFlip>((doHorizontalFlip ? SDL_FLIP_HORIZONTAL : 0) | (doVerticalFlip ? SDL_FLIP_VERTICAL : 0));
@@ -513,162 +511,161 @@ namespace
 	}
 }
 
-namespace ImGuiSDL
+
+void ImGui_ImplSDLRenderer_Init(SDL_Renderer* renderer)
 {
-	void Initialize(SDL_Renderer* renderer)
+	ImGuiIO& io = ImGui::GetIO();
+
+	ImGui::GetStyle().WindowRounding = 0.0f;
+	ImGui::GetStyle().AntiAliasedFill = false;
+	ImGui::GetStyle().AntiAliasedLines = false;
+
+	// Loads the font texture.
+	unsigned char* pixels;
+	int width, height;
+	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
+	static constexpr uint32_t rmask = 0x000000ff, gmask = 0x0000ff00, bmask = 0x00ff0000, amask = 0xff000000;
+	SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(pixels, width, height, 32, 4 * width, rmask, gmask, bmask, amask);
+
+	Texture* texture = new Texture();
+	texture->Surface = surface;
+	texture->Source = SDL_CreateTextureFromSurface(renderer, surface);
+	io.Fonts->TexID = (void*)texture;
+
+	CurrentDevice = new Device(renderer);
+}
+
+void ImGui_ImplSDLRenderer_Shutdown()
+{
+	// Frees up the memory of the font texture.
+	ImGuiIO& io = ImGui::GetIO();
+	Texture* texture = static_cast<Texture*>(io.Fonts->TexID);
+	delete texture;
+
+	delete CurrentDevice;
+}
+
+void ImGui_ImplSDLRenderer_RenderDrawData(ImDrawData* drawData)
+{
+	SDL_BlendMode blendMode;
+	SDL_GetRenderDrawBlendMode(CurrentDevice->Renderer, &blendMode);
+	SDL_SetRenderDrawBlendMode(CurrentDevice->Renderer, SDL_BLENDMODE_BLEND);
+
+	Uint8 initialR, initialG, initialB, initialA;
+	SDL_GetRenderDrawColor(CurrentDevice->Renderer, &initialR, &initialG, &initialB, &initialA);
+
+	SDL_bool initialClipEnabled = SDL_RenderIsClipEnabled(CurrentDevice->Renderer);
+	SDL_Rect initialClipRect;
+	SDL_RenderGetClipRect(CurrentDevice->Renderer, &initialClipRect);
+
+	SDL_Texture* initialRenderTarget = SDL_GetRenderTarget(CurrentDevice->Renderer);
+
+	ImGuiIO& io = ImGui::GetIO();
+
+	for (int n = 0; n < drawData->CmdListsCount; n++)
 	{
-		ImGuiIO& io = ImGui::GetIO();
+		auto commandList = drawData->CmdLists[n];
+		auto vertexBuffer = commandList->VtxBuffer;
+		auto indexBuffer = commandList->IdxBuffer.Data;
 
-		ImGui::GetStyle().WindowRounding = 0.0f;
-		ImGui::GetStyle().AntiAliasedFill = false;
-		ImGui::GetStyle().AntiAliasedLines = false;
-
-		// Loads the font texture.
-		unsigned char* pixels;
-		int width, height;
-		io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-		static constexpr uint32_t rmask = 0x000000ff, gmask = 0x0000ff00, bmask = 0x00ff0000, amask = 0xff000000;
-		SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(pixels, width, height, 32, 4 * width, rmask, gmask, bmask, amask);
-
-		Texture* texture = new Texture();
-		texture->Surface = surface;
-		texture->Source = SDL_CreateTextureFromSurface(renderer, surface);
-		io.Fonts->TexID = (void*)texture;
-
-		CurrentDevice = new Device(renderer);
-	}
-
-	void Deinitialize()
-	{
-		// Frees up the memory of the font texture.
-		ImGuiIO& io = ImGui::GetIO();
-		Texture* texture = static_cast<Texture*>(io.Fonts->TexID);
-		delete texture;
-
-		delete CurrentDevice;
-	}
-
-	void Render(ImDrawData* drawData)
-	{
-		SDL_BlendMode blendMode;
-		SDL_GetRenderDrawBlendMode(CurrentDevice->Renderer, &blendMode);
-		SDL_SetRenderDrawBlendMode(CurrentDevice->Renderer, SDL_BLENDMODE_BLEND);
-
-		Uint8 initialR, initialG, initialB, initialA;
-		SDL_GetRenderDrawColor(CurrentDevice->Renderer, &initialR, &initialG, &initialB, &initialA);
-
-		SDL_bool initialClipEnabled = SDL_RenderIsClipEnabled(CurrentDevice->Renderer);
-		SDL_Rect initialClipRect;
-		SDL_RenderGetClipRect(CurrentDevice->Renderer, &initialClipRect);
-
-		SDL_Texture* initialRenderTarget = SDL_GetRenderTarget(CurrentDevice->Renderer);
-
-		ImGuiIO& io = ImGui::GetIO();
-
-		for (int n = 0; n < drawData->CmdListsCount; n++)
+		for (int cmd_i = 0; cmd_i < commandList->CmdBuffer.Size; cmd_i++)
 		{
-			auto commandList = drawData->CmdLists[n];
-			auto vertexBuffer = commandList->VtxBuffer;
-			auto indexBuffer = commandList->IdxBuffer.Data;
+			const ImDrawCmd* drawCommand = &commandList->CmdBuffer[cmd_i];
 
-			for (int cmd_i = 0; cmd_i < commandList->CmdBuffer.Size; cmd_i++)
+			const Device::ClipRect clipRect = {
+				static_cast<int>(drawCommand->ClipRect.x),
+				static_cast<int>(drawCommand->ClipRect.y),
+				static_cast<int>(drawCommand->ClipRect.z - drawCommand->ClipRect.x),
+				static_cast<int>(drawCommand->ClipRect.w - drawCommand->ClipRect.y)
+			};
+			CurrentDevice->SetClipRect(clipRect);
+
+			if (drawCommand->UserCallback)
 			{
-				const ImDrawCmd* drawCommand = &commandList->CmdBuffer[cmd_i];
+				drawCommand->UserCallback(commandList, drawCommand);
+			}
+			else
+			{
+				const bool isWrappedTexture = drawCommand->TextureId == io.Fonts->TexID;
 
-				const Device::ClipRect clipRect = {
-					static_cast<int>(drawCommand->ClipRect.x),
-					static_cast<int>(drawCommand->ClipRect.y),
-					static_cast<int>(drawCommand->ClipRect.z - drawCommand->ClipRect.x),
-					static_cast<int>(drawCommand->ClipRect.w - drawCommand->ClipRect.y)
-				};
-				CurrentDevice->SetClipRect(clipRect);
-
-				if (drawCommand->UserCallback)
+				// Loops over triangles.
+				for (unsigned int i = 0; i + 3 <= drawCommand->ElemCount; i += 3)
 				{
-					drawCommand->UserCallback(commandList, drawCommand);
-				}
-				else
-				{
-					const bool isWrappedTexture = drawCommand->TextureId == io.Fonts->TexID;
+					const ImDrawVert& v0 = vertexBuffer[indexBuffer[i + 0]];
+					const ImDrawVert& v1 = vertexBuffer[indexBuffer[i + 1]];
+					const ImDrawVert& v2 = vertexBuffer[indexBuffer[i + 2]];
 
-					// Loops over triangles.
-					for (unsigned int i = 0; i + 3 <= drawCommand->ElemCount; i += 3)
+					const Rect& bounding = Rect::CalculateBoundingBox(v0, v1, v2);
+
+					const bool isTriangleUniformColor = v0.col == v1.col && v1.col == v2.col;
+					const bool doesTriangleUseOnlyColor = bounding.UsesOnlyColor();
+
+					// Actually, since we render a whole bunch of rectangles, we try to first detect those, and render them more efficiently.
+					// How are rectangles detected? It's actually pretty simple: If all 6 vertices lie on the extremes of the bounding box,
+					// it's a rectangle.
+					if (i + 6 <= drawCommand->ElemCount)
 					{
-						const ImDrawVert& v0 = vertexBuffer[indexBuffer[i + 0]];
-						const ImDrawVert& v1 = vertexBuffer[indexBuffer[i + 1]];
-						const ImDrawVert& v2 = vertexBuffer[indexBuffer[i + 2]];
+						const ImDrawVert& v3 = vertexBuffer[indexBuffer[i + 3]];
+						const ImDrawVert& v4 = vertexBuffer[indexBuffer[i + 4]];
+						const ImDrawVert& v5 = vertexBuffer[indexBuffer[i + 5]];
 
-						const Rect& bounding = Rect::CalculateBoundingBox(v0, v1, v2);
+						const bool isUniformColor = isTriangleUniformColor && v2.col == v3.col && v3.col == v4.col && v4.col == v5.col;
 
-						const bool isTriangleUniformColor = v0.col == v1.col && v1.col == v2.col;
-						const bool doesTriangleUseOnlyColor = bounding.UsesOnlyColor();
-
-						// Actually, since we render a whole bunch of rectangles, we try to first detect those, and render them more efficiently.
-						// How are rectangles detected? It's actually pretty simple: If all 6 vertices lie on the extremes of the bounding box,
-						// it's a rectangle.
-						if (i + 6 <= drawCommand->ElemCount)
+						if (isUniformColor
+						&& bounding.IsOnExtreme(v0.pos)
+						&& bounding.IsOnExtreme(v1.pos)
+						&& bounding.IsOnExtreme(v2.pos)
+						&& bounding.IsOnExtreme(v3.pos)
+						&& bounding.IsOnExtreme(v4.pos)
+						&& bounding.IsOnExtreme(v5.pos))
 						{
-							const ImDrawVert& v3 = vertexBuffer[indexBuffer[i + 3]];
-							const ImDrawVert& v4 = vertexBuffer[indexBuffer[i + 4]];
-							const ImDrawVert& v5 = vertexBuffer[indexBuffer[i + 5]];
+							// ImGui gives the triangles in a nice order: the first vertex happens to be the topleft corner of our rectangle.
+							// We need to check for the orientation of the texture, as I believe in theory ImGui could feed us a flipped texture,
+							// so that the larger texture coordinates are at topleft instead of bottomright.
+							// We don't consider equal texture coordinates to require a flip, as then the rectangle is mostlikely simply a colored rectangle.
+							const bool doHorizontalFlip = v2.uv.x < v0.uv.x;
+							const bool doVerticalFlip = v2.uv.x < v0.uv.x;
 
-							const bool isUniformColor = isTriangleUniformColor && v2.col == v3.col && v3.col == v4.col && v4.col == v5.col;
-
-							if (isUniformColor
-							&& bounding.IsOnExtreme(v0.pos)
-							&& bounding.IsOnExtreme(v1.pos)
-							&& bounding.IsOnExtreme(v2.pos)
-							&& bounding.IsOnExtreme(v3.pos)
-							&& bounding.IsOnExtreme(v4.pos)
-							&& bounding.IsOnExtreme(v5.pos))
+							if (isWrappedTexture)
 							{
-								// ImGui gives the triangles in a nice order: the first vertex happens to be the topleft corner of our rectangle.
-								// We need to check for the orientation of the texture, as I believe in theory ImGui could feed us a flipped texture,
-								// so that the larger texture coordinates are at topleft instead of bottomright.
-								// We don't consider equal texture coordinates to require a flip, as then the rectangle is mostlikely simply a colored rectangle.
-								const bool doHorizontalFlip = v2.uv.x < v0.uv.x;
-								const bool doVerticalFlip = v2.uv.x < v0.uv.x;
-
-								if (isWrappedTexture)
-								{
-									DrawRectangle(bounding, static_cast<const Texture*>(drawCommand->TextureId), Color(v0.col), doHorizontalFlip, doVerticalFlip);
-								}
-								else
-								{
-									DrawRectangle(bounding, static_cast<SDL_Texture*>(drawCommand->TextureId), Color(v0.col), doHorizontalFlip, doVerticalFlip);
-								}
-
-								i += 3;  // Additional increment to account for the extra 3 vertices we consumed.
-								continue;
+								DrawRectangle(bounding, static_cast<const Texture*>(drawCommand->TextureId), Color(v0.col), doHorizontalFlip, doVerticalFlip);
 							}
-						}
+							else
+							{
+								DrawRectangle(bounding, static_cast<SDL_Texture*>(drawCommand->TextureId), Color(v0.col), doHorizontalFlip, doVerticalFlip);
+							}
 
-						if (isTriangleUniformColor && doesTriangleUseOnlyColor)
-						{
-							DrawUniformColorTriangle(v0, v1, v2);
-						}
-						else
-						{
-							// Currently we assume that any non rectangular texture samples the font texture. Dunno if that's what actually happens, but it seems to work.
-							assert(isWrappedTexture);
-							DrawTriangle(v0, v1, v2, static_cast<const Texture*>(drawCommand->TextureId));
+							i += 3;  // Additional increment to account for the extra 3 vertices we consumed.
+							continue;
 						}
 					}
+
+					if (isTriangleUniformColor && doesTriangleUseOnlyColor)
+					{
+						DrawUniformColorTriangle(v0, v1, v2);
+					}
+					else
+					{
+						// Currently we assume that any non rectangular texture samples the font texture. Dunno if that's what actually happens, but it seems to work.
+						assert(isWrappedTexture);
+						DrawTriangle(v0, v1, v2, static_cast<const Texture*>(drawCommand->TextureId));
+					}
 				}
-
-				indexBuffer += drawCommand->ElemCount;
 			}
+
+			indexBuffer += drawCommand->ElemCount;
 		}
-
-		CurrentDevice->DisableClip();
-
-		SDL_SetRenderTarget(CurrentDevice->Renderer, initialRenderTarget);
-
-		SDL_RenderSetClipRect(CurrentDevice->Renderer, initialClipEnabled ? &initialClipRect : nullptr);
-
-		SDL_SetRenderDrawColor(CurrentDevice->Renderer,
-			initialR, initialG, initialB, initialA);
-
-		SDL_SetRenderDrawBlendMode(CurrentDevice->Renderer, blendMode);
 	}
+
+	CurrentDevice->DisableClip();
+
+	SDL_SetRenderTarget(CurrentDevice->Renderer, initialRenderTarget);
+
+	SDL_RenderSetClipRect(CurrentDevice->Renderer, initialClipEnabled ? &initialClipRect : nullptr);
+
+	SDL_SetRenderDrawColor(CurrentDevice->Renderer,
+		initialR, initialG, initialB, initialA);
+
+	SDL_SetRenderDrawBlendMode(CurrentDevice->Renderer, blendMode);
 }
+

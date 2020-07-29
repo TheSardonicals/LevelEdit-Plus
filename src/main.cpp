@@ -6,12 +6,8 @@ int main(int argc, char* args[]){
     
     if (!editor.Start(argc, args)){
         return -1;
-    }else
-    {
+    }else{
         editor.Loop();
     }
-    
-
     return 0;
-    
 }

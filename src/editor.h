@@ -15,7 +15,7 @@ class Editor{
         void LoadFromFile(string, map<string, SDL_Texture*>, SDL_Renderer*);
         void Render();
         void Loop();
-        void SetColors();
+        void SetClearColor();
 
         int Start(int argc, char* args[]);
         ImVec4 clear_color;
@@ -34,7 +34,7 @@ class Editor{
 
         SDL_Event event;
 
-        int state = 1;
+        enum EditorState{MENU = 0, LOADING = 1, NAMING = 2, EDITING = 3} state;
 
         char map_name;
         char filepath;
