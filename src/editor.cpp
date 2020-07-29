@@ -17,7 +17,7 @@ int Editor::Start(int argc, char** argv){
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void) io;
-    io.Fonts->AddFontFromFileTTF("../misc/fonts/joystix.ttf", 16.0f);
+    io.Fonts->AddFontFromFileTTF("misc/fonts/joystix.ttf", 16.0f);
 
     ImGui::StyleColorsClassic();
 
@@ -44,7 +44,7 @@ int Editor::Start(int argc, char** argv){
 }
 
 void Editor::Loop(){
-    while(running){
+    while (running){
         Process();
         Render();
         SDL_Delay(5);
@@ -70,8 +70,11 @@ void Editor::Process()
             }
 
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
+            {
                 running = false;
                 break;
+            }
+                
         }
 
         switch(state)
