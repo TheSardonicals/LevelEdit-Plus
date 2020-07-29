@@ -161,6 +161,6 @@ void Editor::SetColors(){
 }
 
 Editor::~Editor(){
-    delete renderer;
-    delete window;
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
 }
