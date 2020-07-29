@@ -1,0 +1,47 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		
+		{
+			"name": "launch (debug)",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/bin/LevelEdit++DEBUG.x86_64",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}",
+			"environment": [],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"setupCommands": [
+				{
+					"description": "Enable pretty-printing for gdb",
+					"text": "-enable-pretty-printing",
+				}
+			],
+			"preLaunchTask": "build (debug)",
+		},
+		{
+			"name": "launch",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/bin/LevelEdit++.x86_64",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}",
+			"environment": [],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"setupCommands": [
+				{
+					"description": "Enable pretty-printing for gdb",
+					"text": "-enable-pretty-printing",
+				}
+			],
+			"preLaunchTask": "build executable and set script",
+		}
+	]
+}

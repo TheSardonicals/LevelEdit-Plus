@@ -1,0 +1,67 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build (debug)",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-g",
+                "-Wall",
+                "-Wextra",
+                "-Wdisabled-optimization",
+                "src/*.cpp",
+                "-o",
+                "${workspaceFolder}/bin/LeveleEdit++DEBUG.x86_64",
+                "-lSDL2",
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-O3",
+                "-g",
+                "src/*.cpp",
+                "-lSDL2",
+                "-o",
+                "${workspaceFolder}/bin/LevelEdit++.x86_64"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "build executable",
+            "type": "shell",
+            "command": "chmod",
+            "args": [
+                "a+x",
+                "bin/LevelEdit++.x86_64"
+            ],
+            "dependsOn": [
+                "build"
+            ]
+        },
+        {
+            "label": "build executable and set script",
+            "type": "shell",
+            "command": "chmod",
+            "args": [
+                "a+x",
+                "VKEngine.sh"
+            ],
+            "dependsOn": [
+                "build executable"
+            ]
+        },
+    ]
+}
