@@ -6,8 +6,7 @@
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
-#include "imgui_sdl.h" // This is functionally the same thing as "imgui_impl_opengl3.h", except it implements the rendering backend that relies on SDL_Renderer, instead of a rendering backend based on OpenGL 3.0
-                       // nitpick (isaboll1): I think it's named badly. the header and implementation should've been called "imgui_impl_sdl_renderer".
+#include "imgui_impl_sdl_renderer.h" // This is functionally the same thing as "imgui_impl_opengl3.h", except it implements the rendering backend that relies on SDL_Renderer, instead of a rendering backend based on OpenGL 3.0               
 #include <stdio.h>
 #include <SDL2/SDL.h>
 
@@ -48,10 +47,7 @@ int main(int argc, char ** argv)
                                            // implementing the core OS related functionality provided through SDL2. In my opinion this is unnecessary and kinda wasteful, especially since every version
                                            // of this function ends up calling "ImGui_ImplSDL2_Init" anyways, which can't be called directly. this allows for behavior more consisten with other platforms.
     
-    ImGuiSDL::Initialize(renderer); // Initialize renderer (equivalent to ImGui_ImplOpenGL3_Init).
-                                    // nitpick (isaboll1): I changed the function prototype and implementation to not rely on giving the window size, simply because 
-                                    // the regular SDL binding for imgui already handles setting io.DisplaySize. that should be handled by the OS bindings, not the
-                                    // renderer bindings, as per how imgui dictates how stuff works (seperation between OS and renderer bindings).
+    ImGui_ImplSDLRenderer_Init(renderer); // Initialize renderer (equivalent to ImGui_ImplOpenGL3_Init).
 
     // Load Fonts
     // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
@@ -96,7 +92,7 @@ int main(int argc, char ** argv)
         // Start the Dear ImGui frame
         ImGui_ImplSDL2_NewFrame(window);
         ImGui::NewFrame();
-
+        
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
@@ -141,18 +137,18 @@ int main(int argc, char ** argv)
             r_clear_color.b = clear_color.z * 255;
             r_clear_color.a = clear_color.w * 255;
         }
-
+        
         // Rendering
         ImGui::Render();
         SDL_SetRenderDrawColor(renderer, r_clear_color.r, r_clear_color.g, r_clear_color.b, r_clear_color.a);
         SDL_RenderClear(renderer);
-        ImGuiSDL::Render(ImGui::GetDrawData()); // Render the GUI to the screen with the primitives created from ImGui using SDL_Renderer.
-                                                // Equivalent to ImGui_ImplOpenGL3_RenderDrawData
+        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData()); // Render the GUI to the screen with the primitives created from ImGui using SDL_Renderer.
+                                                                    // Equivalent to ImGui_ImplOpenGL3_RenderDrawData
         SDL_RenderPresent(renderer);
     }
 
     // Cleanup
-    ImGuiSDL::Deinitialize();
+    ImGui_ImplSDLRenderer_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
 
