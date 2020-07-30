@@ -83,7 +83,8 @@ void EditorMenu::Process(){
             for (auto tile: tile_paths){
                 count += 1;
                 texture = cache->LoadTexture(tile.second);
-                if (ImGui::ImageButton((void *)texture, ImVec2(52.0f, 52.0f), ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 1.0f)))
+                cache->SetTextureAlpha(texture, max(alpha, .5f));
+                if (ImGui::ImageButton((void *)texture, ImVec2(52.0f, 52.0f), ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
                 {   
                     // Handle setting ghost tile when button is clicked
                 }
