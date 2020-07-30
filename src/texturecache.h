@@ -9,16 +9,14 @@ class TextureCache{
         TextureCache(SDL_Renderer *);
         ~TextureCache();
 
-        void init(SDL_Renderer * );
-        map<string, SDL_Texture*> LoadTexture(string);
+        SDL_Texture* LoadTexture(string);
 
-        map<string, SDL_Texture *> _cache;
+        // alpha values are between 0 - 1.
+        void SetTextureAlpha(SDL_Texture * texture, float alpha = 1);
         SDL_Renderer * renderer;
 
-        
     private:
-    
-
+        map<string, SDL_Texture *> cache = {};
 
 };
 #endif
