@@ -11,6 +11,7 @@ class EditorMenu{
         ~EditorMenu();
         void Process();
     private:
+        bool show_item_menu = false;
         float alpha = 1.0f;
         bool hide_stats = false;
         bool align_menu_to_screen = true;

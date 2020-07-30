@@ -36,11 +36,13 @@ void EditorMenu::Process(){
         }
         ImGui::End();
     }
-
+    
+    ImVec2 lower_menu_pos = ImVec2(*window_width - 265, *window_height - 55);
     // Menu for selecting tiles and saving, just like old times.
     if (!hide_lower_options){
+        
         if (align_menu_to_screen){
-            ImGui::SetNextWindowPos(ImVec2(*window_width - 265, *window_height - 55));
+            ImGui::SetNextWindowPos(lower_menu_pos);
         }
         ImGui::SetNextWindowBgAlpha(alpha);
         if (ImGui::Begin("Option Menu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize)){
@@ -50,12 +52,22 @@ void EditorMenu::Process(){
             ImGui::SameLine();
 
             if (ImGui::Button("Assets", ImVec2(120, 40))){
-                ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .25f));
-                if (ImGui::BeginPopup("Tile Selection Menu")){
-                    // Create Game Tile buttons and handle what happens when the buttons are clicked, etc... 
-                    ImGui::EndPopup();
-                }    
+                if (show_item_menu == false)
+                    show_item_menu = true;
+                else
+                    show_item_menu = false;
+                ImGui::SetNextWindowPos(ImVec2(lower_menu_pos.x - 40, lower_menu_pos.y - 400)); 
+                ImGui::SetNextWindowSize(ImVec2(310, 400));  
             }
+        }
+        ImGui::End();
+    }
+    
+    if (show_item_menu){
+        ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .25f));
+        if (ImGui::Begin("Asset Menu", NULL)){
+            // Create Game Tile buttons and handle what happens when the buttons are clicked, etc... 
+            
         }
         ImGui::End();
     }
