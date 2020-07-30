@@ -20,14 +20,13 @@ using namespace std;
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_sdl_renderer.h"
-#include "myimgui.h"
 
 //HEADER INCLUDES
 #include "functions.h"
 #include "pointer.h"
 #include "texturecache.h"
-#include "submenu.h"
 #include "gametile.h"
+#include "editor_menu.h"
 #include "camera.h"
 
 

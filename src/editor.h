@@ -56,17 +56,11 @@ class Editor{
 
         vector<string> tile_stack;
 
+        // OBJ
+        EditorMenu * gui;
+
         void SetupImGuiStyleColor(float alpha_ = 1);
         void Process();
-
-        MyGui gui;
-
-
-
-
-
-
-
 };
 
 
