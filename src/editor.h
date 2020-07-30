@@ -1,5 +1,6 @@
 #include "headers.h"
 #include "editor_menu.h"
+#include "texturecache.h"
 
 #ifndef editor_h
 #define editor_h
@@ -56,11 +57,13 @@ class Editor{
         array<int, 2> pos_at_push = {0, 0};
 
         vector<string> tile_stack;
-        map<char, string> tile_paths;
+        map<string, string> tile_paths;
 
         // OBJ
         EditorMenu * gui;
         Pointer * mouse;
+        TextureCache * cache;
+        
 
         void SetupImGuiStyleColor();
         void Process();

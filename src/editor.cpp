@@ -38,8 +38,8 @@ int Editor::Start(int argc, char** argv){
 
     // OBJECTS
     mouse = new Pointer();
-    gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths);
-    //cache = new TextureCache(renderer);
+    cache = new TextureCache(renderer);
+    gui = new EditorMenu(renderer, &SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths, cache);
     //camera = new Camera();
     //submenu = new Submenu();
 

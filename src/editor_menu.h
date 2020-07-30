@@ -8,7 +8,7 @@
 class EditorMenu{
     public:
         bool hide_lower_options = false;
-        EditorMenu(int *, int *, ImVec4 *, Pointer *, map<char, string> *);
+        EditorMenu(SDL_Renderer *, int *, int *, ImVec4 *, Pointer *, map<string, string> *, TextureCache *);
         ~EditorMenu();
         void Process();
     private:
@@ -21,7 +21,9 @@ class EditorMenu{
         ImVec4 * clear_color;
         Pointer * mouse;
         map<string, GameTile *> * tile_list;
-        map<char, string> * tile_paths;
+        map<string, string> * tile_paths;
         ImVec4 original_button_color;
+        TextureCache * cache;
+        SDL_Renderer * renderer;
 };
 #endif

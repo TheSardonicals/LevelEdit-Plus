@@ -17,6 +17,6 @@ void ShowError(char * title, string message, string log, bool show_sdl_error);
 
 vector<string> split(string const & word, char delim = ' ');
 map<string, string> Get_Resources();
-map<char, string> GetPaths();
+map<string, string> GetPaths();
 
 #endif /* functions_h */

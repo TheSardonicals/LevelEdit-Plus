@@ -1,12 +1,14 @@
 #include "editor_menu.h"
 
-EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer * _mouse, map<char, string> * paths){
+EditorMenu::EditorMenu(SDL_Renderer * render, int * width, int * height, ImVec4 * clear_color, Pointer * _mouse, map<string, string> * paths, TextureCache * _cache){
     window_width = width;
     window_height = height;
     this->clear_color = clear_color;
     mouse = _mouse;
+    renderer = render;
 
     tile_paths = paths;
+    cache = _cache;
     tile_list = {
 
     };
@@ -80,6 +82,13 @@ void EditorMenu::Process(){
         ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .1f));
         if (ImGui::Begin("Asset Menu", NULL)){
             // Create Game Tile buttons and handle what happens when the buttons are clicked, etc... 
+            for (map<string, string>::iterator it = tile_paths->begin(); it != tile_paths->end(); it++){
+                char cstr[it->second.size() + 1];
+                strcpy(cstr, it->second.c_str());
+                SDL_Surface * texture = SDL_LoadBMP(cstr);
+                SDL_Texture * t = SDL_CreateTextureFromSurface(renderer, texture);
+                ImGui::ImageButton(t, ImVec2(32.0f, 32.0f), ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+            }
             
             
             

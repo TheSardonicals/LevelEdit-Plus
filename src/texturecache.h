@@ -14,11 +14,11 @@ class TextureCache{
         TextureCache(SDL_Renderer *);
         ~TextureCache();
 
-        SDL_Texture * LoadTexture(string);
+        SDL_Texture * LoadTexture(char);
         SDL_Renderer * renderer;
         
     private:
-        map<string, SDL_Texture *> textures = {};
+        map<char, SDL_Texture *> textures = {};
     
 
 

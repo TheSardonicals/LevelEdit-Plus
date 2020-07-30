@@ -30,13 +30,13 @@ map<string, string> Get_Resources(map<string, string> tiles){
     return resources;
 }
 
-map<char, string> GetPaths(){
-  map<char, string> paths;
+map<string, string> GetPaths(){
+  map<string, string> paths;
   string filepath = "resources/";
 
   for (auto &p : fs::directory_iterator(filepath)){
       vector<string> tile = split(p.path(), '/');
-      paths[tile[1].c_str()[0]] = p.path();
+      paths[tile[1]] = p.path();
   }
   return paths;
 }
