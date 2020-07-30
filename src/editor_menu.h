@@ -22,5 +22,6 @@ class EditorMenu{
         Pointer * mouse;
         map<string, GameTile *> * tile_list;
         map<char, string> * tile_paths;
+        ImVec4 original_button_color;
 };
 #endif

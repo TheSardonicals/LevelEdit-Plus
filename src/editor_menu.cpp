@@ -10,6 +10,7 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     tile_list = {
 
     };
+    original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
 }
 
 void EditorMenu::Process(){
@@ -57,6 +58,10 @@ void EditorMenu::Process(){
             }
             ImGui::SameLine();
 
+            // Change button color if it's been clicked, else use original button color.
+            if (show_item_menu){ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.46f, 0.47f, 0.48f, 1.00f));}
+            else{ImGui::PushStyleColor(ImGuiCol_Button, original_button_color);}
+
             if (ImGui::Button("Assets", ImVec2(120, 40))){
                 if (show_item_menu == false)
                     show_item_menu = true;
@@ -65,12 +70,14 @@ void EditorMenu::Process(){
                 ImGui::SetNextWindowPos(ImVec2(lower_menu_pos.x - 40, lower_menu_pos.y - 400)); 
                 ImGui::SetNextWindowSize(ImVec2(310, 400));  
             }
+
+            ImGui::PopStyleColor(1);
         }
         ImGui::End();
     }
     
     if (show_item_menu){
-        ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .25f));
+        ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .1f));
         if (ImGui::Begin("Asset Menu", NULL)){
             // Create Game Tile buttons and handle what happens when the buttons are clicked, etc... 
             
