@@ -35,8 +35,8 @@ int Editor::Start(int argc, char** argv){
     clear_color = ImVec4(.8627, .8627, .8627, 1);
 
     // OBJECTS
-    mouse = Pointer();
-    gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, &mouse);
+    mouse = new Pointer();
+    gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse);
     //cache = new TextureCache(renderer);
     //camera = new Camera();
     //submenu = new Submenu();
@@ -77,7 +77,7 @@ void Editor::Process()
                 SCREEN_HEIGHT = event.window.data2;
             }
         }
-        printf("%i, %i", mouse.xpos, mouse.ypos);
+        printf("%i, %i \n", mouse->xpos, mouse->ypos);
             
     }
 
@@ -90,6 +90,9 @@ void Editor::Process()
             ImGui::NewFrame();
 
             gui->Process();
+            mouse->Compute(&event);
+            mouse->Process();
+            
 
         }break;
 

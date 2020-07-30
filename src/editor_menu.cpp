@@ -4,6 +4,7 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     window_width = width;
     window_height = height;
     this->clear_color = clear_color;
+    mouse = _mouse;
 }
 
 void EditorMenu::Process(){

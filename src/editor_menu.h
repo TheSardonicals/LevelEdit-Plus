@@ -18,5 +18,6 @@ class EditorMenu{
         int * window_width;
         int * window_height;
         ImVec4 * clear_color;
+        Pointer * mouse;
 };
 #endif
