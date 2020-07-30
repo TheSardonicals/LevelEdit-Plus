@@ -3,8 +3,8 @@
 
 GameTile::GameTile(TextureCache * cache, string filepath, int xpos, int ypos, int w, int h){
 
-    string filename = split(filepath, '/')[-1];
-    name = split(filename, '.bmp')[0];
+    string filename = Split(filepath, '/')[-1];
+    name = Split(filename, '.bmp')[0];
     this->cache = cache;
 
     texture = cache->LoadTexture(filepath);

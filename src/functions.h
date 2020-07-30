@@ -13,11 +13,10 @@ namespace fs = std::experimental::filesystem;
 #ifndef functions_h
 #define functions_h
 
-// Split function returns a vector of each split char or item.
-
 void ShowError(char * title, string message, string log, bool show_sdl_error);
 
-vector<string> split(string const & word, char delim = ' ');
+// Split function returns a vector of each split char or item.
+vector<string> Split(string const & word, char delim = ' ');
 map<string, string> Get_Resources();
 map<string, string> GetPaths();
 
