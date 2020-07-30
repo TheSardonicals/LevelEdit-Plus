@@ -75,12 +75,29 @@ void EditorMenu::Process(){
     
     if (show_item_menu){
         ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .1f));
+        int count = 0;
+        int row = 4;
         if (ImGui::Begin("Asset Menu", NULL)){
             SDL_Texture * texture;
+            
             for (auto tile: tile_paths){
+                count += 1;
                 texture = cache->LoadTexture(tile.second);
-                if (ImGui::ImageButton((void *)texture, ImVec2(32.0f, 32.0f), ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 1.0f))){
+                if (ImGui::ImageButton((void *)texture, ImVec2(52.0f, 52.0f), ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 1.0f)))
+                {   
                     // Handle setting ghost tile when button is clicked
+                }
+                if (ImGui::IsItemHovered()){
+                    ImGui::BeginTooltip();
+                    ImGui::Text(tile.first.c_str());
+                    ImGui::EndTooltip();
+                }
+                if (count == row){
+                    ImGui::NewLine();
+                    count = 0;
+                }
+                else{
+                    ImGui::SameLine();
                 }
             }  
             
