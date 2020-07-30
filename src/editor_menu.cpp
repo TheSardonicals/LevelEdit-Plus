@@ -89,14 +89,13 @@ void EditorMenu::Process(){
     }
     
     if (show_item_menu){
+        FillTileList();
         ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .1f));
         if (ImGui::Begin("Asset Menu", NULL)){
             // Create Game Tile buttons and handle what happens when the buttons are clicked, etc... 
             for (map<string, SDL_Texture *>::iterator it = tile_list->begin(); it != tile_list->end(); it++){
                 ImGui::ImageButton(it->second, ImVec2(32.0f, 32.0f), ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
-            }
-            
-            
+            }  
             
         }
         ImGui::End();
