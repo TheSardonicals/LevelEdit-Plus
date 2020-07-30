@@ -44,6 +44,7 @@ int Editor::Start(int argc, char** argv){
     return 1;
 }
 
+
 void Editor::Loop(){
     while (running){
         Process();
@@ -51,6 +52,7 @@ void Editor::Loop(){
         SDL_Delay(5);
     }
 }
+
 
 void Editor::Process()
 {
@@ -172,6 +174,7 @@ void Editor::SetupImGuiStyleColor(){
     colors[ImGuiCol_NavHighlight]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
     colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
 }
+
 
 Editor::~Editor(){
 
