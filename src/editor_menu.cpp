@@ -9,10 +9,20 @@ EditorMenu::EditorMenu(SDL_Renderer * render, int * width, int * height, ImVec4 
 
     tile_paths = paths;
     cache = _cache;
-    tile_list = {
-
-    };
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
+
+}
+
+void EditorMenu::FillTileList(){
+    map<string, SDL_Texture *> tiles;
+    for (map<string, string>::iterator it = tile_paths->begin(); it != tile_paths->end(); it++){
+        if (tiles.count(it->first) == 0){
+            char cstr[it->second.size() + 1];
+            strcpy(cstr, it->second.c_str());
+            tiles[it->first] = cache->LoadTexture(cstr);
+        }
+    }
+    tile_list = &tiles;
 }
 
 void EditorMenu::Process(){
@@ -82,12 +92,8 @@ void EditorMenu::Process(){
         ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .1f));
         if (ImGui::Begin("Asset Menu", NULL)){
             // Create Game Tile buttons and handle what happens when the buttons are clicked, etc... 
-            for (map<string, string>::iterator it = tile_paths->begin(); it != tile_paths->end(); it++){
-                char cstr[it->second.size() + 1];
-                strcpy(cstr, it->second.c_str());
-                SDL_Surface * texture = SDL_LoadBMP(cstr);
-                SDL_Texture * t = SDL_CreateTextureFromSurface(renderer, texture);
-                ImGui::ImageButton(t, ImVec2(32.0f, 32.0f), ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+            for (map<string, SDL_Texture *>::iterator it = tile_list->begin(); it != tile_list->end(); it++){
+                ImGui::ImageButton(it->second, ImVec2(32.0f, 32.0f), ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
             }
             
             

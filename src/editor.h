@@ -56,14 +56,15 @@ class Editor{
         array<int, 2> tile_size = {32, 32};
         array<int, 2> pos_at_push = {0, 0};
 
-        vector<string> tile_stack;
-        map<string, string> tile_paths;
+        
 
         // OBJ
         EditorMenu * gui;
         Pointer * mouse;
         TextureCache * cache;
-        
+
+        vector<string> tile_stack;
+        map<string, string> tile_paths;
 
         void SetupImGuiStyleColor();
         void Process();

@@ -14,15 +14,6 @@ namespace fs = std::experimental::filesystem;
 #define functions_h
 
 // Split function returns a vector of each split char or item.
-vector<string> Split(string const & word, char delim){
-    vector<string> strings;
-    stringstream s(word);
-    string w;
-    while (getline(s, w, delim)){
-        strings.push_back(w);
-    }
-    return strings;
-}
 
 void ShowError(char * title, string message, string log, bool show_sdl_error);
 
