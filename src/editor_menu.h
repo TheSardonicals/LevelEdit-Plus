@@ -12,6 +12,7 @@ class EditorMenu{
         void Process();
     private:
         bool hide_stats = false;
+        bool align_menu_to_screen = true;
         int * window_width;
         int * window_height;
         ImVec4 * clear_color;

@@ -7,7 +7,7 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color){
 }
 
 void EditorMenu::Process(){
-    // menu bar with options and such
+    // Menu Bar with options and such
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){
             if (ImGui::MenuItem("Save File", NULL, false)){
@@ -19,6 +19,7 @@ void EditorMenu::Process(){
         if (ImGui::BeginMenu("Options")){
             ImGui::Checkbox("Hide Menu", &hide_lower_options);
             ImGui::Checkbox("Hide Stats", &hide_stats);
+            ImGui::Checkbox("Align Menu to bottom corner", &align_menu_to_screen);
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
@@ -34,10 +35,12 @@ void EditorMenu::Process(){
         ImGui::End();
     }
 
-    // menu for selecting tiles and saving, just like old times.
+    // Menu for selecting tiles and saving, just like old times.
     if (!hide_lower_options){
-        ImGui::SetNextWindowPos(ImVec2(*window_width - 265, *window_height - 56));
-        if (ImGui::Begin("Option Menu", NULL, ImGuiWindowFlags_NoTitleBar||ImGuiWindowFlags_NoResize)){
+        if (align_menu_to_screen){
+            ImGui::SetNextWindowPos(ImVec2(*window_width - 265, *window_height - 55));
+        }
+        if (ImGui::Begin("Option Menu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize)){
             if (ImGui::Button("Save File", ImVec2(120, 40))){
                 // Save .mx file contents.
             }
