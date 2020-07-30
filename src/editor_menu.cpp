@@ -1,6 +1,6 @@
 #include "editor_menu.h"
 
-EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color){
+EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer * _mouse){
     window_width = width;
     window_height = height;
     this->clear_color = clear_color;

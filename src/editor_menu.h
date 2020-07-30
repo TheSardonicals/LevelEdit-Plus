@@ -7,7 +7,7 @@
 class EditorMenu{
     public:
         bool hide_lower_options = false;
-        EditorMenu(int *, int *, ImVec4 *);
+        EditorMenu(int *, int *, ImVec4 *, Pointer *);
         ~EditorMenu();
         void Process();
     private:

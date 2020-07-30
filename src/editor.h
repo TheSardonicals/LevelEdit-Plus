@@ -58,6 +58,7 @@ class Editor{
 
         // OBJ
         EditorMenu * gui;
+        Pointer mouse;
 
         void SetupImGuiStyleColor();
         void Process();
