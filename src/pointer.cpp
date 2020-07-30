@@ -1,5 +1,4 @@
 #include "pointer.h"
-#include "headers.h"
 
 Pointer::Pointer(){
     xpos = 0;

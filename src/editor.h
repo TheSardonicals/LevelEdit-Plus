@@ -1,4 +1,5 @@
 #include "headers.h"
+#include "editor_menu.h"
 
 #ifndef editor_h
 #define editor_h

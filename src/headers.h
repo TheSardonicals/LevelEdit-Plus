@@ -24,9 +24,6 @@ using namespace std;
 //HEADER INCLUDES
 #include "functions.h"
 #include "pointer.h"
-#include "texturecache.h"
-#include "gametile.h"
-#include "editor_menu.h"
 #include "camera.h"
 
 

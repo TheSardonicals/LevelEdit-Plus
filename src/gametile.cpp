@@ -1,4 +1,4 @@
-#include "headers.h"
+#include "gametile.h"
 
 GameTile::GameTile(string filepath, int xpos, int ypos, int w, int h){
     string name = split(filepath, '.bmp')[0];

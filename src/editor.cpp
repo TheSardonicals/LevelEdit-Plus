@@ -1,4 +1,3 @@
-#include "headers.h"
 #include "editor.h"
 
 Editor::Editor(){}
@@ -77,8 +76,7 @@ void Editor::Process()
                 SCREEN_HEIGHT = event.window.data2;
             }
         }
-        printf("%i, %i \n", mouse->xpos, mouse->ypos);
-            
+        printf("%i, %i \n", mouse->xpos, mouse->ypos);            
     }
 
     //Application Loop
