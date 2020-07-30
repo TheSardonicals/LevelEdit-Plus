@@ -1,8 +1,11 @@
 #include "gametile.h"
+#include "functions.h"
 
-GameTile::GameTile(TextureCache * _cache, char filepath, int xpos, int ypos, int w, int h){
-    name = &filepath;
-    cache = _cache;
+GameTile::GameTile(TextureCache * cache, string filepath, int xpos, int ypos, int w, int h){
+
+    string filename = Split(filepath, '/')[-1];
+    name = Split(filename, '.bpm')[0];
+    this->cache = cache;
 
     texture = cache->LoadTexture(filepath);
     
@@ -17,6 +20,8 @@ void GameTile::Render(TextureCache * cache, array<int, 2> camera_pos = {0, 0}, i
     this->rect.y = (this->y - (this->h/2)) + camera_pos[1];
     this->rect.w = this->w;
     this->rect.h = this->h;
+    // nitpick (isaboll1): This might as well use the cache->SetTextureAlpha() function, that uses floats instead.
+    // for consistency sake.
     SDL_SetTextureAlphaMod(this->texture, alpha);
     SDL_RenderCopy(cache->renderer, this->texture, NULL, &rect);
 }

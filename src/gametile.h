@@ -12,7 +12,7 @@ using namespace std;
 
 class GameTile{
     public:
-        GameTile(TextureCache *, char, int, int, int, int);
+        GameTile(TextureCache *, string, int, int, int, int);
         ~GameTile();
 
         string name;
