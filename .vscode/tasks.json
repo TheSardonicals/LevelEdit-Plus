@@ -14,6 +14,7 @@
                 "-o",
                 "${workspaceFolder}/bin/LevelEdit++DEBUG.x86_64",
                 "-lSDL2",
+                "-lstdc++fs"
             ],
             "group": "build",
             "presentation": {

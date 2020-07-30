@@ -1,28 +1,13 @@
 #include "editor_menu.h"
 
-EditorMenu::EditorMenu(SDL_Renderer * render, int * width, int * height, ImVec4 * clear_color, Pointer * _mouse, map<string, string> * paths, TextureCache * _cache){
+EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer * mouse, map<string, string> * paths, TextureCache * cache){
     window_width = width;
     window_height = height;
     this->clear_color = clear_color;
-    mouse = _mouse;
-    renderer = render;
-
-    tile_paths = paths;
-    cache = _cache;
+    this->mouse = mouse;
+    tile_paths = *paths;
+    this->cache = cache;
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
-
-}
-
-void EditorMenu::FillTileList(){
-    map<string, SDL_Texture *> tiles;
-    for (map<string, string>::iterator it = tile_paths->begin(); it != tile_paths->end(); it++){
-        if (tiles.count(it->first) == 0){
-            char cstr[it->second.size() + 1];
-            strcpy(cstr, it->second.c_str());
-            tiles[it->first] = cache->LoadTexture(cstr);
-        }
-    }
-    tile_list = &tiles;
 }
 
 void EditorMenu::Process(){
@@ -79,7 +64,7 @@ void EditorMenu::Process(){
                     show_item_menu = true;
                 else
                     show_item_menu = false;
-                ImGui::SetNextWindowPos(ImVec2(lower_menu_pos.x - 40, lower_menu_pos.y - 400)); 
+                ImGui::SetNextWindowPos(ImVec2(lower_menu_pos.x - 45, lower_menu_pos.y - 400)); 
                 ImGui::SetNextWindowSize(ImVec2(310, 400));  
             }
 
@@ -89,12 +74,14 @@ void EditorMenu::Process(){
     }
     
     if (show_item_menu){
-        FillTileList();
         ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .1f));
         if (ImGui::Begin("Asset Menu", NULL)){
-            // Create Game Tile buttons and handle what happens when the buttons are clicked, etc... 
-            for (map<string, SDL_Texture *>::iterator it = tile_list->begin(); it != tile_list->end(); it++){
-                ImGui::ImageButton(it->second, ImVec2(32.0f, 32.0f), ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+            SDL_Texture * texture;
+            for (auto tile: tile_paths){
+                texture = cache->LoadTexture(tile.second);
+                if (ImGui::ImageButton((void *)texture, ImVec2(32.0f, 32.0f), ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 1.0f))){
+                    // Handle setting ghost tile when button is clicked
+                }
             }  
             
         }

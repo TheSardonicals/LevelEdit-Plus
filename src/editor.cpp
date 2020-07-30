@@ -39,7 +39,7 @@ int Editor::Start(int argc, char** argv){
     // OBJECTS
     mouse = new Pointer();
     cache = new TextureCache(renderer);
-    gui = new EditorMenu(renderer, &SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths, cache);
+    gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths, cache);
     //camera = new Camera();
     //submenu = new Submenu();
 
@@ -134,7 +134,6 @@ void Editor::SetClearColor(){
 void Editor::SetupImGuiStyleColor(){
 
     //Unreal Engine style coloring, with global alpha. 
-    ImGuiStyle style = ImGui::GetStyle();
     ImVec4* colors = ImGui::GetStyle().Colors;
     colors[ImGuiCol_Text]                   = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
     colors[ImGuiCol_TextDisabled]           = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
@@ -182,7 +181,7 @@ void Editor::SetupImGuiStyleColor(){
 
 
 Editor::~Editor(){
-
+    delete cache;
     ImGui_ImplSDLRenderer_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
