@@ -11,7 +11,7 @@ class EditorMenu{
         ~EditorMenu();
         void Process();
     private:
-        
+        bool hide_stats = false;
         int * window_width;
         int * window_height;
         ImVec4 * clear_color;
