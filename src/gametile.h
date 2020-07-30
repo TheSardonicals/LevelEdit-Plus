@@ -1,5 +1,10 @@
 #pragma once
-#include "headers.h"
+#include "functions.h"
+
+#include <array>
+#include <SDL2/SDL.h>
+
+using namespace std;
 
 #ifndef gametile_h
 #define gametile_h
@@ -13,8 +18,6 @@ class GameTile{
         int x, y, w, h;
         SDL_Rect rect = {};
         SDL_Texture* texture = NULL;
-
-
 
         void Render(array<int, 2>, int);
         void SetPos(int, int);

@@ -1,10 +1,15 @@
 #include "editor_menu.h"
 
-EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer * _mouse){
+EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer * _mouse, map<char, string> * paths){
     window_width = width;
     window_height = height;
     this->clear_color = clear_color;
     mouse = _mouse;
+
+    tile_paths = paths;
+    tile_list = {
+
+    };
 }
 
 void EditorMenu::Process(){
@@ -68,6 +73,8 @@ void EditorMenu::Process(){
         ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .25f));
         if (ImGui::Begin("Asset Menu", NULL)){
             // Create Game Tile buttons and handle what happens when the buttons are clicked, etc... 
+            
+            
             
         }
         ImGui::End();

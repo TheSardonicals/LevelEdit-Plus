@@ -1,5 +1,8 @@
 #pragma once
-#include "headers.h"
+#include <SDL2/SDL.h>
+#include <map>
+
+using namespace std;
 
 #ifndef pointer_h
 #define pointer_h

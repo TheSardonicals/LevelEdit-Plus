@@ -1,5 +1,7 @@
 #pragma once
-#include "headers.h"
+#include "pointer.h"
+
+using namespace std;
 
 #ifndef handler_h
 #define handler_h

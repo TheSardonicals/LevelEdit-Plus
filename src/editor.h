@@ -56,6 +56,7 @@ class Editor{
         array<int, 2> pos_at_push = {0, 0};
 
         vector<string> tile_stack;
+        map<char, string> tile_paths;
 
         // OBJ
         EditorMenu * gui;

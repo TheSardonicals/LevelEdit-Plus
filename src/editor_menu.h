@@ -1,5 +1,6 @@
 #pragma once
 #include "headers.h"
+#include "gametile.h"
 
 #ifndef editor_menu_h
 #define editor_menu_h
@@ -7,7 +8,7 @@
 class EditorMenu{
     public:
         bool hide_lower_options = false;
-        EditorMenu(int *, int *, ImVec4 *, Pointer *);
+        EditorMenu(int *, int *, ImVec4 *, Pointer *, map<char, string> *);
         ~EditorMenu();
         void Process();
     private:
@@ -19,5 +20,7 @@ class EditorMenu{
         int * window_height;
         ImVec4 * clear_color;
         Pointer * mouse;
+        map<string, GameTile *> * tile_list;
+        map<char, string> * tile_paths;
 };
 #endif

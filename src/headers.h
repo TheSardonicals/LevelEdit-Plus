@@ -12,7 +12,6 @@ using namespace std;
 #include <string.h>
 #include <vector>
 #include <memory>
-#include <filesystem>
 #include <tuple>
 #include <stdio.h>
 
@@ -22,7 +21,6 @@ using namespace std;
 #include "imgui_impl_sdl_renderer.h"
 
 //HEADER INCLUDES
-#include "functions.h"
 #include "pointer.h"
 #include "camera.h"
 

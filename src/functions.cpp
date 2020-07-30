@@ -20,16 +20,23 @@ vector<string> split(string const & word, char delim){
     return strings;
 }
 
-vector<string> Get_Resources(){
-    vector<string> resources{};
+map<string, string> Get_Resources(map<string, string> tiles){
+    map<string, string> resources;
+
+    for (map<string, string>::iterator t = tiles.begin(); t != tiles.end(); ++t){
+
+    }
 
     return resources;
-
-
 }
 
-vector<string> Get_Paths(){
+map<char, string> GetPaths(){
+  map<char, string> paths;
+  string filepath = "resources/";
 
-  vector<string> paths{};
+  for (auto &p : fs::directory_iterator(filepath)){
+      vector<string> tile = split(p.path(), '/');
+      paths[tile[1].c_str()[0]] = p.path();
+  }
   return paths;
 }
