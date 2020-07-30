@@ -64,7 +64,7 @@ void EditorMenu::Process(){
     }
     
     if (show_item_menu){
-        ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .25f));
+        ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .1f));
         if (ImGui::Begin("Asset Menu", NULL)){
             // Create Game Tile buttons and handle what happens when the buttons are clicked, etc... 
             
