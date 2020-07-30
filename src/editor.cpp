@@ -55,8 +55,6 @@ void Editor::Loop(){
 void Editor::Process()
 {
     //mouse->Process();
-    bool show_window = true;
-    bool show_another_window = false;
 
     //Event Loop
     while (SDL_PollEvent(&event)) {
