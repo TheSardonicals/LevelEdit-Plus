@@ -59,7 +59,7 @@ class Editor{
         // OBJ
         EditorMenu * gui;
 
-        void SetupImGuiStyleColor(float alpha_ = 1);
+        void SetupImGuiStyleColor();
         void Process();
 };
 

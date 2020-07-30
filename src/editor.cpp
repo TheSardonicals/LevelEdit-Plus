@@ -125,7 +125,7 @@ void Editor::SetClearColor(){
     r_clear_color.a = clear_color.w * 255;
 }
 
-void Editor::SetupImGuiStyleColor(float alpha_){
+void Editor::SetupImGuiStyleColor(){
 
     //Unreal Engine style coloring, with global alpha. 
     ImGuiStyle style = ImGui::GetStyle();
@@ -172,17 +172,6 @@ void Editor::SetupImGuiStyleColor(float alpha_){
     colors[ImGuiCol_DragDropTarget]         = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
     colors[ImGuiCol_NavHighlight]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
     colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
-
-    for (int i = 0; i <= ImGuiCol_COUNT; i++){
-        ImVec4& col = style.Colors[i];
-        if( col.w < 1.00f )
-        {
-            col.x *= alpha_;
-            col.y *= alpha_;
-            col.z *= alpha_;
-            col.w *= alpha_;
-        }
-    }
 }
 
 Editor::~Editor(){
