@@ -1,5 +1,10 @@
 #pragma once
-#include "headers.h"
+#include <SDL2/SDL.h>
+#include <map>
+
+#include "functions.h"
+
+using namespace std;
 
 #ifndef texturecache_h
 #define texturecache_h

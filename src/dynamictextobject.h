@@ -1,3 +1,4 @@
+#pragma once
 #include "headers.h"
 
 #ifndef dynamictextobject_h

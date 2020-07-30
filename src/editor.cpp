@@ -1,5 +1,6 @@
 #include "headers.h"
 #include "editor.h"
+#include "functions.h"
 
 Editor::Editor(){}
 
@@ -33,11 +34,12 @@ int Editor::Start(int argc, char** argv){
     // VARIABLES
     state = EDITING;
     clear_color = ImVec4(.8627, .8627, .8627, 1);
+    tile_paths = GetPaths();
 
     // OBJECTS
-    gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color);
-    //mouse = new Pointer();
-    //cache = new TextureCache(renderer);
+    mouse = new Pointer();
+    cache = new TextureCache(renderer);
+    gui = new EditorMenu(renderer, &SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths, cache);
     //camera = new Camera();
     //submenu = new Submenu();
 
@@ -77,7 +79,8 @@ void Editor::Process()
                 SCREEN_HEIGHT = event.window.data2;
             }
         }
-            
+        //For Debugging
+        //printf("%i, %i \n", mouse->xpos, mouse->ypos);            
     }
 
     //Application Loop
@@ -89,6 +92,9 @@ void Editor::Process()
             ImGui::NewFrame();
 
             gui->Process();
+            mouse->Compute(&event);
+            mouse->Process();
+            
 
         }break;
 
