@@ -92,12 +92,9 @@ void EditorMenu::Process(){
                 if (ImGui::ImageButton((void *)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
                 {   
                     // Handle setting ghost tile when button is clicked
-                    if (!ghost_tile){
-                        ghost_tile = new GameTile(cache, tile_paths[i][1], mouse->xpos, mouse->ypos, 32, 32);
-                    }else{
-                        
-                        ghost_tile = new GameTile(cache, tile_paths[i][1], mouse->xpos, mouse->ypos, 32, 32);
-                    }
+                    ghost_tile = new GameTile(cache, tile_paths[i][1], mouse->xpos, mouse->ypos, 32, 32);
+                    selected_tile = ghost_tile;
+                    
                 }
                 if (ImGui::IsItemHovered()){
                     ImGui::BeginTooltip();
@@ -113,10 +110,20 @@ void EditorMenu::Process(){
             }   
         }
         ImGui::End();
-
-        if (ghost_tile){
-            ghost_tile->SetPos(mouse->xpos, mouse->ypos);
+    }
+    if (ghost_tile){
+        ghost_tile->SetPos(mouse->xpos, mouse->ypos);
+        if (ImGui::Begin("Texture Properties", NULL)){
+            string x_string = "X: " + to_string(selected_tile->x);
+            string y_string = "Y: " + to_string(selected_tile->y);
+            string w_string = "width: " + to_string(selected_tile->w);
+            string h_string = "height: " + to_string(selected_tile->h);
+            ImGui::Text(x_string.c_str());
+            ImGui::Text(y_string.c_str());
+            ImGui::Text(w_string.c_str());
+            ImGui::Text(h_string.c_str());
         }
+        ImGui::End();
     }
 }
 

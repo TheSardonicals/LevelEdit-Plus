@@ -8,6 +8,7 @@
 class EditorMenu{
     public:
         bool hide_lower_options = false;
+        bool edit_texture_window = false;
         EditorMenu(int *, int *, ImVec4 *, Pointer *, map<string, string> *, TextureCache *);
         ~EditorMenu();
         void Process();
@@ -29,6 +30,7 @@ class EditorMenu{
         TextureCache * cache;
         SDL_Renderer * renderer;
         GameTile * ghost_tile = nullptr;
+        GameTile * selected_tile = nullptr;
 
 };
 #endif
