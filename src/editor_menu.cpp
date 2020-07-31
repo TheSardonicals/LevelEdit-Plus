@@ -94,6 +94,9 @@ void EditorMenu::Process(){
                     // Handle setting ghost tile when button is clicked
                     if (!ghost_tile){
                         ghost_tile = new GameTile(cache, tile_paths[i][1], mouse->xpos, mouse->ypos, 32, 32);
+                    }else{
+                        
+                        ghost_tile = new GameTile(cache, tile_paths[i][1], mouse->xpos, mouse->ypos, 32, 32);
                     }
                 }
                 if (ImGui::IsItemHovered()){
@@ -110,16 +113,15 @@ void EditorMenu::Process(){
             }   
         }
         ImGui::End();
-    }
 
-    if (ghost_tile){
-        ghost_tile->SetPos(mouse->xpos, mouse->ypos);
+        if (ghost_tile){
+            ghost_tile->SetPos(mouse->xpos, mouse->ypos);
+        }
     }
 }
 
 void EditorMenu::Render(){
     if (ghost_tile){
-        ghost_tile->Render(cache, {0, 0}, 255);
-        cout << ghost_tile->x << " " << ghost_tile->y << "\n";      //Checking if Gametile is moving with mouse position
+        ghost_tile->Render(cache, {0, 0}, 100);
     }
 }

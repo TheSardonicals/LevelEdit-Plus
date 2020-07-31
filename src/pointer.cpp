@@ -29,8 +29,6 @@ void Pointer::Process(){
 
     clicked = clicking;
 
-    this->xpos = (this->xpos - int(pointer_rect.w / 2));
-    this->ypos = (this->ypos - int(this->pointer_rect.h / 2));
 }
 
 bool Pointer::IsClicking(SDL_Rect* rect){

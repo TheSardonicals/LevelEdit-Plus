@@ -8,6 +8,11 @@ GameTile::GameTile(TextureCache * cache, string filepath, int xpos, int ypos, in
     this->cache = cache;
 
     texture = cache->LoadTexture(filepath);
+
+    this->x = xpos;
+    this->y = ypos;
+    this->w = w;
+    this->h = h;
     
     this->rect.x = xpos;
     this->rect.y = ypos;
