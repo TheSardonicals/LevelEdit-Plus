@@ -1,8 +1,8 @@
 #include "pointer.h"
 
 Pointer::Pointer(){
-    xpos = 0;
-    ypos = 0;
+    this->xpos = 0;
+    this->ypos = 0;
     clicking = false;
     r_clicking = false;
     clicked = false;
@@ -15,8 +15,8 @@ void Pointer::Compute(SDL_Event* event){
     this->r_clicking = false;
 
     if (event->type == SDL_MOUSEMOTION){
-        xpos = event->motion.x;
-        ypos = event->motion.y;
+        this->xpos = event->motion.x;
+        this->ypos = event->motion.y;
     }
 }
 
@@ -29,8 +29,8 @@ void Pointer::Process(){
 
     clicked = clicking;
 
-    pointer_rect.x = (xpos - int(pointer_rect.w / 2));
-    pointer_rect.y = (ypos - int(pointer_rect.h / 2));
+    this->xpos = (this->xpos - int(pointer_rect.w / 2));
+    this->ypos = (this->ypos - int(this->pointer_rect.h / 2));
 }
 
 bool Pointer::IsClicking(SDL_Rect* rect){
