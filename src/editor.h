@@ -62,9 +62,9 @@ class Editor{
         EditorMenu * gui;
         Pointer * mouse;
         TextureCache * cache;
-
         vector<string> tile_stack;
         map<string, string> tile_paths;
+        GameTile * ghost_tile = nullptr;
 
         void SetupImGuiStyleColor();
         void Process();

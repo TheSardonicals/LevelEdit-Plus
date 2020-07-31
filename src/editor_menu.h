@@ -11,7 +11,9 @@ class EditorMenu{
         EditorMenu(int *, int *, ImVec4 *, Pointer *, map<string, string> *, TextureCache *);
         ~EditorMenu();
         void Process();
+        void Render();
 
+        string current_item = "";
     private:
         bool show_item_menu = false;
         float alpha = 1.0f;
@@ -26,6 +28,7 @@ class EditorMenu{
         ImVec4 original_button_color;
         TextureCache * cache;
         SDL_Renderer * renderer;
+        GameTile * ghost_tile = nullptr;
 
 };
 #endif

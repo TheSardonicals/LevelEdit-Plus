@@ -32,7 +32,8 @@
                 "src/*.cpp",
                 "-lSDL2",
                 "-o",
-                "${workspaceFolder}/bin/LevelEdit++.x86_64"
+                "${workspaceFolder}/bin/LevelEdit++.x86_64",
+                "-lstdc++fs"
             ],
             "group": "build",
             "presentation": {
@@ -58,7 +59,7 @@
             "command": "chmod",
             "args": [
                 "a+x",
-                "LevelEdit++.sh"
+                "${workspaceFolder}/bin/LevelEdit++DEBUG.x86_64"
             ],
             "dependsOn": [
                 "build executable"

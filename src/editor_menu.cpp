@@ -87,6 +87,10 @@ void EditorMenu::Process(){
                 if (ImGui::ImageButton((void *)texture, ImVec2(52.0f, 52.0f), ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
                 {   
                     // Handle setting ghost tile when button is clicked
+                    current_item = tile.first;
+                    if (!ghost_tile){
+                        ghost_tile = new GameTile(cache, tile.second, mouse->xpos, mouse->ypos, 32, 32);
+                    }
                 }
                 if (ImGui::IsItemHovered()){
                     ImGui::BeginTooltip();
@@ -103,5 +107,11 @@ void EditorMenu::Process(){
             }   
         }
         ImGui::End();
+    }
+}
+
+void EditorMenu::Render(){
+    if (ghost_tile){
+        ghost_tile->Render(cache, {0, 0}, 100);
     }
 }

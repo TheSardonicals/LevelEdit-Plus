@@ -39,7 +39,7 @@ int Editor::Start(int argc, char** argv){
     // OBJECTS
     mouse = new Pointer();
     cache = new TextureCache(renderer);
-    gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths, cache);
+    gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths, cache, ghost_tile);
     //camera = new Camera();
     //submenu = new Submenu();
 
@@ -114,6 +114,7 @@ void Editor::Render(){
         case EDITING:{
             ImGui::Render();
             ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+            gui->Render();
 
         }break;   
 
