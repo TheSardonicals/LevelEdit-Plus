@@ -8,10 +8,9 @@
 class EditorMenu{
     public:
         bool hide_lower_options = false;
-        EditorMenu(int *, int *, ImVec4 *, Pointer *, map<string, string> *, TextureCache *);
+        EditorMenu(int *, int *, ImVec4 *, Pointer *, map<string, string> *,  TextureCache *);
         ~EditorMenu();
-        void Process();
-        void Render();
+        void Process(GameTile * &ghost_tile);
 
         string current_item = "";
     private:
@@ -28,7 +27,5 @@ class EditorMenu{
         ImVec4 original_button_color;
         TextureCache * cache;
         SDL_Renderer * renderer;
-        GameTile * ghost_tile = nullptr;
-
 };
 #endif

@@ -21,7 +21,7 @@ class GameTile{
         TextureCache * cache;
         SDL_Texture * texture;
 
-        void Render(TextureCache *, array<int, 2>, int);
+        void Render(TextureCache *, array<int, 2>, float);
         void SetPos(int, int);
 
         array<int, 2> GetPos();
