@@ -63,22 +63,23 @@ void Editor::Process()
     //Event Loop
     while (SDL_PollEvent(&event)) {
         ImGui_ImplSDL2_ProcessEvent(&event);
+        
         if (event.type == SDL_QUIT){
             running = false;
             break;
         }
 
-        if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)){
-            running = false;
-            break;
-        }
-
         if (event.type == SDL_WINDOWEVENT){
+            if (event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)){
+                running = false;
+                break;
+            }
             if (event.window.event == SDL_WINDOWEVENT_RESIZED){
                 SCREEN_WIDTH = event.window.data1;
                 SCREEN_HEIGHT = event.window.data2;
             }
         }
+
         //For Debugging
         //printf("%i, %i \n", mouse->xpos, mouse->ypos);            
     }
