@@ -36,7 +36,8 @@ map<string, string> GetPaths(){
 
   for (auto &p : fs::directory_iterator(filepath)){
       vector<string> tile = Split(p.path(), '/');
-      paths[tile[1]] = p.path();
+      string name = Split(tile[1], '.')[0];
+      paths[name] = p.path();
   }
   return paths;
 }

@@ -57,7 +57,7 @@ void EditorMenu::Process(){
 
             // Change button color if it's been clicked, else use original button color.
             if (show_item_menu){ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.46f, 0.47f, 0.48f, 1.00f));}
-            else{ImGui::PushStyleColor(ImGuiCol_Button, original_button_color);}
+            else {ImGui::PushStyleColor(ImGuiCol_Button, original_button_color);}
 
             if (ImGui::Button("Assets", ImVec2(120, 40))){
                 if (show_item_menu == false)
@@ -100,8 +100,7 @@ void EditorMenu::Process(){
                 else{
                     ImGui::SameLine();
                 }
-            }  
-            
+            }   
         }
         ImGui::End();
     }
