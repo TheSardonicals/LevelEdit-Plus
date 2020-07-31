@@ -24,7 +24,7 @@ class EditorMenu{
         ImVec4 * clear_color;
         Pointer * mouse;
         map<string, SDL_Texture *> * tile_list;
-        map<string, string> tile_paths;
+        vector<vector<string>> tile_paths;
         ImVec4 original_button_color;
         TextureCache * cache;
         SDL_Renderer * renderer;
