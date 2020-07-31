@@ -39,7 +39,7 @@ int Editor::Start(int argc, char** argv){
     // OBJECTS
     mouse = new Pointer();
     cache = new TextureCache(renderer);
-    gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths, cache);
+    gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths,  cache);
     //camera = new Camera();
     //submenu = new Submenu();
 
@@ -63,22 +63,23 @@ void Editor::Process()
     //Event Loop
     while (SDL_PollEvent(&event)) {
         ImGui_ImplSDL2_ProcessEvent(&event);
+        
         if (event.type == SDL_QUIT){
             running = false;
             break;
         }
 
-        if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)){
-            running = false;
-            break;
-        }
-
         if (event.type == SDL_WINDOWEVENT){
+            if (event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)){
+                running = false;
+                break;
+            }
             if (event.window.event == SDL_WINDOWEVENT_RESIZED){
                 SCREEN_WIDTH = event.window.data1;
                 SCREEN_HEIGHT = event.window.data2;
             }
         }
+
         //For Debugging
         //printf("%i, %i \n", mouse->xpos, mouse->ypos);            
     }
@@ -91,10 +92,12 @@ void Editor::Process()
             ImGui_ImplSDL2_NewFrame(window);
             ImGui::NewFrame();
 
-            gui->Process();
+            gui->Process(ghost_tile);
             mouse->Compute(&event);
             mouse->Process();
-            
+            if (ghost_tile){
+                ghost_tile->SetPos(mouse->xpos, mouse->ypos);
+            }
 
         }break;
 
@@ -113,9 +116,11 @@ void Editor::Render(){
     switch (state){
         case EDITING:{
             ImGui::Render();
+            // (TODO): Render level stuff here so that it appears behind the menu.
             ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-            gui->Render();
-
+            if (ghost_tile){
+                ghost_tile->Render(cache, {0, 0}, .6);
+            }
         }break;   
 
         default:

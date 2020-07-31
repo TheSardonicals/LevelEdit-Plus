@@ -24,6 +24,7 @@ class Editor{
         SDL_Color r_clear_color{};
 
         int current_width = SCREEN_WIDTH, current_height = SCREEN_HEIGHT;
+        
 
     private:
         SDL_Window* window;
@@ -56,15 +57,13 @@ class Editor{
         array<int, 2> tile_size = {32, 32};
         array<int, 2> pos_at_push = {0, 0};
 
-        
-
         // OBJ
         EditorMenu * gui;
         Pointer * mouse;
         TextureCache * cache;
         vector<string> tile_stack;
         map<string, string> tile_paths;
-        GameTile * ghost_tile = nullptr;
+        GameTile * ghost_tile = NULL;
 
         void SetupImGuiStyleColor();
         void Process();

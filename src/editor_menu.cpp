@@ -14,7 +14,7 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
 }
 
-void EditorMenu::Process(){
+void EditorMenu::Process(GameTile * &ghost_tile){
     // Menu Bar with options and such
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){
@@ -89,12 +89,16 @@ void EditorMenu::Process(){
                 texture = cache->LoadTexture(tile_paths[i][1]);
                 cache->SetTextureAlpha(texture, max(alpha, .5f));
                  ImGui::PushID(i);
-                if (ImGui::ImageButton((void *)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
+                if (ImGui::ImageButton((void *)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
                 {   
                     // Handle setting ghost tile when button is clicked
-                    ghost_tile = new GameTile(cache, tile_paths[i][1], mouse->xpos, mouse->ypos, 32, 32);
-                    selected_tile = ghost_tile;
-                    
+                    if (ghost_tile == nullptr){
+                        ghost_tile = new GameTile(cache, tile_paths[i][1], mouse->xpos, mouse->ypos, 32, 32);
+                    }
+                    else {
+                        delete ghost_tile;
+                        ghost_tile = new GameTile(cache, tile_paths[i][1], mouse->xpos, mouse->ypos, 32, 32);
+                    }
                 }
                 if (ImGui::IsItemHovered()){
                     ImGui::BeginTooltip();
@@ -112,6 +116,7 @@ void EditorMenu::Process(){
         ImGui::End();
     }
     if (ghost_tile){
+        selected_tile = ghost_tile;
         ghost_tile->SetPos(mouse->xpos, mouse->ypos);
         if (ImGui::Begin("Texture Properties", NULL)){
             string x_string = "X: " + to_string(selected_tile->x);
@@ -124,11 +129,5 @@ void EditorMenu::Process(){
             ImGui::Text(h_string.c_str());
         }
         ImGui::End();
-    }
-}
-
-void EditorMenu::Render(){
-    if (ghost_tile){
-        ghost_tile->Render(cache, {0, 0}, 100);
     }
 }
