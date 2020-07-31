@@ -89,7 +89,7 @@ void EditorMenu::Process(GameTile * &ghost_tile){
                 texture = cache->LoadTexture(tile_paths[i][1]);
                 cache->SetTextureAlpha(texture, max(alpha, .5f));
                  ImGui::PushID(i);
-                if (ImGui::ImageButton((void *)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
+                if (ImGui::ImageButton((void *)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
                 {   
                     // Handle setting ghost tile when button is clicked
                     if (ghost_tile == nullptr){
@@ -117,7 +117,7 @@ void EditorMenu::Process(GameTile * &ghost_tile){
     }
     if (ghost_tile){
         selected_tile = ghost_tile;
-        ghost_tile->SetPos(mouse->xpos, mouse->ypos);
+        ImGui::SetNextWindowBgAlpha(alpha);
         if (ImGui::Begin("Texture Properties", NULL)){
             string x_string = "X: " + to_string(selected_tile->x);
             string y_string = "Y: " + to_string(selected_tile->y);
