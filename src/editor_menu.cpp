@@ -79,7 +79,7 @@ void EditorMenu::Process(){
     
     if (show_item_menu){
         ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .1f));
-        ImVec2 button_size =ImVec2(52.0f, 52.0f);
+        ImVec2 button_size = ImVec2(52.0f, 52.0f);
         if (ImGui::Begin("Asset Menu", NULL)){
             SDL_Texture * texture;
             int button_count = tile_paths.size();
@@ -91,7 +91,7 @@ void EditorMenu::Process(){
                  ImGui::PushID(i);
                 if (ImGui::ImageButton((void *)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
                 {   
-                    // Handle setting ghost tile when button is clicked
+                    // (TODO) Handle setting ghost tile when button is clicked
                 }
                 if (ImGui::IsItemHovered()){
                     ImGui::BeginTooltip();
