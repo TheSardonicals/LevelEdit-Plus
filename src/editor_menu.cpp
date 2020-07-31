@@ -5,7 +5,11 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     window_height = height;
     this->clear_color = clear_color;
     this->mouse = mouse;
-    tile_paths = *paths;
+    // We do this because we have to use indexing for auto resizing buttons on the menu.
+    for (auto tile: *paths){
+        vector<string> path = {tile.first, tile.second};
+        tile_paths.push_back(path);
+    }
     this->cache = cache;
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
 }
@@ -77,29 +81,31 @@ void EditorMenu::Process(){
         ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .1f));
         int count = 0;
         int row = 4;
+        ImVec2 button_size =ImVec2(52.0f, 52.0f);
         if (ImGui::Begin("Asset Menu", NULL)){
             SDL_Texture * texture;
-            
-            for (auto tile: tile_paths){
-                count += 1;
-                texture = cache->LoadTexture(tile.second);
+            int button_count = tile_paths.size();
+            ImGuiStyle& style = ImGui::GetStyle();
+            float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+            for (int i = 0; i < button_count; i++){
+                texture = cache->LoadTexture(tile_paths[i][1]);
                 cache->SetTextureAlpha(texture, max(alpha, .5f));
-                if (ImGui::ImageButton((void *)texture, ImVec2(52.0f, 52.0f), ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
+                 ImGui::PushID(i);
+                if (ImGui::ImageButton((void *)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
                 {   
                     // Handle setting ghost tile when button is clicked
                 }
                 if (ImGui::IsItemHovered()){
                     ImGui::BeginTooltip();
-                    ImGui::Text(tile.first.c_str());
+                    ImGui::Text(tile_paths[i][0].c_str());
                     ImGui::EndTooltip();
                 }
-                if (count == row){
-                    ImGui::NewLine();
-                    count = 0;
-                }
-                else{
+                // This is for auto layout resizing, solution provided by imgui_demo.
+                float last_button_x2 = ImGui::GetItemRectMax().x;
+                float next_button_x2 = last_button_x2 + style.ItemSpacing.x + button_size.x; // Expected position if next button was on same line
+                if (i + 1 < button_count && next_button_x2 < window_visible_x2)
                     ImGui::SameLine();
-                }
+                ImGui::PopID();
             }   
         }
         ImGui::End();
