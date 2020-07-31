@@ -79,8 +79,6 @@ void EditorMenu::Process(){
     
     if (show_item_menu){
         ImGui::SetNextWindowBgAlpha(max(alpha-.4f, .1f));
-        int count = 0;
-        int row = 4;
         ImVec2 button_size =ImVec2(52.0f, 52.0f);
         if (ImGui::Begin("Asset Menu", NULL)){
             SDL_Texture * texture;
