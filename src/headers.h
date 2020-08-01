@@ -4,7 +4,9 @@ using namespace std;
 
 //SDL INCLUDES
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h
 
+//STANDARD INCLUDES
 #include <map>
 #include <iostream>
 #include <fstream>
