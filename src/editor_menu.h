@@ -11,7 +11,7 @@ class EditorMenu{
         bool edit_texture_window = false;
         EditorMenu(int *, int *, ImVec4 *, Pointer *, map<string, string> *, TextureCache *);
         ~EditorMenu();
-        void Process(GameTile * &ghost_tile, map<string, vector<GameTile *>> * &tile_cache);
+        void Process(GameTile * &ghost_tile);
 
         string current_item = "";
     private:
@@ -30,7 +30,6 @@ class EditorMenu{
         ImVec4 original_button_color;
         TextureCache * cache;
         SDL_Renderer * renderer;
-        GameTile * selected_tile;
-        map<string, vector<GameTile *>> block_cache;
+        GameTile * selected_tile = NULL;
 };
 #endif

@@ -90,11 +90,21 @@ void Editor::Process()
             ImGui_ImplSDL2_NewFrame(window);
             ImGui::NewFrame();
 
-            gui->Process(ghost_tile, tile_cache);
+            gui->Process(ghost_tile);
             mouse->Compute(&event);
             mouse->Process();
             if (ghost_tile){
                 ghost_tile->SetPos(mouse->xpos, mouse->ypos);
+            }
+
+            if (ghost_tile){
+                if (mouse->has_clicked){
+                    if (tile_cache.count(ghost_tile->name) == 0){
+                        tile_cache[ghost_tile->name] = {new GameTile(cache, ghost_tile->name, ghost_tile->x, ghost_tile->y, 32, 32)};
+                    }else{
+                        tile_cache[ghost_tile->name].push_back(new GameTile(cache, ghost_tile->name, ghost_tile->x, ghost_tile->y, 32, 32));
+                    }
+                }
             }
 
         }break;
@@ -115,16 +125,16 @@ void Editor::Render(){
         case EDITING:{
             ImGui::Render();
             // (TODO): Render level stuff here so that it appears behind the menu.
-            ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-            if (ghost_tile){
-                ghost_tile->Render(cache, {0, 0}, .6);
-            }
             if (&tile_cache){
-                for (map<string, vector<GameTile *>>::iterator it = tile_cache->begin(); it != tile_cache->end(); ++it ){
+                for (map<string, vector<GameTile *>>::iterator it = tile_cache.begin(); it != tile_cache.end(); ++it ){
                     for (auto &tile : it->second){
                         tile->Render(cache, {0, 0}, 1);
                     }
                 }
+            }
+            ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+            if (ghost_tile){
+                ghost_tile->Render(cache, {0, 0}, .6);
             }
         }break;   
 
