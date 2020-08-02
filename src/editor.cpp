@@ -80,8 +80,6 @@ void Editor::Process()
             }
         }
 
-        //For Debugging
-        //printf("%i, %i \n", mouse->xpos, mouse->ypos);            
     }
 
     //Application Loop
@@ -92,7 +90,7 @@ void Editor::Process()
             ImGui_ImplSDL2_NewFrame(window);
             ImGui::NewFrame();
 
-            gui->Process(ghost_tile);
+            gui->Process(ghost_tile, tile_cache);
             mouse->Compute(&event);
             mouse->Process();
             if (ghost_tile){
@@ -120,6 +118,13 @@ void Editor::Render(){
             ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
             if (ghost_tile){
                 ghost_tile->Render(cache, {0, 0}, .6);
+            }
+            if (&tile_cache){
+                for (map<string, vector<GameTile *>>::iterator it = tile_cache->begin(); it != tile_cache->end(); ++it ){
+                    for (auto &tile : it->second){
+                        tile->Render(cache, {0, 0}, 1);
+                    }
+                }
             }
         }break;   
 

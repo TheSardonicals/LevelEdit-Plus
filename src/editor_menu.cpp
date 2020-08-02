@@ -14,7 +14,7 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
 }
 
-void EditorMenu::Process(GameTile * &ghost_tile){
+void EditorMenu::Process(GameTile * &ghost_tile, map<string, vector<GameTile *>> * &tile_cache){
     // Menu Bar with options and such
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){
@@ -29,6 +29,12 @@ void EditorMenu::Process(GameTile * &ghost_tile){
             ImGui::Checkbox("Hide Stats", &hide_stats);
             ImGui::Checkbox("Align Menu to bottom corner", &align_menu_to_screen);
             ImGui::SliderFloat("Alpha", &alpha, 0.0f, 1.0f, "Alpha = %.3f");
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Help")){
+            ImGui::Checkbox("About", &about_window);
+            ImGui::Checkbox("User Instructions", &instruction_manual);
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
@@ -89,7 +95,7 @@ void EditorMenu::Process(GameTile * &ghost_tile){
                 texture = cache->LoadTexture(tile_paths[i][1]);
                 cache->SetTextureAlpha(texture, max(alpha, .5f));
                  ImGui::PushID(i);
-                if (ImGui::ImageButton((void *)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), -1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
+                if (ImGui::ImageButton((void *)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
                 {   
                     // Handle setting ghost tile when button is clicked
                     if (ghost_tile == nullptr){
@@ -115,9 +121,23 @@ void EditorMenu::Process(GameTile * &ghost_tile){
         }
         ImGui::End();
     }
+
+    if (about_window){
+        if (ImGui::Begin("About LevelEditor++", NULL)){
+
+        }
+        ImGui::End();
+    }
+
+    if (instruction_manual){
+        if (ImGui::Begin("Instruction Manual", NULL)){
+
+        }
+        ImGui::End();
+    }
+
     if (ghost_tile){
         selected_tile = ghost_tile;
-        ImGui::SetNextWindowBgAlpha(alpha);
         if (ImGui::Begin("Texture Properties", NULL)){
             string x_string = "X: " + to_string(selected_tile->x);
             string y_string = "Y: " + to_string(selected_tile->y);
@@ -130,4 +150,18 @@ void EditorMenu::Process(GameTile * &ghost_tile){
         }
         ImGui::End();
     }
+
+    if (selected_tile){
+        if (mouse->HasClicked(NULL)){
+            if(tile_cache->count(selected_tile->name) == 0){
+                vector<GameTile *> tile = {selected_tile};
+                block_cache[selected_tile->name] = tile;
+            }else{
+                block_cache[selected_tile->name].push_back(selected_tile);
+            }
+        }
+        tile_cache = &block_cache;
+    }
 }
+
+

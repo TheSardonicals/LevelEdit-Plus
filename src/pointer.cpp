@@ -25,9 +25,9 @@ void Pointer::Process(){
 
     r_clicking = SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(2);
 
-    has_clicked = clicked && !clicking;
-
     clicked = clicking;
+    
+    has_clicked = clicked && !clicking;
 
 }
 

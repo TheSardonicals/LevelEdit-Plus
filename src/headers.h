@@ -20,6 +20,9 @@ using namespace std;
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_sdl_renderer.h"
 
+//NFD INCLUDE
+#include "nfd.h"
+
 //HEADER INCLUDES
 #include "pointer.h"
 #include "camera.h"
