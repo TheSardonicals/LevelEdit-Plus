@@ -150,17 +150,6 @@ void EditorMenu::Process(GameTile * &ghost_tile){
         }
         ImGui::End();
     }
-
-    if (selected_tile){
-        if (mouse->HasClicked(NULL)){
-            if(tile_cache->count(selected_tile->name) == 0){
-                vector<GameTile *> tile = {selected_tile};
-                (*tile_cache)[selected_tile->name] = tile;
-            }else{
-                (*tile_cache)[selected_tile->name].push_back(selected_tile);
-            }
-        }
-    }
 }
 
 
