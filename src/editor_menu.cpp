@@ -14,7 +14,7 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
 }
 
-void EditorMenu::Process(GameTile * &ghost_tile, map<string, vector<GameTile *>> * tile_cache){
+void EditorMenu::Process(GameTile * &ghost_tile){
     // Menu Bar with options and such
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){

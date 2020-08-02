@@ -90,7 +90,7 @@ void Editor::Process()
             ImGui_ImplSDL2_NewFrame(window);
             ImGui::NewFrame();
 
-            gui->Process(ghost_tile, &tile_cache);
+            gui->Process(ghost_tile);
             mouse->Compute(&event);
             mouse->Process();
             if (ghost_tile){
@@ -101,7 +101,6 @@ void Editor::Process()
             if (!ImGui::GetIO().WantCaptureMouse){
 
             }
-
         }break;
 
         default:
@@ -130,6 +129,10 @@ void Editor::Render(){
                         tile->Render({0, 0});
                     }
                 }
+            }
+            ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+            if (ghost_tile){
+                ghost_tile->Render({0, 0}, .6);
             }
         }break;   
 
