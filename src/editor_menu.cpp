@@ -14,7 +14,7 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
 }
 
-void EditorMenu::Process(GameTile * &ghost_tile, map<string, vector<GameTile *>> * &tile_cache){
+void EditorMenu::Process(GameTile * &ghost_tile, map<string, vector<GameTile *>> * tile_cache){
     // Menu Bar with options and such
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){
@@ -155,12 +155,11 @@ void EditorMenu::Process(GameTile * &ghost_tile, map<string, vector<GameTile *>>
         if (mouse->HasClicked(NULL)){
             if(tile_cache->count(selected_tile->name) == 0){
                 vector<GameTile *> tile = {selected_tile};
-                block_cache[selected_tile->name] = tile;
+                (*tile_cache)[selected_tile->name] = tile;
             }else{
-                block_cache[selected_tile->name].push_back(selected_tile);
+                (*tile_cache)[selected_tile->name].push_back(selected_tile);
             }
         }
-        tile_cache = &block_cache;
     }
 }
 

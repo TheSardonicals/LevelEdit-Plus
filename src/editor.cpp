@@ -90,11 +90,16 @@ void Editor::Process()
             ImGui_ImplSDL2_NewFrame(window);
             ImGui::NewFrame();
 
-            gui->Process(ghost_tile, tile_cache);
+            gui->Process(ghost_tile, &tile_cache);
             mouse->Compute(&event);
             mouse->Process();
             if (ghost_tile){
                 ghost_tile->SetPos(mouse->xpos, mouse->ypos);
+            }
+
+            // Handle every editor-related thing that works outside of the GUI underneath this conditional.
+            if (!ImGui::GetIO().WantCaptureMouse){
+
             }
 
         }break;
@@ -117,12 +122,12 @@ void Editor::Render(){
             // (TODO): Render level stuff here so that it appears behind the menu.
             ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
             if (ghost_tile){
-                ghost_tile->Render(cache, {0, 0}, .6);
+                ghost_tile->Render({0, 0}, .6);
             }
-            if (&tile_cache){
-                for (map<string, vector<GameTile *>>::iterator it = tile_cache->begin(); it != tile_cache->end(); ++it ){
-                    for (auto &tile : it->second){
-                        tile->Render(cache, {0, 0}, 1);
+            if (tile_cache.size() > 0){
+                for (auto tile_list: tile_cache){
+                    for (auto tile: tile_list.second){
+                        tile->Render({0, 0});
                     }
                 }
             }
@@ -192,6 +197,11 @@ void Editor::SetupImGuiStyleColor(){
 
 
 Editor::~Editor(){
+    for (auto tile_list: tile_cache){
+        for (auto tile: tile_list.second){
+            delete tile;
+        }
+    }
     delete cache;
     ImGui_ImplSDLRenderer_Shutdown();
     ImGui_ImplSDL2_Shutdown();

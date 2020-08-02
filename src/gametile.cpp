@@ -22,7 +22,7 @@ GameTile::GameTile(TextureCache * cache, string filepath, int xpos, int ypos, in
 
 GameTile::~GameTile(){}
 
-void GameTile::Render(TextureCache * cache, array<int, 2> camera_pos = {0, 0}, float alpha = 1){
+void GameTile::Render(array<int, 2> camera_pos = {0, 0}, float alpha){
     this->rect.x = (this->x - (this->w/2)) + camera_pos[0];
     this->rect.y = (this->y - (this->h/2)) + camera_pos[1];
     this->rect.w = this->w;

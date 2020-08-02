@@ -11,7 +11,7 @@ class EditorMenu{
         bool edit_texture_window = false;
         EditorMenu(int *, int *, ImVec4 *, Pointer *, map<string, string> *, TextureCache *);
         ~EditorMenu();
-        void Process(GameTile * &ghost_tile, map<string, vector<GameTile *>> * &tile_cache);
+        void Process(GameTile * &ghost_tile, map<string, vector<GameTile *>> * tile_cache);
 
         string current_item = "";
     private:
