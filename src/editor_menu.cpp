@@ -14,7 +14,7 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
 }
 
-void EditorMenu::Process(GameTile * &ghost_tile){
+void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera){
     // Menu Bar with options and such
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){
@@ -124,7 +124,9 @@ void EditorMenu::Process(GameTile * &ghost_tile){
 
     if (about_window){
         if (ImGui::Begin("About LevelEditor++", NULL)){
-
+            ImGui::TextWrapped("Welcome To LevelEditor++ created by The Sardonicals.  LevelEdit++ is a upgraded edition from the Python counterpart.");
+            ImGui::TextWrapped("The Plus Edition will feature many APIs to enhance the user experience of the Level Editor.");
+            
         }
         ImGui::End();
     }
@@ -139,8 +141,8 @@ void EditorMenu::Process(GameTile * &ghost_tile){
     if (ghost_tile){
         selected_tile = ghost_tile;
         if (ImGui::Begin("Texture Properties", NULL)){
-            string x_string = "X: " + to_string(selected_tile->x);
-            string y_string = "Y: " + to_string(selected_tile->y);
+            string x_string = "X: " + to_string(selected_tile->x - camera->xpos);
+            string y_string = "Y: " + to_string(selected_tile->y - camera->ypos);
             string w_string = "width: " + to_string(selected_tile->w);
             string h_string = "height: " + to_string(selected_tile->h);
             ImGui::Text(x_string.c_str());

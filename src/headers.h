@@ -28,5 +28,6 @@ using namespace std;
 //HEADER INCLUDES
 #include "pointer.h"
 #include "camera.h"
+#include "keyboard.h"
 
 

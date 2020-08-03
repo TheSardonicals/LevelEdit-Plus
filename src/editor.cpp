@@ -39,9 +39,9 @@ int Editor::Start(int argc, char** argv){
     // OBJECTS
     mouse = new Pointer();
     cache = new TextureCache(renderer);
+    camera = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT, 3, 40);
+    keyboard = new KeyboardManager();
     gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths,  cache);
-    //camera = new Camera();
-    //submenu = new Submenu();
 
     return 1;
 }
@@ -90,9 +90,34 @@ void Editor::Process()
             ImGui_ImplSDL2_NewFrame(window);
             ImGui::NewFrame();
 
-            gui->Process(ghost_tile);
+            gui->Process(ghost_tile, camera);
             mouse->Compute(&event);
             mouse->Process();
+            keyboard->Process();
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_ESCAPE)){
+            running = false;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_X)){
+                ghost_tile = NULL;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_UP)){
+                camera->ypos += camera->speed;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_DOWN)){
+                camera->ypos -= camera->speed;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_LEFT)){
+                camera->xpos += camera->speed;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_RIGHT)){
+                camera->xpos -= camera->speed;
+            }
             if (ghost_tile){
                 ghost_tile->SetPos(mouse->xpos, mouse->ypos);
             }
@@ -102,9 +127,9 @@ void Editor::Process()
                 if (ghost_tile){
                     if (mouse->has_clicked){
                         if (tile_cache.count(ghost_tile->name) == 0){
-                            tile_cache[ghost_tile->name] = {new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos, mouse->ypos, 32, 32)};
+                            tile_cache[ghost_tile->name] = {new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, 32, 32)};
                         }else{
-                            tile_cache[ghost_tile->name].push_back(new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos, mouse->ypos, 32, 32));
+                            tile_cache[ghost_tile->name].push_back(new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, 32, 32));
                             
                         }
                     }   
@@ -136,10 +161,11 @@ void Editor::Render(){
             if (tile_cache.size() > 0){
                 for (auto tile_list: tile_cache){
                     for (auto tile: tile_list.second){
-                        tile->Render({0, 0});
+                        tile->Render({camera->xpos, camera->ypos});
                     }
                 }
             }
+            camera->Show(renderer);
             ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
             if (ghost_tile){
                 ghost_tile->Render({0, 0}, .6);

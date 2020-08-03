@@ -7,15 +7,7 @@ using namespace std;
 #define handler_h
 
 class Handler{
-    public:
-        Handler(Pointer*);
-        ~Handler();
-
-        bool OptionClicked(string);
-        void Render(int);
-
-    private:
-        Pointer * mouse;
+    
 
 };
 

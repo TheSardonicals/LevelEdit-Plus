@@ -65,6 +65,9 @@ class Editor{
         map<string, string> tile_paths;
         GameTile * ghost_tile = NULL;
         map<string, vector<GameTile *>> tile_cache;
+        Camera * camera; 
+        KeyboardManager * keyboard;
+
 
         void SetupImGuiStyleColor();
         void Process();
