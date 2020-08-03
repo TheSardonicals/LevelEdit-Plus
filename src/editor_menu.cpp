@@ -140,17 +140,20 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera){
 
     if (ghost_tile){
         selected_tile = ghost_tile;
+        w_increase = selected_tile->w;
+        h_increase = selected_tile->h;
         if (ImGui::Begin("Texture Properties", NULL)){
             string x_string = "X: " + to_string(selected_tile->x - camera->xpos);
             string y_string = "Y: " + to_string(selected_tile->y - camera->ypos);
-            string w_string = "width: " + to_string(selected_tile->w);
-            string h_string = "height: " + to_string(selected_tile->h);
             ImGui::Text(x_string.c_str());
             ImGui::Text(y_string.c_str());
-            ImGui::Text(w_string.c_str());
-            ImGui::Text(h_string.c_str());
+            ImGui::InputInt("Width:", &w_increase);
+            ImGui::InputInt("Height:", &h_increase);
         }
         ImGui::End();
+
+        ghost_tile->w = w_increase;
+        ghost_tile->h = h_increase;
     }
 }
 

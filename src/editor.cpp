@@ -95,6 +95,7 @@ void Editor::Process()
             mouse->Process();
             keyboard->Process();
 
+            // Keyboard Inputs
             if (keyboard->KeyIsPressed(SDL_SCANCODE_ESCAPE)){
             running = false;
             }
@@ -118,6 +119,7 @@ void Editor::Process()
             if (keyboard->KeyIsPressed(SDL_SCANCODE_RIGHT)){
                 camera->xpos -= camera->speed;
             }
+
             if (ghost_tile){
                 ghost_tile->SetPos(mouse->xpos, mouse->ypos);
             }
@@ -127,9 +129,9 @@ void Editor::Process()
                 if (ghost_tile){
                     if (mouse->has_clicked){
                         if (tile_cache.count(ghost_tile->name) == 0){
-                            tile_cache[ghost_tile->name] = {new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, 32, 32)};
+                            tile_cache[ghost_tile->name] = {new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h)};
                         }else{
-                            tile_cache[ghost_tile->name].push_back(new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, 32, 32));
+                            tile_cache[ghost_tile->name].push_back(new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h));
                             
                         }
                     }   

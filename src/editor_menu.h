@@ -31,5 +31,7 @@ class EditorMenu{
         TextureCache * cache;
         SDL_Renderer * renderer;
         GameTile * selected_tile = NULL;
+        int w_increase;
+        int h_increase;
 };
 #endif

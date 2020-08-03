@@ -17,7 +17,7 @@ class GameTile{
 
         string name;
         string filename;
-        int x, y, w, h;
+        int x, y, w = 32, h = 32;
         SDL_Rect rect = {};
         TextureCache * cache;
         SDL_Texture * texture;

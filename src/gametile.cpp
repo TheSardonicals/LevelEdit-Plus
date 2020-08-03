@@ -1,7 +1,7 @@
 #include "gametile.h"
 #include "functions.h"
 
-GameTile::GameTile(TextureCache * cache, string filepath, int xpos, int ypos, int w, int h){
+GameTile::GameTile(TextureCache * cache, string filepath, int xpos, int ypos, int w = 32, int h = 32){
 
     filename = Split(filepath, '/')[1];
     name = Split(filename, '.')[0];
