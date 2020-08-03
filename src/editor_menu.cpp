@@ -147,8 +147,8 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera){
             string y_string = "Y: " + to_string(selected_tile->y - camera->ypos);
             ImGui::Text(x_string.c_str());
             ImGui::Text(y_string.c_str());
-            ImGui::InputInt("Width:", &w_increase);
-            ImGui::InputInt("Height:", &h_increase);
+            ImGui::InputInt("Width", &w_increase);
+            ImGui::InputInt("Height", &h_increase);
         }
         ImGui::End();
 
