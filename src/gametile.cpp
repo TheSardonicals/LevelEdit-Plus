@@ -3,7 +3,7 @@
 
 GameTile::GameTile(TextureCache * cache, string filepath, int xpos, int ypos, int w, int h){
 
-    string filename = Split(filepath, '/')[1];
+    filename = Split(filepath, '/')[1];
     name = Split(filename, '.')[0];
     this->cache = cache;
 

@@ -99,6 +99,16 @@ void Editor::Process()
 
             // Handle every editor-related thing that works outside of the GUI underneath this conditional.
             if (!ImGui::GetIO().WantCaptureMouse){
+                if (ghost_tile){
+                    if (mouse->has_clicked){
+                        if (tile_cache.count(ghost_tile->name) == 0){
+                            tile_cache[ghost_tile->name] = {new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos, mouse->ypos, 32, 32)};
+                        }else{
+                            tile_cache[ghost_tile->name].push_back(new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos, mouse->ypos, 32, 32));
+                            
+                        }
+                    }   
+                }
 
             }
         }break;

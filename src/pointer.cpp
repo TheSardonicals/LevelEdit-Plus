@@ -11,8 +11,6 @@ Pointer::Pointer(){
 }
 
 void Pointer::Compute(SDL_Event* event){
-    this->clicking = false;
-    this->r_clicking = false;
 
     if (event->type == SDL_MOUSEMOTION){
         this->xpos = event->motion.x;
@@ -24,10 +22,10 @@ void Pointer::Process(){
     clicking = SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(1);
 
     r_clicking = SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(2);
-
-    clicked = clicking;
     
     has_clicked = clicked && !clicking;
+    
+    clicked = clicking;
 
 }
 
