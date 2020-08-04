@@ -30,7 +30,6 @@ class EditorMenu{
         ImVec4 original_button_color;
         TextureCache * cache;
         SDL_Renderer * renderer;
-        GameTile * selected_tile = NULL;
         int w_increase;
         int h_increase;
 };
