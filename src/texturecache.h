@@ -1,6 +1,6 @@
 #pragma once
 #include <SDL2/SDL.h>
-#include <map>
+#include <unordered_map>
 
 #include "functions.h"
 
@@ -21,7 +21,7 @@ class TextureCache{
         SDL_Renderer * renderer;
 
     private:
-        map<string, SDL_Texture *> cache = {};
+        unordered_map<string, SDL_Texture *> cache = {};
 
 };
 #endif
