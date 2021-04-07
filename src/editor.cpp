@@ -163,11 +163,7 @@ void Editor::Render(){
     switch (state){
         case EDITING:{
             ImGui::Render();
-            // (TODO): Render level stuff here so that it appears behind the menu.
-            ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-            if (ghost_tile){
-                ghost_tile->Render({0, 0}, .6);
-            }
+            // Anything that should render before the imgui-based menu, render  underneath this line.
             if (tile_cache.size() > 0){
                 for (auto tile_list: tile_cache){
                     for (auto tile: tile_list.second){
@@ -176,7 +172,9 @@ void Editor::Render(){
                 }
             }
             camera->Show(renderer);
+            // Send the data imgui stored from "Imgui::Render" to the screen using the specified render api.
             ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+            // Anything that should render after the Imgui-based menu, render underneath this line.
             if (ghost_tile){
                 ghost_tile->Render({0, 0}, .6);
             }
