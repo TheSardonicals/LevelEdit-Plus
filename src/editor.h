@@ -2,6 +2,8 @@
 #include "editor_menu.h"
 #include "texturecache.h"
 
+using json = nlohmann::json;
+
 #ifndef editor_h
 #define editor_h
 
@@ -67,6 +69,9 @@ class Editor{
         map<string, vector<GameTile *>> tile_cache;
         Camera * camera; 
         KeyboardManager * keyboard;
+        
+        // JSON
+        json json_tiles;
 
 
         void SetupImGuiStyleColor();

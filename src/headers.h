@@ -30,4 +30,7 @@ using namespace std;
 #include "camera.h"
 #include "keyboard.h"
 
+//JSON SINGLE INCLUDE
+#include "json.hpp"
+
 

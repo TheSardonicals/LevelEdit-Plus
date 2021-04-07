@@ -130,10 +130,18 @@ void Editor::Process()
                     if (mouse->has_clicked){
                         if (tile_cache.count(ghost_tile->name) == 0){
                             tile_cache[ghost_tile->name] = {new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h)};
+                            if (json_tiles == NULL){
+                                json json_tiles = {
+                                    {"tile", ghost_tile->name},
+                                    {"dimensions", {ghost_tile->w, ghost_tile->h}},
+                                    {"positions", {ghost_tile->x, ghost_tile->y}}
+                                };
+                            }
                         }else{
                             tile_cache[ghost_tile->name].push_back(new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h));
                             
                         }
+                        
                     }   
                 }
 
