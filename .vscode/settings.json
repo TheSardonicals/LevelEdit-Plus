@@ -3,6 +3,8 @@
     "files.associations": {
         "cwchar": "cpp",
         "type_traits": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "fstream": "cpp",
+        "ostream": "cpp"
     }
 }

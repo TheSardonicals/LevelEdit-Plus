@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL2/SDL.h>
 #include <map>
+#include <string>
 
 using namespace std;
 

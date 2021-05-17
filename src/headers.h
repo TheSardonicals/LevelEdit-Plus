@@ -16,6 +16,7 @@ using namespace std;
 #include <memory>
 #include <tuple>
 #include <stdio.h>
+#include <string>
 
 //IMGUI INCLUDES
 #include "imgui.h"
