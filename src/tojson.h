@@ -18,16 +18,14 @@ public:
 ToJson();
 ~ToJson();
 
-void init(json*);
+void SaveToJson(string, map<string, vector<GameTile *>>);             //Function used to write json to 
+void ImportJson();
+void ExportJson(string);
 
-void AddToJson(json*, string, GameTile&);       //Function used to append to json object
-void SaveToJson(json*, string);             //Function used to write json to 
-void ReadJson(json*);
-
-private: 
+private:
 
 json json_blocks;
-json json_cache;
+
 
 };
 

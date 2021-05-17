@@ -70,8 +70,8 @@ class Editor{
         Camera * camera; 
         KeyboardManager * keyboard;
         
-        // JSON
-        json json_tiles;
+        //JSON OBJ
+        ToJson * json_blocks;
 
 
         void SetupImGuiStyleColor();
