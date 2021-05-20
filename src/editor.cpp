@@ -92,7 +92,7 @@ void Editor::Process()
             ImGui_ImplSDL2_NewFrame(window);
             ImGui::NewFrame();
 
-            gui->Process(ghost_tile, camera);
+            gui->Process(ghost_tile, camera, tile_cache, json_blocks);
             mouse->Compute(&event);
             mouse->Process();
             keyboard->Process();
@@ -132,6 +132,9 @@ void Editor::Process()
                     if (mouse->has_clicked){
                         if (tile_cache.count(ghost_tile->name) == 0){
                             tile_cache[ghost_tile->name] = {new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h)};
+                        }
+                        else{
+                            tile_cache[ghost_tile->name].push_back(new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h));
                         }
                     }   
                 }

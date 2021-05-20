@@ -4,7 +4,7 @@
 ToJson::ToJson(){
     this->json_blocks = {
         {"name", ""},
-        {"Tiles", {}}
+        {"tiles", {}}
     };
 }
 
@@ -18,11 +18,11 @@ void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache)
 
     for (auto it : tile_cache){
         for (auto tile : it.second){
-            auto it_tiles = json_blocks["Tiles"].find(tile->name);
-            if (it_tiles != json_blocks["Tiles"].end() == true){
-                json_blocks["Tiles"][tile->name].push_back({tile->x, tile->y, tile->w, tile->h});
+            auto it_tiles = json_blocks["tiles"].find(tile->name);
+            if (it_tiles != json_blocks["tiles"].end() == true){
+                json_blocks["tiles"][tile->name].push_back({tile->x, tile->y, tile->w, tile->h});
             }else{
-                json_blocks["Tiles"][tile->name] = {{tile->x, tile->y, tile->w, tile->h}};
+                json_blocks["tiles"][tile->name] = {{tile->x, tile->y, tile->w, tile->h}};
             }
         }
     }
@@ -33,7 +33,7 @@ void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache)
 void ToJson::ExportJson(string filename){
 
     fstream jsonfile;
-    string export_dir = "../bin/" + filename + ".json";
+    string export_dir = "../bin/" + filename + ".mxpr";
 
     jsonfile.open(export_dir);
 

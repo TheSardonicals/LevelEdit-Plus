@@ -1,6 +1,7 @@
 #pragma once
 #include "headers.h"
 #include "gametile.h"
+#include "tojson.h"
 
 #ifndef editor_menu_h
 #define editor_menu_h
@@ -11,7 +12,7 @@ class EditorMenu{
         bool edit_texture_window = false;
         EditorMenu(int *, int *, ImVec4 *, Pointer *, map<string, string> *, TextureCache *);
         ~EditorMenu();
-        void Process(GameTile * &ghost_tile, Camera * camera);
+        void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >>, ToJson*);
 
         string current_item = "";
     private:

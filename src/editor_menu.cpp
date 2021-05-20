@@ -14,12 +14,14 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
 }
 
-void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera){
+void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile *>> tile_cache, ToJson * j_tiles){
     // Menu Bar with options and such
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){
             if (ImGui::MenuItem("Save File", NULL, false)){
                 //Save .mx file contents.
+                j_tiles->SaveToJson("", tile_cache);
+
             }
             ImGui::EndMenu();
         }
@@ -62,6 +64,8 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera){
         if (ImGui::Begin("Option Menu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize)){
             if (ImGui::Button("Save File", ImVec2(120, 40))){
                 // Save .mx file contents.
+                j_tiles->SaveToJson("", tile_cache);
+
             }
             ImGui::SameLine();
 
