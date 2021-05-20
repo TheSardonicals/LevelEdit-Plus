@@ -32,12 +32,11 @@ void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache)
 
 void ToJson::ExportJson(string filename){
 
-    fstream jsonfile;
+    ofstream jsonfile;
     string export_dir = "../bin/" + filename + ".mxpr";
+    //string export_dir = "../bin/testjson.json";
 
-    jsonfile.open(export_dir);
-
+    jsonfile.open(export_dir, ios::out);
     jsonfile << setw(4) << json_blocks;
-    
     jsonfile.close();
 }

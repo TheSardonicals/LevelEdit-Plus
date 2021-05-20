@@ -18,11 +18,7 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
     // Menu Bar with options and such
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){
-            if (ImGui::MenuItem("Save File", NULL, false)){
-                //Save .mx file contents.
-                j_tiles->SaveToJson("", tile_cache);
-
-            }
+            ImGui::Checkbox("Save File", &saving_to_json);
             ImGui::EndMenu();
         }
 
@@ -41,6 +37,8 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         }
         ImGui::EndMainMenuBar();
     }
+
+
 
     // Stats and information.
     if (!hide_stats){
@@ -64,7 +62,7 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         if (ImGui::Begin("Option Menu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize)){
             if (ImGui::Button("Save File", ImVec2(120, 40))){
                 // Save .mx file contents.
-                j_tiles->SaveToJson("", tile_cache);
+                saving_to_json = true;
 
             }
             ImGui::SameLine();
@@ -142,6 +140,21 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         ImGui::End();
     }
 
+    if(saving_to_json){
+        static char str0[64];
+        string tileset_name = "";
+        if (ImGui::Begin("Please Enter a name for your tileset", NULL)){
+            ImGui::InputText(str0, &tileset_name);
+            if(ImGui::Button("Save")){
+                j_tiles->SaveToJson(tileset_name, tile_cache);
+                //Reset the window to close or to show a text saying, 'Tileset Saved'.  
+                //Made it a checkbox to have that constant availability of saving.
+                //saving_to_json = false;  
+            }
+            ImGui::End();
+        }
+    }
+
     if (ghost_tile){
         w_increase = ghost_tile->w;
         h_increase = ghost_tile->h;
@@ -159,5 +172,3 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         ghost_tile->h = h_increase;
     }
 }
-
-

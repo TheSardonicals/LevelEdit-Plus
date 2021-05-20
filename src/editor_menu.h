@@ -2,6 +2,7 @@
 #include "headers.h"
 #include "gametile.h"
 #include "tojson.h"
+#include "imgui_stdlib.h"
 
 #ifndef editor_menu_h
 #define editor_menu_h
@@ -15,6 +16,7 @@ class EditorMenu{
         void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >>, ToJson*);
 
         string current_item = "";
+        
     private:
         bool show_item_menu = false;
         float alpha = 1.0f;
@@ -22,6 +24,7 @@ class EditorMenu{
         bool align_menu_to_screen = true;
         bool about_window = false;
         bool instruction_manual = false;
+        bool saving_to_json = false;
         int * window_width;
         int * window_height;
         ImVec4 * clear_color;
@@ -33,5 +36,7 @@ class EditorMenu{
         SDL_Renderer * renderer;
         int w_increase;
         int h_increase;
+
+        
 };
 #endif
