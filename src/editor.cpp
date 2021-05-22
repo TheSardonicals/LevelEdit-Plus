@@ -43,7 +43,6 @@ int Editor::Start(int argc, char** argv){
     camera = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT, 3, 40);
     keyboard = new KeyboardManager();
     gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths,  cache);
-    json_blocks = new ToJson();
 
     return 1;
 }
@@ -92,7 +91,7 @@ void Editor::Process()
             ImGui_ImplSDL2_NewFrame(window);
             ImGui::NewFrame();
 
-            gui->Process(ghost_tile, camera, tile_cache, json_blocks);
+            gui->Process(ghost_tile, camera, tile_cache);
             mouse->Compute(&event);
             mouse->Process();
             keyboard->Process();

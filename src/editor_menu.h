@@ -13,7 +13,7 @@ class EditorMenu{
         bool edit_texture_window = false;
         EditorMenu(int *, int *, ImVec4 *, Pointer *, map<string, string> *, TextureCache *);
         ~EditorMenu();
-        void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >>, ToJson*);
+        void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >>);
 
         string current_item = "";
         
@@ -36,6 +36,8 @@ class EditorMenu{
         SDL_Renderer * renderer;
         int w_increase;
         int h_increase;
+
+        ToJson * j_tiles;
 
         
 };

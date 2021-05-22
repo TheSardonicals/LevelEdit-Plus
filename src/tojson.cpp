@@ -13,7 +13,7 @@ ToJson::~ToJson(){}
 void ToJson::ImportJson(){}
 
 void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache){
-    
+    cout << "1" << endl;
     json_blocks["name"] = name;
 
     for (auto it : tile_cache){
@@ -30,13 +30,18 @@ void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache)
 }
 
 
-void ToJson::ExportJson(string filename){
+void ToJson::ExportJson(string filename = "yaya"){
 
-    ofstream jsonfile;
+    fstream jsonfile;
     string export_dir = "../bin/" + filename + ".mxpr";
-    //string export_dir = "../bin/testjson.json";
+    string json_serialized = json_blocks.dump(4);
+    //string export_dir = "..//bin//testjson.json";
+    cout << json_serialized << endl;
+
+
 
     jsonfile.open(export_dir, ios::out);
-    jsonfile << setw(4) << json_blocks;
+    jsonfile.open(export_dir, ios::in | ios::out | ios::binary);
+    jsonfile << setw(4) << json_serialized << endl;
     jsonfile.close();
 }

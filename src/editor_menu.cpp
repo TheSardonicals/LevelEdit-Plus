@@ -12,9 +12,10 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     }
     this->cache = cache;
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
+    j_tiles = new ToJson();
 }
 
-void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile *>> tile_cache, ToJson * j_tiles){
+void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile *>> tile_cache){
     // Menu Bar with options and such
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){
@@ -63,7 +64,6 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
             if (ImGui::Button("Save File", ImVec2(120, 40))){
                 // Save .mx file contents.
                 saving_to_json = true;
-
             }
             ImGui::SameLine();
 
@@ -147,6 +147,7 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
             ImGui::InputText(str0, &tileset_name);
             if(ImGui::Button("Save")){
                 j_tiles->SaveToJson(tileset_name, tile_cache);
+                j_tiles->ExportJson(tileset_name);
                 //Reset the window to close or to show a text saying, 'Tileset Saved'.  
                 //Made it a checkbox to have that constant availability of saving.
                 //saving_to_json = false;  
