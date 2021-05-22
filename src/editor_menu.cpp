@@ -140,20 +140,20 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         ImGui::End();
     }
 
-    if(saving_to_json){
-        static char str0[64];
-        string tileset_name = "";
+    if (saving_to_json){
+        string label_name = "(.mx)";
+        static string tileset_name = "";
         if (ImGui::Begin("Please Enter a name for your tileset", NULL)){
-            ImGui::InputText(str0, &tileset_name);
-            if(ImGui::Button("Save")){
+            ImGui::InputText(label_name.c_str(), &tileset_name);
+            if (ImGui::Button("Save")){ 
                 j_tiles->SaveToJson(tileset_name, tile_cache);
                 j_tiles->ExportJson(tileset_name);
                 //Reset the window to close or to show a text saying, 'Tileset Saved'.  
                 //Made it a checkbox to have that constant availability of saving.
-                //saving_to_json = false;  
-            }
-            ImGui::End();
+                saving_to_json = false;  
+            } 
         }
+        ImGui::End();
     }
 
     if (ghost_tile){
