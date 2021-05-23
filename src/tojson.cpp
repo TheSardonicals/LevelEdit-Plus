@@ -10,12 +10,13 @@ ToJson::ToJson(){
 
 ToJson::~ToJson(){}
 
-void ToJson::ImportJson(){}
+void ToJson::ImportMX(){}
 
 void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache){
-    cout << "1" << endl;
-    json_blocks["name"] = name;
-
+    if (json_blocks["name"] != name){
+        json_blocks["name"] = name;
+    }
+    
     for (auto it : tile_cache){
         for (auto tile : it.second){
             auto it_tiles = json_blocks["tiles"].find(tile->name);
@@ -36,7 +37,7 @@ void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache)
 // and in turn are expected to be supported outside of the editor, while ".mxpr" files are relative to the editor, and
 // contain directory locations relative to the project that has to be saved. I think the Json format for ".mxpr" would be different to reflect this.
 // TODO @isaboll1, @Dexsidius: Renamethis to 'ExportMX', and have it also handle exporting all assets to the same directory.
-void ToJson::ExportJson(string filename = "default"){
+void ToJson::ExportMX(map<string, vector<GameTile *>> tile_cache, string filename = "default"){
     // create variables to be used for necessary paths, and create 'export' directory if it does not exist;
     string directory_path = "exports/"+ filename;
     experimental::filesystem::create_directories(directory_path.c_str());
@@ -45,6 +46,19 @@ void ToJson::ExportJson(string filename = "default"){
     //serialize the json string.
     string json_serialized = json_blocks.dump(4);
     cout << json_serialized << endl;
+    
+    //Copying the tiles in the tile cache from the editor resources to project folder
+    for (auto it : tile_cache){
+        for(auto tile : it.second){
+            try{
+                experimental::filesystem::copy(tile->filepath, directory_path.c_str());
+            }
+            //Error thrown when copying a file that already exists in the folder. ie. multples of lava puddle will throw error on second lava
+            catch(experimental::filesystem::filesystem_error){
+                break;
+            }
+        }
+    }
 
     //create the file within the path, and output the json to it.
     ofstream mx_file(export_dir.c_str());
@@ -59,3 +73,8 @@ void ToJson::ExportJson(string filename = "default"){
     }
     
 }
+
+void ToJson::SaveMXProject(){}
+
+void ToJson::LoadMXProject(){}
+

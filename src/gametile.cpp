@@ -6,6 +6,7 @@ GameTile::GameTile(TextureCache * cache, string filepath, int xpos, int ypos, in
     filename = Split(filepath, '/')[1];
     name = Split(filename, '.')[0];
     this->cache = cache;
+    this->filepath = filepath;
 
     texture = cache->LoadTexture(filepath);
 
