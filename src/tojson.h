@@ -21,9 +21,6 @@ ToJson();
 void SaveToJson(string, map<string, vector<GameTile *>>);             //Function used to write json to 
 void ImportMX();
 void ExportMX(map<string, vector<GameTile *>>, string) ;
-void SaveMXProject();
-void LoadMXProject();
-
 
 
 private:

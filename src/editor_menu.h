@@ -16,8 +16,7 @@ class EditorMenu{
         void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >>);
 
         string current_item = "";
-        
-    private:
+
         bool show_item_menu = false;
         float alpha = 1.0f;
         bool hide_stats = false;
@@ -27,6 +26,7 @@ class EditorMenu{
         bool saving_to_json = false;
         int * window_width;
         int * window_height;
+
         ImVec4 * clear_color;
         Pointer * mouse;
         map<string, SDL_Texture *> * tile_list;
@@ -37,7 +37,12 @@ class EditorMenu{
         int w_increase;
         int h_increase;
 
+        //Json Storage
         ToJson * j_tiles;
+
+        string project_location;
+            
+
 
         
 };

@@ -235,6 +235,14 @@ void Editor::SetupImGuiStyleColor(){
     colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
 }
 
+void Editor::SaveMXProject(map<string, vector<GameTile* >>, string project_name = "default"){
+    string directory_path = project_name;
+    
+
+}
+
+void Editor::LoadMXProject(){}
+
 
 Editor::~Editor(){
     for (auto tile_list: tile_cache){
