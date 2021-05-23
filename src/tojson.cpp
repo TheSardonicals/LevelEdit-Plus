@@ -21,9 +21,11 @@ void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache)
         for (auto tile : it.second){
             auto it_tiles = json_blocks["tiles"].find(tile->name);
             if (it_tiles != json_blocks["tiles"].end() == true){
-                json_blocks["tiles"][tile->name].push_back({tile->x, tile->y, tile->w, tile->h});
+                json_blocks["tiles"][tile->name]["locations"].push_back({tile->x, tile->y, tile->w, tile->h});
+                
             }else{
-                json_blocks["tiles"][tile->name] = {{tile->x, tile->y, tile->w, tile->h}};
+                json_blocks["tiles"][tile->name]["filepath"] = "assets/" + tile->name + ".bmp";
+                json_blocks["tiles"][tile->name]["locations"] = {{tile->x, tile->y, tile->w, tile->h}};
             }
         }
     }
@@ -42,7 +44,7 @@ void ToJson::ExportMX(map<string, vector<GameTile *>> tile_cache, string filenam
     string directory_path = "exports/"+ filename;
     experimental::filesystem::create_directories(directory_path.c_str());
     string export_dir = directory_path +"/" + filename+ ".mx";
-    string tile_dir = directory_path + "/resources";
+    string tile_dir = directory_path + "/assets";
     experimental::filesystem::create_directories(tile_dir);
     
     //serialize the json string.
