@@ -20,6 +20,8 @@ class Editor{
         void Render();
         void Loop();
         void SetClearColor();
+        void SaveMXProject(map<string, vector<GameTile *>>, string);
+        void LoadMXProject();
 
         int Start(int argc, char* args[]);
         ImVec4 clear_color;

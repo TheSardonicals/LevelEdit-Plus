@@ -173,3 +173,5 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         ghost_tile->h = h_increase;
     }
 }
+
+

@@ -78,7 +78,4 @@ void ToJson::ExportMX(map<string, vector<GameTile *>> tile_cache, string filenam
     
 }
 
-void ToJson::SaveMXProject(){}
-
-void ToJson::LoadMXProject(){}
 
