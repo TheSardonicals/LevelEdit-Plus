@@ -38,7 +38,6 @@ void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache)
 // REMINDER: Exporting the files need to be saved as ".mx" files, because they export with simple directories,
 // and in turn are expected to be supported outside of the editor, while ".mxpr" files are relative to the editor, and
 // contain directory locations relative to the project that has to be saved. I think the Json format for ".mxpr" would be different to reflect this.
-// TODO @isaboll1, @Dexsidius: Renamethis to 'ExportMX', and have it also handle exporting all assets to the same directory.
 void ToJson::ExportMX(map<string, vector<GameTile *>> tile_cache, string filename = "default"){
     // create variables to be used for necessary paths, and create 'export' directory if it does not exist;
     string directory_path = "exports/"+ filename;

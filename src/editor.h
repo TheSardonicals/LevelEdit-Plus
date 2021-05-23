@@ -33,9 +33,10 @@ class Editor{
     private:
         SDL_Window* window;
         SDL_Renderer* renderer;
+        SDL_Surface * icon;
         
         int SCREEN_WIDTH = 1280, SCREEN_HEIGHT = 720;
-
+        
         SDL_WindowFlags WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
         SDL_RendererFlags RENDERER_FLAGS = SDL_RENDERER_PRESENTVSYNC;
 
