@@ -42,6 +42,8 @@ void ToJson::ExportMX(map<string, vector<GameTile *>> tile_cache, string filenam
     string directory_path = "exports/"+ filename;
     experimental::filesystem::create_directories(directory_path.c_str());
     string export_dir = directory_path +"/" + filename+ ".mx";
+    string tile_dir = directory_path + "/resources";
+    experimental::filesystem::create_directories(tile_dir);
     
     //serialize the json string.
     string json_serialized = json_blocks.dump(4);
@@ -51,7 +53,7 @@ void ToJson::ExportMX(map<string, vector<GameTile *>> tile_cache, string filenam
     for (auto it : tile_cache){
         for(auto tile : it.second){
             try{
-                experimental::filesystem::copy(tile->filepath, directory_path.c_str());
+                experimental::filesystem::copy(tile->filepath, tile_dir);
             }
             //Error thrown when copying a file that already exists in the folder. ie. multples of lava puddle will throw error on second lava
             catch(experimental::filesystem::filesystem_error){
