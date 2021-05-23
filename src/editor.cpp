@@ -23,6 +23,10 @@ int Editor::Start(int argc, char** argv){
         return 0;
     }
 
+    //Load Icon
+    icon = SDL_LoadBMP("LE++.bmp");
+    SDL_SetWindowIcon(window, icon);
+
     // ImGui Initialization.
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -248,5 +252,6 @@ Editor::~Editor(){
     ImGui::DestroyContext();
 
     SDL_DestroyRenderer(renderer);
+    SDL_FreeSurface(icon);
     SDL_DestroyWindow(window);
 }
