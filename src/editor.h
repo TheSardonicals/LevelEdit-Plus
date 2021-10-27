@@ -73,6 +73,8 @@ class Editor{
         Camera * camera; 
         KeyboardManager * keyboard;
 
+        ToJson mxpr_j;
+
 
         void SetupImGuiStyleColor();
         void Process();

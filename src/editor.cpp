@@ -47,6 +47,7 @@ int Editor::Start(int argc, char** argv){
     camera = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT, 3, 40);
     keyboard = new KeyboardManager();
     gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths,  cache);
+    mxpr_j = new ToJson();
 
     return 1;
 }
@@ -240,8 +241,24 @@ void Editor::SetupImGuiStyleColor(){
 }
 
 void Editor::SaveMXProject(map<string, vector<GameTile* >>, string project_name = "default"){
-    string directory_path = project_name;
-    
+    string directory_path = "projects/" + project_name;
+    experimental::filesystem::create_directories(directory_path.c_str());
+    string export_dir = directory_path + "/" + project_name + ".mxpr";
+
+    //MXPR files will hold the booleans and UI statuses and settings
+    //Code here
+    mxpr_j["name"] = project_name;
+    mxpr_j["c-color"] = r_clear_color.r + ", " + r_clear_color.g + ", " + 
+                            r_clear_color.b + ", " + r_clear_color.a;
+
+    //MXPR serialization 
+    string json_serialized = mxpr_j.dump(4);
+
+    ofstream mxpr_file(export_dir.c_str());
+    if (mxpr_file.is_open()){
+        mxpr_file << json_serialized << "\n";
+        mxpr_file.close();
+    }
 
 }
 

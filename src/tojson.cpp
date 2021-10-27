@@ -48,7 +48,6 @@ void ToJson::ExportMX(map<string, vector<GameTile *>> tile_cache, string filenam
     
     //serialize the json string.
     string json_serialized = json_blocks.dump(4);
-    cout << json_serialized << endl;
     
     //Copying the tiles in the tile cache from the editor resources to project folder
     for (auto it : tile_cache){
