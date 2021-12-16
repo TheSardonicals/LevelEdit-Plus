@@ -25,6 +25,7 @@ class EditorMenu{
         bool instruction_manual = false;
         bool saving_to_json = false;
         bool saving_mxpr = false;
+        bool save_to_mxpr = false;
         int * window_width;
         int * window_height;
 

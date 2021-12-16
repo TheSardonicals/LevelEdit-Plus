@@ -143,6 +143,8 @@ void Editor::Process()
                 }
 
             }
+
+
         }break;
 
         default:
@@ -175,6 +177,8 @@ void Editor::Render(){
             if (ghost_tile){
                 ghost_tile->Render({0, 0}, .6);
             }
+
+            
         }break;   
 
         default:

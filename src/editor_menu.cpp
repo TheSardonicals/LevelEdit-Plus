@@ -174,12 +174,14 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         ghost_tile->h = h_increase;
     }
 
+    // Saving MXPR settings and Booleans Statuses
     if (saving_mxpr){
         string prlabel_name = "(.mxpr)";
         static string project_name = "";
         if (ImGui::Begin("Please Enter a Project name", NULL)){
             ImGui::InputText(prlabel_name.c_str(), &project_name);
             if (ImGui::Button("Save")){
+                // save_to_mxpr = true; 
                 bool_states["show_item_menu"] = show_item_menu;
                 bool_states["hide_stats"] = hide_stats;
                 bool_states["align_menu_to_screen"] = align_menu_to_screen;
@@ -187,6 +189,7 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
                 bool_states["instruction_manual"] = instruction_manual;
                 j_tiles->SaveMXProject(bool_states, project_name);
             }
+            save_to_mxpr = false;
         }
         ImGui::End();
     }

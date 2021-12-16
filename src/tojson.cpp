@@ -86,7 +86,7 @@ void ToJson::SaveMXProject(map<string, bool> bool_state, string project_name = "
     json_pr["project_name"] = project_name;
     
     for (auto state: bool_state){
-        json_pr[state.first] = state.second;
+        json_pr["states"][state.first] = state.second;
     }
 
     //MXPR serialization 
