@@ -76,4 +76,30 @@ void ToJson::ExportMX(map<string, vector<GameTile *>> tile_cache, string filenam
     
 }
 
+void ToJson::SaveMXProject(map<string, bool> bool_state, string project_name = "default"){
+    string directory_path = "projects/" + project_name;
+    experimental::filesystem::create_directories(directory_path.c_str());
+    string export_dir = directory_path + "/" + project_name + ".mxpr";
 
+    //MXPR files will hold the booleans and UI statuses and settings
+    //Code here
+    json_pr["project_name"] = project_name;
+    
+    for (auto state: bool_state){
+        json_pr[state.first] = state.second;
+    }
+
+    //MXPR serialization 
+    string json_serialized = json_pr.dump(4);
+
+    ofstream mxpr_file(export_dir.c_str());
+    if (mxpr_file.is_open()){
+        mxpr_file << json_serialized << "\n";
+        mxpr_file.close();
+    } else{
+        string file_error = "couldn't write " + export_dir;
+        cout << file_error;
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "LevelEdit++ File Writing Error", file_error.c_str(), NULL);
+    }
+
+}

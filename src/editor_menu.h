@@ -24,8 +24,11 @@ class EditorMenu{
         bool about_window = false;
         bool instruction_manual = false;
         bool saving_to_json = false;
+        bool saving_mxpr = false;
         int * window_width;
         int * window_height;
+
+        map<string, bool> bool_states;
 
         ImVec4 * clear_color;
         Pointer * mouse;
@@ -39,6 +42,7 @@ class EditorMenu{
 
         //Json Storage
         ToJson * j_tiles;
+
 
         string project_location;
             

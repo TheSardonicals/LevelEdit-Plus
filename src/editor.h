@@ -20,7 +20,7 @@ class Editor{
         void Render();
         void Loop();
         void SetClearColor();
-        void SaveMXProject(map<string, vector<GameTile *>>, string);
+        void SaveMXProject(string, ToJson,  map<string, bool>);
         void LoadMXProject();
 
         int Start(int argc, char* args[]);
@@ -72,8 +72,6 @@ class Editor{
         map<string, vector<GameTile *>> tile_cache;
         Camera * camera; 
         KeyboardManager * keyboard;
-
-        ToJson mxpr_j;
 
 
         void SetupImGuiStyleColor();

@@ -20,6 +20,7 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){
             ImGui::Checkbox("Save File", &saving_to_json);
+            ImGui::Checkbox("Save Project", &saving_mxpr);
             ImGui::EndMenu();
         }
 
@@ -171,6 +172,23 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
 
         ghost_tile->w = w_increase;
         ghost_tile->h = h_increase;
+    }
+
+    if (saving_mxpr){
+        string prlabel_name = "(.mxpr)";
+        static string project_name = "";
+        if (ImGui::Begin("Please Enter a Project name", NULL)){
+            ImGui::InputText(prlabel_name.c_str(), &project_name);
+            if (ImGui::Button("Save")){
+                bool_states["show_item_menu"] = show_item_menu;
+                bool_states["hide_stats"] = hide_stats;
+                bool_states["align_menu_to_screen"] = align_menu_to_screen;
+                bool_states["about_window"] = about_window;
+                bool_states["instruction_manual"] = instruction_manual;
+                j_tiles->SaveMXProject(bool_states, project_name);
+            }
+        }
+        ImGui::End();
     }
 }
 
