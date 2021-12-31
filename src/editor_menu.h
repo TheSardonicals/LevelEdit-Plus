@@ -26,10 +26,14 @@ class EditorMenu{
         bool saving_to_json = false;
         bool saving_mxpr = false;
         bool save_to_mxpr = false;
+        bool loading_tileset = false;
         int * window_width;
         int * window_height;
 
-        map<string, bool> bool_states;
+        string prlabel_name = "(.mxpr)";
+        string project_name = "";
+
+        map<string, bool> editor_states;
 
         ImVec4 * clear_color;
         Pointer * mouse;

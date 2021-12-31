@@ -47,6 +47,7 @@ int Editor::Start(int argc, char** argv){
     camera = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT, 3, 40);
     keyboard = new KeyboardManager();
     gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths,  cache);
+    json_handler = new ToJson();
 
     return 1;
 }
@@ -144,6 +145,8 @@ void Editor::Process()
 
             }
 
+            //TODO Code Project and Tile Json Processes here and remove from editor_menu.cpp file.  Make it clean!!            
+
 
         }break;
 
@@ -177,7 +180,6 @@ void Editor::Render(){
             if (ghost_tile){
                 ghost_tile->Render({0, 0}, .6);
             }
-
             
         }break;   
 

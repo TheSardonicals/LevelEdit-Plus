@@ -103,3 +103,7 @@ void ToJson::SaveMXProject(map<string, bool> bool_state, string project_name = "
     }
 
 }
+
+json ToJson::LoadMXProject(){
+
+}

@@ -22,6 +22,7 @@ void SaveToJson(string, map<string, vector<GameTile *>>);             //Function
 void ImportMX();
 void ExportMX(map<string, vector<GameTile *>>, string);
 void SaveMXProject(map<string, bool>, string);
+json LoadMXProject();
 
 
 private:

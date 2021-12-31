@@ -72,6 +72,7 @@ class Editor{
         map<string, vector<GameTile *>> tile_cache;
         Camera * camera; 
         KeyboardManager * keyboard;
+        ToJson * json_handler;
 
 
         void SetupImGuiStyleColor();

@@ -21,6 +21,7 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         if (ImGui::BeginMenu("File")){
             ImGui::Checkbox("Save File", &saving_to_json);
             ImGui::Checkbox("Save Project", &saving_mxpr);
+            ImGui::Checkbox("Load Project", &loading_tileset);
             ImGui::EndMenu();
         }
 
@@ -176,20 +177,25 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
 
     // Saving MXPR settings and Booleans Statuses
     if (saving_mxpr){
-        string prlabel_name = "(.mxpr)";
-        static string project_name = "";
         if (ImGui::Begin("Please Enter a Project name", NULL)){
             ImGui::InputText(prlabel_name.c_str(), &project_name);
             if (ImGui::Button("Save")){
-                // save_to_mxpr = true; 
-                bool_states["show_item_menu"] = show_item_menu;
-                bool_states["hide_stats"] = hide_stats;
-                bool_states["align_menu_to_screen"] = align_menu_to_screen;
-                bool_states["about_window"] = about_window;
-                bool_states["instruction_manual"] = instruction_manual;
-                j_tiles->SaveMXProject(bool_states, project_name);
+                editor_states["show_item_menu"] = show_item_menu;
+                editor_states["hide_stats"] = hide_stats;
+                editor_states["align_menu_to_screen"] = align_menu_to_screen;
+                editor_states["about_window"] = about_window;
+                editor_states["instruction_manual"] = instruction_manual;
+                j_tiles->SaveMXProject(editor_states, project_name);
+            }   
+        }
+        ImGui::End();
+    }
+
+    if (loading_tileset){
+        if(ImGui::Begin("Please Input the name of the tileset you want to load", NULL)){
+            if (ImGui::Button("Load")){
+
             }
-            save_to_mxpr = false;
         }
         ImGui::End();
     }
