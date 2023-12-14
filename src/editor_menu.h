@@ -32,6 +32,7 @@ class EditorMenu{
 
         string prlabel_name = "(.mxpr)";
         string project_name = "";
+        string project_location;
 
         map<string, bool> editor_states;
 
@@ -49,7 +50,8 @@ class EditorMenu{
         ToJson * j_tiles;
 
 
-        string project_location;
+
+        
             
 
 

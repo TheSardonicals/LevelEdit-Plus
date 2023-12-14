@@ -10,7 +10,9 @@ ToJson::ToJson(){
 
 ToJson::~ToJson(){}
 
-void ToJson::ImportMX(){}
+void ToJson::ImportMX(string filepath, map<string, vector<GameTile *>>){
+    
+}
 
 void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache){
     if (json_blocks["name"] != name){
@@ -104,6 +106,5 @@ void ToJson::SaveMXProject(map<string, bool> bool_state, string project_name = "
 
 }
 
-json ToJson::LoadMXProject(){
-
+json ToJson::LoadMXProject(string filepath){
 }

@@ -1,0 +1,10 @@
+{
+    "project_name": "testing this too",
+    "states": {
+        "about_window": false,
+        "align_menu_to_screen": true,
+        "hide_stats": false,
+        "instruction_manual": false,
+        "show_item_menu": true
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "name": "Testing this",
+    "tiles": {
+        "Dark Ground": {
+            "filepath": "assets/Dark Ground.bmp",
+            "locations": [
+                [
+                    604,
+                    201,
+                    32,
+                    32
+                ],
+                [
+                    591,
+                    307,
+                    32,
+                    32
+                ],
+                [
+                    23,
+                    44,
+                    32,
+                    32
+                ]
+            ]
+        }
+    }
+}
