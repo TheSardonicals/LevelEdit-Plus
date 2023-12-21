@@ -21,7 +21,8 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         if (ImGui::BeginMenu("File")){
             ImGui::Checkbox("Save File", &saving_to_json);
             ImGui::Checkbox("Save Project", &saving_mxpr);
-            ImGui::Checkbox("Load Project", &loading_tileset);
+            ImGui::Checkbox("Load Project", &loading_project);
+            ImGui::Checkbox("Load Tileset", &loading_tileset);
             ImGui::EndMenu();
         }
 
@@ -191,7 +192,7 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         ImGui::End();
     }
 
-    if (loading_tileset){
+    if (loading_project){
         if(ImGui::Begin("Please Input the name of the tileset you want to load", NULL)){
             ImGui::InputText(project_name.c_str(), &project_name);
             if (ImGui::Button("Load")){
@@ -202,6 +203,17 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
             }
         }
         ImGui::End();
+    }
+
+    if (loading_tileset){
+        if (ImGui::Begin("Input the filepath to the tileset you want to load")){
+            
+            if (ImGui::Button("Load")){
+                tileset_import = true;
+            }
+        }
+        ImGui::End();
+
     }
 }
 

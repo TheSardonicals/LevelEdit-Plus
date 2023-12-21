@@ -1,4 +1,6 @@
 #include "tojson.h"
+#include <fstream>
+#include <iostream>
 
 
 ToJson::ToJson(){
@@ -10,7 +12,13 @@ ToJson::ToJson(){
 
 ToJson::~ToJson(){}
 
-void ToJson::ImportMX(string filepath, map<string, vector<GameTile *>>){
+void ToJson::ImportMX(string filepath, map<string, vector<GameTile *>> tile_cache){
+    string import_fp = "../exports/" + filepath;
+    
+
+    if (json_blocks){
+        json_blocks.empty();
+    }
     
 }
 
@@ -107,4 +115,5 @@ void ToJson::SaveMXProject(map<string, bool> bool_state, string project_name = "
 }
 
 json ToJson::LoadMXProject(string filepath){
+    
 }

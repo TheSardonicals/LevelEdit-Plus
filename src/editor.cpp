@@ -146,6 +146,9 @@ void Editor::Process()
             }
 
             //TODO Code Project and Tile Json Processes here and remove from editor_menu.cpp file.  Make it clean!!            
+            if (gui->loading_tileset){
+                
+            }
 
 
         }break;

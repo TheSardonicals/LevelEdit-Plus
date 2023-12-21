@@ -27,9 +27,12 @@ class EditorMenu{
         bool saving_mxpr = false;
         bool save_to_mxpr = false;
         bool loading_tileset = false;
+        bool loading_project = false;
+        bool tileset_import = false;
         int * window_width;
         int * window_height;
 
+        string tileset_name;
         string prlabel_name = "(.mxpr)";
         string project_name = "";
         string project_location;
