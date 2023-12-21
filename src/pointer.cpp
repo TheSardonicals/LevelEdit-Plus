@@ -17,7 +17,7 @@ Pointer::Pointer(){
 
 void Pointer::Compute(SDL_Event* event){
     // Instead of checking for SDL_MOUSEMOTION event, We Will use a change in the mouse's state from its relative state from last called.
-    
+
     if (SDL_GetRelativeMouseState(&this->xpos, &this->ypos) != SDL_GetMouseState(&this->xpos, &this->ypos)){
         this->xpos = event->motion.x;
         this->ypos = event->motion.y;
@@ -34,6 +34,10 @@ void Pointer::Process(){
     has_clicked = clicked && !clicking;
     
     clicked = clicking;
+
+    has_rclicked = r_clicking && !r_clicking;
+
+    r_clicked = r_clicking;
 
 }
 

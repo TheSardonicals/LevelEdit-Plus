@@ -34,12 +34,14 @@ class Pointer{
         map<string, SDL_Cursor*> cursor;
 
         bool has_clicked;
+        bool has_rclicked;
         
 
     private:
         SDL_Rect pointer_rect;
         bool clicking;
         bool r_clicking;
+        bool r_clicked;
         bool clicked;
 
 };
