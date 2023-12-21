@@ -14,11 +14,13 @@ ToJson::~ToJson(){}
 
 void ToJson::ImportMX(string filepath, map<string, vector<GameTile *>> tile_cache){
     string import_fp = "../exports/" + filepath;
-    
+    json j = j;
 
     if (json_blocks){
         json_blocks.empty();
     }
+
+
     
 }
 

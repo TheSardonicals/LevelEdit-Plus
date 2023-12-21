@@ -32,7 +32,8 @@ class EditorMenu{
         int * window_width;
         int * window_height;
 
-        string tileset_name;
+        string load_label = "../exports/";
+        string tileset_name = "";
         string prlabel_name = "(.mxpr)";
         string project_name = "";
         string project_location;
