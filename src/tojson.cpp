@@ -13,11 +13,11 @@ ToJson::ToJson(){
 ToJson::~ToJson(){}
 
 void ToJson::ImportMX(string filepath, map<string, vector<GameTile *>> tile_cache){
-    string import_fp = "../exports/" + filepath;
-    json j = j;
+    string fp = "exports/" + filepath;
+    string assets_fp = "exports/assets";
 
-    if (json_blocks){
-        json_blocks.empty();
+    if (this->json_blocks){
+        this->json_blocks.empty();
     }
 
 
@@ -25,19 +25,19 @@ void ToJson::ImportMX(string filepath, map<string, vector<GameTile *>> tile_cach
 }
 
 void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache){
-    if (json_blocks["name"] != name){
-        json_blocks["name"] = name;
+    if (this->json_blocks["name"] != name){
+        this->json_blocks["name"] = name;
     }
     
     for (auto it : tile_cache){
         for (auto tile : it.second){
             auto it_tiles = json_blocks["tiles"].find(tile->name);
             if (it_tiles != json_blocks["tiles"].end() == true){
-                json_blocks["tiles"][tile->name]["locations"].push_back({tile->x, tile->y, tile->w, tile->h});
+                this->json_blocks["tiles"][tile->name]["locations"].push_back({tile->x, tile->y, tile->w, tile->h});
                 
             }else{
-                json_blocks["tiles"][tile->name]["filepath"] = "assets/" + tile->name + ".bmp";
-                json_blocks["tiles"][tile->name]["locations"] = {{tile->x, tile->y, tile->w, tile->h}};
+                this->json_blocks["tiles"][tile->name]["filepath"] = "assets/" + tile->name + ".bmp";
+                this->json_blocks["tiles"][tile->name]["locations"] = {{tile->x, tile->y, tile->w, tile->h}};
             }
         }
     }
