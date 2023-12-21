@@ -148,6 +148,21 @@ void Editor::Process()
             //TODO Code Project and Tile Json Processes here and remove from editor_menu.cpp file.  Make it clean!!            
             if (gui->tileset_import){
                 //Call gui->ImportMX() for the tile_cache import logic to happen here
+                
+            }
+
+            if (gui->save_to_mxpr){
+                json_handler->SaveMXProject(gui->editor_states, gui->project_name);
+                gui->save_to_mxpr = false;
+            }
+
+            if (gui->save_to_mx){
+                json_handler->SaveToJson(gui->tileset_name, tile_cache);
+                json_handler->ExportMX(tile_cache, gui->tileset_name);
+                //Reset the window to close or to show a text saying, 'Tileset Saved'.  
+                //Made it a checkbox to have that constant availability of saving.
+                gui->saving_to_mx = false;  
+
             }
 
 

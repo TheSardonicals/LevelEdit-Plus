@@ -23,7 +23,8 @@ class EditorMenu{
         bool align_menu_to_screen = true;
         bool about_window = false;
         bool instruction_manual = false;
-        bool saving_to_json = false;
+        bool saving_to_mx = false;
+        bool save_to_mx = false;
         bool saving_mxpr = false;
         bool save_to_mxpr = false;
         bool loading_tileset = false;
