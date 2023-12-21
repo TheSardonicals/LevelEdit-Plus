@@ -51,9 +51,6 @@ class EditorMenu{
         int w_increase;
         int h_increase;
 
-        //Json Storage
-        ToJson * j_tiles;
-
 
 
         

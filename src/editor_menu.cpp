@@ -12,7 +12,6 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     }
     this->cache = cache;
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
-    j_tiles = new ToJson();
 }
 
 void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile *>> tile_cache){
