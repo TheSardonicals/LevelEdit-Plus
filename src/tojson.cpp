@@ -12,15 +12,31 @@ ToJson::ToJson(){
 
 ToJson::~ToJson(){}
 
-void ToJson::ImportMX(string filepath, map<string, vector<GameTile *>> tile_cache){
-    string fp = "exports/" + filepath;
+void ToJson::ImportMX(string filepath, map<string, vector<GameTile *>>* tile_cache){
+    string fp = "exports/" + filepath + "/";
     string assets_fp = "exports/assets";
+    string mx_file = fp + filepath + ".mx";
 
-    if (this->json_blocks){
-        this->json_blocks.empty();
+    // If the Json with the blocks is not empty, run the constructor to reset
+    if (!json_blocks.empty()){
+        ToJson();
     }
 
+    std::ifstream f(mx_file);
+    this->json_blocks = json::parse(f);
 
+    // Uncomment to see output of the json parse
+    //cout << json_blocks.dump() << endl;
+
+    if (!tile_cache->empty()){
+        tile_cache->clear();
+    }
+
+    for (auto& it : json_blocks["tiles"].items()){
+        // Uncomment to see output of json [key, value]
+        //cout << it.key() << it.value() << endl;
+        
+    }
     
 }
 

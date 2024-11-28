@@ -191,7 +191,7 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         if(ImGui::Begin("Please Input the name of the tileset you want to load", NULL)){
             ImGui::InputText(project_name.c_str(), &project_name);
             if (ImGui::Button("Load")){
-                
+                    
             }
         }
         ImGui::End();

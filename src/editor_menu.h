@@ -37,7 +37,7 @@ class EditorMenu{
         string tileset_name = "";
         string prlabel_name = "(.mxpr)";
         string project_name = "";
-        string project_location;
+        string project_location = "";
 
         map<string, bool> editor_states;
 

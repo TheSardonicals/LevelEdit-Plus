@@ -148,6 +148,8 @@ void Editor::Process()
             //TODO Code Project and Tile Json Processes here and remove from editor_menu.cpp file.  Make it clean!!            
             if (gui->tileset_import){
                 //Call gui->ImportMX() for the tile_cache import logic to happen here
+                json_handler->ImportMX(gui->tileset_name, &tile_cache);
+                gui->tileset_import = false;
                 
             }
 
