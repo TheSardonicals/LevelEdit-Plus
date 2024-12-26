@@ -145,11 +145,26 @@ void Editor::Process()
 
             }
 
-            //TODO Code Project and Tile Json Processes here and remove from editor_menu.cpp file.  Make it clean!!            
+            //TODO Code Project and Tile Json Processes here and remove from editor_menu.cpp file.  Make tile clean!!            
             if (gui->tileset_import){
-                //Call gui->ImportMX() for the tile_cache import logic to happen here
-                json_handler->ImportMX(gui->tileset_name, &tile_cache);
                 gui->tileset_import = false;
+                //Call gui->ImportMX() for the tile_cache import logic to happen here
+                json_handler->ImportMX(gui->tileset_name);
+
+                // Debug of json ingest 
+                //cout << json_handler->json_blocks.dump() << endl;
+
+                if (!tile_cache.empty()){
+                    tile_cache.clear();
+                }
+
+                // Iterating through json_blocks json structure to pull its tile's name and locations to add to the tile_cache
+                for (auto& tile : json_handler->json_blocks["tiles"].items()){
+                    cout << tile.key() << endl;
+                    for (auto& locations : json_handler->json_blocks["tiles"][tile.key()]["locations"].items()){
+                        cout << locations.value() << endl;
+                    }
+                }
                 
             }
 
@@ -159,11 +174,12 @@ void Editor::Process()
             }
 
             if (gui->save_to_mx){
+                gui->saving_to_mx = false;  
                 json_handler->SaveToJson(gui->tileset_name, tile_cache);
                 json_handler->ExportMX(tile_cache, gui->tileset_name);
                 //Reset the window to close or to show a text saying, 'Tileset Saved'.  
-                //Made it a checkbox to have that constant availability of saving.
-                gui->saving_to_mx = false;  
+                //Made tile a checkbox to have that constant availability of saving.
+                
 
             }
 

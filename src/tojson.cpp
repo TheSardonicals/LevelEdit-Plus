@@ -12,7 +12,7 @@ ToJson::ToJson(){
 
 ToJson::~ToJson(){}
 
-void ToJson::ImportMX(string filepath, map<string, vector<GameTile *>>* tile_cache){
+void ToJson::ImportMX(string filepath){
     string fp = "exports/" + filepath + "/";
     string assets_fp = "exports/assets";
     string mx_file = fp + filepath + ".mx";
@@ -27,16 +27,6 @@ void ToJson::ImportMX(string filepath, map<string, vector<GameTile *>>* tile_cac
 
     // Uncomment to see output of the json parse
     //cout << json_blocks.dump() << endl;
-
-    if (!tile_cache->empty()){
-        tile_cache->clear();
-    }
-
-    for (auto& it : json_blocks["tiles"].items()){
-        // Uncomment to see output of json [key, value]
-        //cout << it.key() << it.value() << endl;
-        
-    }
     
 }
 
