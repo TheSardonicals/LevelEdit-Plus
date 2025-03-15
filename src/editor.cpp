@@ -179,7 +179,7 @@ void Editor::Process()
                 json_handler->ExportMX(tile_cache, gui->tileset_name);
                 //Reset the window to close or to show a text saying, 'Tileset Saved'.  
                 //Made tile a checkbox to have that constant availability of saving.
-                
+                gui->save_to_mx = false;
 
             }
 

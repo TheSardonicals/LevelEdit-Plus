@@ -148,7 +148,6 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
             ImGui::InputText(label_name.c_str(), &tileset_name);
             if (ImGui::Button("Save")){
                 save_to_mx = true;
-                
             } 
         }
         ImGui::End();
