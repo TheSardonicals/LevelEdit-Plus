@@ -147,7 +147,7 @@ void Editor::Process()
 
             //TODO Code Project and Tile Json Processes here and remove from editor_menu.cpp file.  Make tile clean!!            
             if (gui->tileset_import){
-                gui->tileset_import = false;
+                
                 //Call gui->ImportMX() for the tile_cache import logic to happen here
                 json_handler->ImportMX(gui->tileset_name);
 
@@ -163,9 +163,19 @@ void Editor::Process()
                     cout << tile.key() << endl;
                     for (auto& locations : json_handler->json_blocks["tiles"][tile.key()]["locations"].items()){
                         cout << locations.value() << endl;
+                        cout << json_handler->json_blocks["tiles"][tile.key()]["filepath"] << endl;
+
+                        if (tile_cache.count(tile.key()) == 0){
+                            //cout << "New Import " << tile.key() << endl; 
+                            tile_cache[tile.key()] = {new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3])};
+                        } 
+                        else{
+                            //cout << "Adding to existing vector of " << tile.key() << endl;
+                            tile_cache[tile.key()].push_back(new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3]));
+                        }
                     }
                 }
-                
+                gui->tileset_import = false;
             }
 
             if (gui->save_to_mxpr){
@@ -202,7 +212,7 @@ void Editor::Render(){
         case EDITING:{
             ImGui::Render();
             // Anything that should render before the imgui-based menu, render  underneath this line.
-            if (tile_cache.size() > 0){
+            if (tile_cache.size() > 0 || import_finish){
                 for (auto tile_list: tile_cache){
                     for (auto tile: tile_list.second){
                         tile->Render({camera->xpos, camera->ypos});
