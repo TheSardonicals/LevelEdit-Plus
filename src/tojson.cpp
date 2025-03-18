@@ -42,7 +42,7 @@ void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache)
                 this->json_blocks["tiles"][tile->name]["locations"].push_back({tile->x, tile->y, tile->w, tile->h});
                 
             }else{
-                this->json_blocks["tiles"][tile->name]["filepath"] = "assets/" + tile->name + ".bmp";
+                this->json_blocks["tiles"][tile->name]["filepath"] = "exports/" + name + "/assets/" + tile->name + ".bmp";
                 this->json_blocks["tiles"][tile->name]["locations"] = {{tile->x, tile->y, tile->w, tile->h}};
             }
         }
