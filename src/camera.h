@@ -6,17 +6,17 @@
 
 class Camera{
     public:
-        Camera(int, int, int, int);
+        Camera(float, float, float, float);
         ~Camera();
 
         void Show(SDL_Renderer*);
 
-        SDL_Rect rect = {};
+        SDL_FRect rect = {};
 
-        int xpos;
-        int ypos;
-        int speed;
-        int cs;
+        float xpos;
+        float ypos;
+        float speed;
+        float cs;
         
         
 

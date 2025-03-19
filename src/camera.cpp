@@ -1,6 +1,6 @@
 #include "camera.h"
 
-Camera::Camera(int width, int height, int speed, int cs){
+Camera::Camera(float width, float height, float speed, float cs){
     xpos = 0;
     ypos = 0;
     this->speed = speed;
@@ -10,5 +10,5 @@ Camera::Camera(int width, int height, int speed, int cs){
 
 void Camera::Show(SDL_Renderer * renderer){
     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-    SDL_RenderDrawRect(renderer, &rect);
+    SDL_RenderRect(renderer, &rect);
 }

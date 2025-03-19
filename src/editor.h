@@ -37,8 +37,8 @@ class Editor{
         
         int SCREEN_WIDTH = 1280, SCREEN_HEIGHT = 720;
         
-        SDL_WindowFlags WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-        SDL_RendererFlags RENDERER_FLAGS = SDL_RENDERER_PRESENTVSYNC;
+        SDL_WindowFlags WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+        //SDL_Render RENDERER_FLAGS = SDL_RENDERER_PRESENTVSYNC;
 
         SDL_Event event;
 

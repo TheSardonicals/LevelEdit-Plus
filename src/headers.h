@@ -3,7 +3,8 @@
 using namespace std;
 
 //SDL INCLUDES
-#include <SDL2/SDL.h>
+
+#include <SDL3/SDL.h>
 
 //STANDARD INCLUDES
 #include <map>

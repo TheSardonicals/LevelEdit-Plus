@@ -7,17 +7,16 @@ Editor::Editor(){}
 
 int Editor::Start(int argc, char** argv){
 
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD);
 
     // Create Window and Renderer
-    window = SDL_CreateWindow("LevelEdit++ - by Sardonicals", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-            SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_FLAGS);
+    window = SDL_CreateWindow("LevelEdit++ - by Sardonicals", SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_FLAGS);
     if (!window){
         ShowError("LevelEdit++ Error!", "Couldn't create window: ", "Window creation failed!: ", true);
         return 0;
     }
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(window, NULL);
     if (!renderer){
         ShowError("LevelEdit++ Error!", "Couldn't create renderer: ", "Renderer creation failed!: ", true);
         return 0;
@@ -70,17 +69,17 @@ void Editor::Process()
     while (SDL_PollEvent(&event)) {
         ImGui_ImplSDL2_ProcessEvent(&event);
         
-        if (event.type == SDL_QUIT){
+        if (event.type == SDL_EVENT_QUIT){
             running = false;
             break;
         }
 
-        if (event.type == SDL_WINDOWEVENT){
-            if (event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)){
+        if (event.type == event.window.type){
+            if (event.window.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window)){
                 running = false;
                 break;
             }
-            if (event.window.event == SDL_WINDOWEVENT_RESIZED){
+            if (event.window.type == SDL_EVENT_WINDOW_RESIZED){
                 SCREEN_WIDTH = event.window.data1;
                 SCREEN_HEIGHT = event.window.data2;
             }
@@ -219,7 +218,7 @@ void Editor::Render(){
             if (tile_cache.size() > 0 || import_finish){
                 for (auto tile_list: tile_cache){
                     for (auto tile: tile_list.second){
-                        tile->Render({camera->xpos, camera->ypos});
+                        tile->Render({static_cast<int>(camera->xpos), static_cast<int>(camera->ypos)});
                     }
                 }
             }
@@ -309,6 +308,6 @@ Editor::~Editor(){
     ImGui::DestroyContext();
 
     SDL_DestroyRenderer(renderer);
-    SDL_FreeSurface(icon);
+    SDL_DestroySurface(icon);
     SDL_DestroyWindow(window);
 }
