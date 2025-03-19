@@ -14,7 +14,7 @@ SDL_Texture* TextureCache::LoadTexture(string filepath){
     if (cache.count(filepath) < 1){
         SDL_Surface* surface = SDL_LoadBMP(filepath.c_str());
         cache[filepath] = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_FreeSurface(surface);
+        SDL_DestroySurface(surface);
         SDL_SetTextureBlendMode(cache[filepath], SDL_BLENDMODE_BLEND);
     }
     return cache[filepath];
