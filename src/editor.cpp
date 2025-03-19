@@ -142,21 +142,17 @@ void Editor::Process()
                         }
                     }   
                 }
-
             }
 
-            //TODO Code Project and Tile Json Processes here and remove from editor_menu.cpp file.  Make tile clean!!            
             if (gui->tileset_import){
                 try {
                     LoadMX();
+                    gui->tileset_import = false;
                 }
                 catch (nlohmann::detail::parse_error) {
                     // Present the user a message on the screen to let them know that it failed.
                     cout << "Error: Tileset Does Not Exist" << endl;
                 }
-                // Iterating through json_blocks json structure to pull its tile's name and locations to add to the tile_cache
-                
-                gui->tileset_import = false;
             }
 
             if (gui->save_to_mxpr){
