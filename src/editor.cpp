@@ -148,7 +148,15 @@ void Editor::Process()
             //TODO Code Project and Tile Json Processes here and remove from editor_menu.cpp file.  Make tile clean!!            
             if (gui->tileset_import){
                 //Call gui->ImportMX() for the tile_cache import logic to happen here
-                json_handler->ImportMX(gui->tileset_name);
+                
+                try {
+                    json_handler->ImportMX(gui->tileset_name);
+                }
+                catch (nlohmann::detail::parse_error) {
+                    // Present the user a message on the screen to let them know that it failed.
+                    cout << "Error: Tileset Does Not Exist" << endl;
+                }
+
 
                 // Debug of json ingest 
                 //cout << json_handler->json_blocks.dump() << endl;
@@ -159,19 +167,19 @@ void Editor::Process()
 
                 // Iterating through json_blocks json structure to pull its tile's name and locations to add to the tile_cache
                 for (auto& tile : json_handler->json_blocks["tiles"].items()){
-                    cout << tile.key() << endl;
+                    //cout << tile.key() << endl;
                     for (auto& locations : json_handler->json_blocks["tiles"][tile.key()]["locations"].items()){
-                        cout << locations.value() << endl;
-                        cout << json_handler->json_blocks["tiles"][tile.key()]["filepath"] << endl;
+                        //cout << locations.value() << endl;
+                        //cout << json_handler->json_blocks["tiles"][tile.key()]["filepath"] << endl;
                         if (tile_cache.count(tile.key()) == 0){
                             //cout << "New Import " << tile.key() << endl; 
                             tile_cache[tile.key().c_str()] = {new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3])};
-                            cout << tile_cache.count(tile.key()) << endl;
+                            //cout << tile_cache.count(tile.key()) << endl;
                         } 
                         else{
                             //cout << "Adding to existing vector of " << tile.key() << endl;
                             tile_cache[tile.key().c_str()].push_back(new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3]));
-                            cout << tile_cache.count(tile.key()) << endl;
+                            
                         }
                     }
                 }

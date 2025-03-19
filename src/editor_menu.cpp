@@ -199,9 +199,9 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
     if (loading_tileset){
         if (ImGui::Begin("Input the filepath to the tileset you want to load")){
             ImGui::InputText(load_label.c_str(), &tileset_name);
-            if (ImGui::Button("Load")){
-                tileset_import = true;
-            }
+                if (ImGui::Button("Load")){
+                    tileset_import = true;
+                }                
         }
         ImGui::End();
 
