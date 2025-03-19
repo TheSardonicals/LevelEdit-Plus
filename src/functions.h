@@ -5,7 +5,7 @@
 #include <iostream>
 #include <map>
 #include <experimental/filesystem>
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 using namespace std;
 namespace fs = std::experimental::filesystem;

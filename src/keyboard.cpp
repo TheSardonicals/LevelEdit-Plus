@@ -3,7 +3,7 @@
 KeyboardManager::KeyboardManager(){
     SDL_memset(previous_keystate, 0, sizeof(Uint8)*SDL_SCANCODE_COUNT);
     SDL_memset(current_keystate, 0, sizeof(Uint8)*SDL_SCANCODE_COUNT);
-    instance_keystate = SDL_GetKeyboardState(NULL);
+    instance_keystate = NULL;
 }
 
 void KeyboardManager::Process(){

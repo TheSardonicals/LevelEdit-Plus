@@ -31,7 +31,7 @@ void GameTile::Render(array<int, 2> camera_pos = {0, 0}, float alpha){
     // nitpick (isaboll1): This might as well use the cache->SetTextureAlpha() function, that uses floats instead.
     // for consistency sake.
     SDL_SetTextureAlphaMod(this->texture, (alpha * 255));
-    SDL_RenderCopy(cache->renderer, this->texture, NULL, &rect);
+    SDL_RenderTexture(cache->renderer, this->texture, NULL, &rect);
 }
 
 void GameTile::SetPos(int xpos, int ypos){
