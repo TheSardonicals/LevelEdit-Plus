@@ -16,7 +16,7 @@ class Editor{
         void WindowState(SDL_Window*, SDL_Renderer*, bool);
         void Deleter(map<string, SDL_Renderer*>);
         void SavetoFile(string, string, SDL_Renderer*, int);
-        void LoadFromFile(string, map<string, SDL_Texture*>, SDL_Renderer*);
+        void LoadMX();
         void Render();
         void Loop();
         void SetClearColor();
