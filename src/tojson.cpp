@@ -1,4 +1,6 @@
 #include "tojson.h"
+#include <fstream>
+#include <iostream>
 
 
 ToJson::ToJson(){
@@ -10,24 +12,38 @@ ToJson::ToJson(){
 
 ToJson::~ToJson(){}
 
-void ToJson::ImportMX(string filepath, map<string, vector<GameTile *>>){
+void ToJson::ImportMX(string filepath){
+    string fp = "exports/" + filepath + "/";
+    string assets_fp = "exports/assets";
+    string mx_file = fp + filepath + ".mx";
+
+    // If the Json with the blocks is not empty, run the constructor to reset
+    if (!json_blocks.empty()){
+        ToJson();
+    }
+
+    std::ifstream f(mx_file);
+    this->json_blocks = json::parse(f);
+
+    // Uncomment to see output of the json parse
+    //cout << json_blocks.dump() << endl;
     
 }
 
 void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache){
-    if (json_blocks["name"] != name){
-        json_blocks["name"] = name;
+    if (this->json_blocks["name"] != name){
+        this->json_blocks["name"] = name;
     }
     
     for (auto it : tile_cache){
         for (auto tile : it.second){
             auto it_tiles = json_blocks["tiles"].find(tile->name);
             if (it_tiles != json_blocks["tiles"].end() == true){
-                json_blocks["tiles"][tile->name]["locations"].push_back({tile->x, tile->y, tile->w, tile->h});
+                this->json_blocks["tiles"][tile->name]["locations"].push_back({tile->x, tile->y, tile->w, tile->h});
                 
             }else{
-                json_blocks["tiles"][tile->name]["filepath"] = "assets/" + tile->name + ".bmp";
-                json_blocks["tiles"][tile->name]["locations"] = {{tile->x, tile->y, tile->w, tile->h}};
+                this->json_blocks["tiles"][tile->name]["filepath"] = "exports/" + name + "/assets/" + tile->name + ".bmp";
+                this->json_blocks["tiles"][tile->name]["locations"] = {{tile->x, tile->y, tile->w, tile->h}};
             }
         }
     }
@@ -107,4 +123,5 @@ void ToJson::SaveMXProject(map<string, bool> bool_state, string project_name = "
 }
 
 json ToJson::LoadMXProject(string filepath){
+    
 }

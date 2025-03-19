@@ -145,7 +145,53 @@ void Editor::Process()
 
             }
 
-            //TODO Code Project and Tile Json Processes here and remove from editor_menu.cpp file.  Make it clean!!            
+            //TODO Code Project and Tile Json Processes here and remove from editor_menu.cpp file.  Make tile clean!!            
+            if (gui->tileset_import){
+                //Call gui->ImportMX() for the tile_cache import logic to happen here
+                json_handler->ImportMX(gui->tileset_name);
+
+                // Debug of json ingest 
+                //cout << json_handler->json_blocks.dump() << endl;
+
+                if (!tile_cache.empty()){
+                    tile_cache.clear();
+                }
+
+                // Iterating through json_blocks json structure to pull its tile's name and locations to add to the tile_cache
+                for (auto& tile : json_handler->json_blocks["tiles"].items()){
+                    cout << tile.key() << endl;
+                    for (auto& locations : json_handler->json_blocks["tiles"][tile.key()]["locations"].items()){
+                        cout << locations.value() << endl;
+                        cout << json_handler->json_blocks["tiles"][tile.key()]["filepath"] << endl;
+                        if (tile_cache.count(tile.key()) == 0){
+                            //cout << "New Import " << tile.key() << endl; 
+                            tile_cache[tile.key().c_str()] = {new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3])};
+                            cout << tile_cache.count(tile.key()) << endl;
+                        } 
+                        else{
+                            //cout << "Adding to existing vector of " << tile.key() << endl;
+                            tile_cache[tile.key().c_str()].push_back(new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3]));
+                            cout << tile_cache.count(tile.key()) << endl;
+                        }
+                    }
+                }
+                gui->tileset_import = false;
+            }
+
+            if (gui->save_to_mxpr){
+                json_handler->SaveMXProject(gui->editor_states, gui->project_name);
+                gui->save_to_mxpr = false;
+            }
+
+            if (gui->save_to_mx){
+                gui->saving_to_mx = false;  
+                json_handler->SaveToJson(gui->tileset_name, tile_cache);
+                json_handler->ExportMX(tile_cache, gui->tileset_name);
+                //Reset the window to close or to show a text saying, 'Tileset Saved'.  
+                //Made tile a checkbox to have that constant availability of saving.
+                gui->save_to_mx = false;
+
+            }
 
 
         }break;
@@ -166,7 +212,7 @@ void Editor::Render(){
         case EDITING:{
             ImGui::Render();
             // Anything that should render before the imgui-based menu, render  underneath this line.
-            if (tile_cache.size() > 0){
+            if (tile_cache.size() > 0 || import_finish){
                 for (auto tile_list: tile_cache){
                     for (auto tile: tile_list.second){
                         tile->Render({camera->xpos, camera->ypos});

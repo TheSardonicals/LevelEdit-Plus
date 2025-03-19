@@ -54,6 +54,7 @@ class Editor{
         bool increase_wh = false;
         bool removing_tile = false;
         bool show_size = true;
+        bool import_finish = false;
 
         int current_x = 0, current_y = 0;
 

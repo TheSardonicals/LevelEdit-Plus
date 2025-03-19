@@ -23,16 +23,21 @@ class EditorMenu{
         bool align_menu_to_screen = true;
         bool about_window = false;
         bool instruction_manual = false;
-        bool saving_to_json = false;
+        bool saving_to_mx = false;
+        bool save_to_mx = false;
         bool saving_mxpr = false;
         bool save_to_mxpr = false;
         bool loading_tileset = false;
+        bool loading_project = false;
+        bool tileset_import = false;
         int * window_width;
         int * window_height;
 
+        string load_label = "../exports/";
+        string tileset_name = "";
         string prlabel_name = "(.mxpr)";
         string project_name = "";
-        string project_location;
+        string project_location = "";
 
         map<string, bool> editor_states;
 
@@ -45,9 +50,6 @@ class EditorMenu{
         SDL_Renderer * renderer;
         int w_increase;
         int h_increase;
-
-        //Json Storage
-        ToJson * j_tiles;
 
 
 

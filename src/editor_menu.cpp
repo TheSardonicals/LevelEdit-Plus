@@ -12,16 +12,16 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     }
     this->cache = cache;
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
-    j_tiles = new ToJson();
 }
 
 void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile *>> tile_cache){
     // Menu Bar with options and such
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){
-            ImGui::Checkbox("Save File", &saving_to_json);
+            ImGui::Checkbox("Save File", &saving_to_mx);
             ImGui::Checkbox("Save Project", &saving_mxpr);
-            ImGui::Checkbox("Load Project", &loading_tileset);
+            ImGui::Checkbox("Load Project", &loading_project);
+            ImGui::Checkbox("Load Tileset", &loading_tileset);
             ImGui::EndMenu();
         }
 
@@ -65,7 +65,7 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         if (ImGui::Begin("Option Menu", NULL, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize)){
             if (ImGui::Button("Save File", ImVec2(120, 40))){
                 // Save .mx file contents.
-                saving_to_json = true;
+                saving_to_mx = true;
             }
             ImGui::SameLine();
 
@@ -142,17 +142,12 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         ImGui::End();
     }
 
-    if (saving_to_json){
+    if (saving_to_mx){
         string label_name = "(.mx)";
-        static string tileset_name = "";
         if (ImGui::Begin("Please Enter a name for your tileset", NULL)){
             ImGui::InputText(label_name.c_str(), &tileset_name);
-            if (ImGui::Button("Save")){ 
-                j_tiles->SaveToJson(tileset_name, tile_cache);
-                j_tiles->ExportMX(tile_cache, tileset_name);
-                //Reset the window to close or to show a text saying, 'Tileset Saved'.  
-                //Made it a checkbox to have that constant availability of saving.
-                saving_to_json = false;  
+            if (ImGui::Button("Save")){
+                save_to_mx = true;
             } 
         }
         ImGui::End();
@@ -180,28 +175,36 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         if (ImGui::Begin("Please Enter a Project name", NULL)){
             ImGui::InputText(prlabel_name.c_str(), &project_name);
             if (ImGui::Button("Save")){
+                save_to_mxpr = true;
                 editor_states["show_item_menu"] = show_item_menu;
                 editor_states["hide_stats"] = hide_stats;
                 editor_states["align_menu_to_screen"] = align_menu_to_screen;
                 editor_states["about_window"] = about_window;
                 editor_states["instruction_manual"] = instruction_manual;
-                j_tiles->SaveMXProject(editor_states, project_name);
             }   
         }
         ImGui::End();
     }
 
-    if (loading_tileset){
+    if (loading_project){
         if(ImGui::Begin("Please Input the name of the tileset you want to load", NULL)){
             ImGui::InputText(project_name.c_str(), &project_name);
             if (ImGui::Button("Load")){
-                
-            }
-            if (ImGui::Button("Browse")){
-                
+                    
             }
         }
         ImGui::End();
+    }
+
+    if (loading_tileset){
+        if (ImGui::Begin("Input the filepath to the tileset you want to load")){
+            ImGui::InputText(load_label.c_str(), &tileset_name);
+            if (ImGui::Button("Load")){
+                tileset_import = true;
+            }
+        }
+        ImGui::End();
+
     }
 }
 
