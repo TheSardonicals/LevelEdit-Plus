@@ -21,8 +21,8 @@ using namespace std;
 
 //IMGUI INCLUDES
 #include "imgui.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_sdl_renderer.h"
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_sdlrenderer3.h"
 
 //NFD INCLUDE
 #include "nfd.h"

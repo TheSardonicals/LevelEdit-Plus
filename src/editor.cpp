@@ -28,12 +28,15 @@ int Editor::Start(int argc, char** argv){
 
     // ImGui Initialization.
     IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
+    ImGuiContext* ctx = ImGui::CreateContext();
+    ImGui::SetCurrentContext(ctx);
     ImGuiIO& io = ImGui::GetIO(); (void) io;
     io.Fonts->AddFontFromFileTTF("misc/fonts/joystix.ttf", 16.0f);
+    
     SetupImGuiStyleColor();
-    ImGui_ImplSDL2_InitStandalone(window);
-    ImGui_ImplSDLRenderer_Init(renderer);
+    
+    ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
+    ImGui_ImplSDLRenderer3_Init(renderer);
 
     // VARIABLES
     state = EDITING;
@@ -67,7 +70,7 @@ void Editor::Process()
 
     //Event Loop
     while (SDL_PollEvent(&event)) {
-        ImGui_ImplSDL2_ProcessEvent(&event);
+        ImGui_ImplSDL3_ProcessEvent(&event);
         
         if (event.type == SDL_EVENT_QUIT){
             running = false;
@@ -92,7 +95,8 @@ void Editor::Process()
         case MENU:{}break;
         case EDITING:{
             // Start the Dear ImGui frame
-            ImGui_ImplSDL2_NewFrame(window);
+            ImGui_ImplSDLRenderer3_NewFrame();
+            ImGui_ImplSDL3_NewFrame();
             ImGui::NewFrame();
 
             gui->Process(ghost_tile, camera, tile_cache);
@@ -224,7 +228,7 @@ void Editor::Render(){
             }
             camera->Show(renderer);
             // Send the data imgui stored from "Imgui::Render" to the screen using the specified render api.
-            ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+            ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
             // Anything that should render after the Imgui-based menu, render underneath this line.
             if (ghost_tile){
                 ghost_tile->Render({0, 0}, .6);
@@ -288,7 +292,7 @@ void Editor::SetupImGuiStyleColor(){
     colors[ImGuiCol_PlotHistogram]          = ImVec4(0.73f, 0.60f, 0.15f, 1.00f);
     colors[ImGuiCol_PlotHistogramHovered]   = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
     colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.87f, 0.87f, 0.87f, 0.35f);
-    colors[ImGuiCol_ModalWindowDarkening]   = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+    //colors[ImGuiCol_ModalWindowDarkening]   = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
     colors[ImGuiCol_DragDropTarget]         = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
     colors[ImGuiCol_NavHighlight]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
     colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
@@ -303,8 +307,8 @@ Editor::~Editor(){
         }
     }
     delete cache;
-    ImGui_ImplSDLRenderer_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
+    ImGui_ImplSDLRenderer3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 
     SDL_DestroyRenderer(renderer);
