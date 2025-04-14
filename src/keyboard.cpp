@@ -1,18 +1,22 @@
 #include "keyboard.h"
 
 KeyboardManager::KeyboardManager(){
-    SDL_memset(previous_keystate, 0, sizeof(Uint8)*SDL_SCANCODE_COUNT);
-    SDL_memset(current_keystate, 0, sizeof(Uint8)*SDL_SCANCODE_COUNT);
-    instance_keystate = NULL;
+    SDL_memset(previous_keystate, 0, sizeof(bool)*SDL_SCANCODE_COUNT);
+    SDL_memset(current_keystate, 0, sizeof(bool)*SDL_SCANCODE_COUNT);
+    instance_keystate = SDL_GetKeyboardState(NULL);
 }
 
 void KeyboardManager::Process(){
 
     for (int key = 0; key < SDL_SCANCODE_COUNT; key++){
-        previous_keystate[key] = current_keystate[key];
+        if (SDL_GetKeyboardState(&key)){
+            previous_keystate[key] = current_keystate[key];
+        }
     }
     for (int key = 0; key < SDL_SCANCODE_COUNT; key++){
-        current_keystate[key] = instance_keystate[key];
+        if (SDL_GetKeyboardState(&key)){
+            current_keystate[key] = instance_keystate[key];
+        }
     }
 }
 
