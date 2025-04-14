@@ -6,7 +6,6 @@
 
 class KeyboardManager {
     private:
-        const bool* instance_keystate;
         bool previous_keystate[SDL_SCANCODE_COUNT];
         bool current_keystate [SDL_SCANCODE_COUNT];
 
