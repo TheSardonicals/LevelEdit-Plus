@@ -3,19 +3,16 @@
 KeyboardManager::KeyboardManager(){
     SDL_memset(previous_keystate, 0, sizeof(bool)*SDL_SCANCODE_COUNT);
     SDL_memset(current_keystate, 0, sizeof(bool)*SDL_SCANCODE_COUNT);
+    instance_keystate = SDL_GetKeyboardState(NULL);
 }
 
 void KeyboardManager::Process(){
-    const bool* instance_keystate = SDL_GetKeyboardState(NULL);
+    
     for (int key = 0; key < SDL_SCANCODE_COUNT; key++){
-        if (SDL_GetKeyboardState(&key)){
-            previous_keystate[key] = current_keystate[key];
-        }
+        previous_keystate[key] = current_keystate[key];
     }
     for (int key = 0; key < SDL_SCANCODE_COUNT; key++){
-        if (SDL_GetKeyboardState(&key)){
-            current_keystate[key] = instance_keystate[key];
-        }
+        current_keystate[key] = instance_keystate[key];
     }
 }
 

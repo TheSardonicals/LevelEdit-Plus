@@ -66,8 +66,6 @@ void Editor::Loop(){
 
 void Editor::Process()
 {
-    //mouse->Process();
-
     //Event Loop
     while (SDL_PollEvent(&event)) {
         ImGui_ImplSDL3_ProcessEvent(&event);
@@ -106,7 +104,7 @@ void Editor::Process()
 
             // Keyboard Inputs
             if (keyboard->KeyIsPressed(SDL_SCANCODE_ESCAPE)){
-            running = false;
+                running = false;
             }
 
             if (keyboard->KeyIsPressed(SDL_SCANCODE_X)){
