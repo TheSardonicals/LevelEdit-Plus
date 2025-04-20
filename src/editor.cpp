@@ -133,6 +133,16 @@ void Editor::Process()
 
             // Handle every editor-related thing that works outside of the GUI underneath this conditional.
             if (!ImGui::GetIO().WantCaptureMouse){
+                // Functionality for Deletion on Right Click
+                for (auto &tile : tile_cache){
+                    for (auto it = tile.second.begin(); it != tile.second.end(); it++) {
+                        if (mouse->IsRClicking(&(*it)->rect)){
+                            cout << "Right clicking on " << tile.first << endl;
+                            tile.second.erase(it);
+                            
+                        }
+                    }
+                }
                 if (ghost_tile){
                     if (mouse->has_clicked){
                         if (tile_cache.count(ghost_tile->name) == 0){
@@ -142,7 +152,7 @@ void Editor::Process()
                             tile_cache[ghost_tile->name].push_back(new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h));
                         }
                     }   
-                }
+                } 
             }
 
             if (gui->tileset_import){

@@ -13,7 +13,7 @@
                 "src/*.cpp",
                 "-o",
                 "${workspaceFolder}/bin/LevelEdit++DEBUG.x86_64",
-                "-lSDL2",
+                "-lSDL3",
                 "-lstdc++fs"
             ],
             "group": "build",
@@ -30,7 +30,7 @@
                 "-O3",
                 "-g",
                 "src/*.cpp",
-                "-lSDL2",
+                "-lSDL3",
                 "-o",
                 "${workspaceFolder}/bin/LevelEdit++.x86_64",
                 "-lstdc++fs"
