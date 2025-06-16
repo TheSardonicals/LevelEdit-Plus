@@ -23,6 +23,7 @@ void Pointer::Compute(SDL_Event* event){
         this->ypos = event->motion.y;
     }
 
+    
 }
 
 void Pointer::Process(){
@@ -38,6 +39,8 @@ void Pointer::Process(){
     has_rclicked = r_clicking && !r_clicking;
 
     r_clicked = r_clicking;
+
+    pointer_rect = {this->xpos, this->ypos, 10, 10};
 
 }
 

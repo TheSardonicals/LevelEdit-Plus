@@ -69,7 +69,9 @@ void Editor::Process()
     //Event Loop
     while (SDL_PollEvent(&event)) {
         ImGui_ImplSDL3_ProcessEvent(&event);
-        
+        mouse->Compute(&event);
+        mouse->Process();
+       
         if (event.type == SDL_EVENT_QUIT){
             running = false;
             break;
@@ -98,9 +100,7 @@ void Editor::Process()
             ImGui::NewFrame();
 
             gui->Process(ghost_tile, camera, tile_cache);
-            mouse->Compute(&event);
-            mouse->Process();
-            keyboard->Process();
+                        keyboard->Process();
 
             // Keyboard Inputs
             if (keyboard->KeyIsPressed(SDL_SCANCODE_ESCAPE)){
@@ -128,21 +128,12 @@ void Editor::Process()
             }
 
             if (ghost_tile){
-                ghost_tile->SetPos(mouse->xpos, mouse->ypos);
+                ghost_tile->SetPos(mouse->xpos , mouse->ypos);
             }
 
             // Handle every editor-related thing that works outside of the GUI underneath this conditional.
             if (!ImGui::GetIO().WantCaptureMouse){
                 // Functionality for Deletion on Right Click
-                for (auto &tile : tile_cache){
-                    for (auto it = tile.second.begin(); it != tile.second.end(); it++) {
-                        if (mouse->IsRClicking(&(*it)->rect)){
-                            cout << "Right clicking on " << tile.first << endl;
-                            tile.second.erase(it);
-                            
-                        }
-                    }
-                }
                 if (ghost_tile){
                     if (mouse->has_clicked){
                         if (tile_cache.count(ghost_tile->name) == 0){
@@ -153,6 +144,15 @@ void Editor::Process()
                         }
                     }   
                 } 
+                else {
+                  for (map<string, vector<GameTile *>>::iterator it = tile_cache.begin(); it != tile_cache.end(); it++ ){
+                    for (auto &tile : it->second){
+                      if (mouse->IsTouching(&tile->rect)){
+                        continue;
+                      }
+                    }
+                  }
+                }
             }
 
             if (gui->tileset_import){
