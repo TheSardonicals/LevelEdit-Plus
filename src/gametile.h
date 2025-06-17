@@ -29,5 +29,6 @@ class GameTile{
         array<int, 2> GetPos();
         array<int, 4> GetInfo();
 
+        bool highlight = false;
 };
 #endif

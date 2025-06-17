@@ -145,13 +145,17 @@ void Editor::Process()
                     }   
                 } 
                 else {
-                  for (map<string, vector<GameTile *>>::iterator it = tile_cache.begin(); it != tile_cache.end(); it++ ){
-                    for (auto &tile : it->second){
-                      if (mouse->IsTouching(&tile->rect)){
-                        continue;
+                  // Functionality for a tile selection mode 
+                  for (auto& tile_name : tile_cache){
+                      for (auto& tile : tile_name.second){
+                        if (mouse->IsTouching(&tile->rect)){
+                          tile->highlight = true;
+                        }
+                        else {
+                          tile->highlight = false;
+                        }
                       }
                     }
-                  }
                 }
             }
 
