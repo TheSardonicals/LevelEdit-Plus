@@ -55,6 +55,7 @@ class Editor{
         bool removing_tile = false;
         bool show_size = true;
         bool import_finish = false;
+        bool selection_mode = false;
 
         int current_x = 0, current_y = 0;
 
@@ -74,6 +75,7 @@ class Editor{
         Camera * camera; 
         KeyboardManager * keyboard;
         ToJson * json_handler;
+        GameTile * selected_tile = NULL;
 
 
         void SetupImGuiStyleColor();

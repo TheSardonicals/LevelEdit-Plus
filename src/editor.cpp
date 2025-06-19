@@ -135,6 +135,7 @@ void Editor::Process()
             if (!ImGui::GetIO().WantCaptureMouse){
                 // Functionality for Deletion on Right Click
                 if (ghost_tile){
+                  // TODO QOL: Add a pre-place highlight to show where user will be placing the selected block.
                     if (mouse->has_clicked){
                         if (tile_cache.count(ghost_tile->name) == 0){
                             tile_cache[ghost_tile->name] = {new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h)};
@@ -145,11 +146,19 @@ void Editor::Process()
                     }   
                 } 
                 else {
-                  // Functionality for a tile selection mode 
+                  // Functionality for a tile selection mode
                   for (auto& tile_name : tile_cache){
                       for (auto& tile : tile_name.second){
                         if (mouse->IsTouching(&tile->rect)){
                           tile->highlight = true;
+                        }
+                        else if (mouse->IsClicking(&tile->rect)){                        
+                          selection_mode = true;
+                          selected_tile = tile;
+
+                          if (selection_mode){
+                            selected_tile->highlight = true;
+                          }
                         }
                         else {
                           tile->highlight = false;
