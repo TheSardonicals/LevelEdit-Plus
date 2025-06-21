@@ -149,19 +149,19 @@ void Editor::Process()
                   // Functionality for a tile selection mode
                   for (auto& tile_name : tile_cache){
                       for (auto& tile : tile_name.second){
-                        if (mouse->IsTouching(&tile->rect)){
-                          tile->highlight = true;
-                        }
-                        else if (mouse->IsClicking(&tile->rect)){                        
-                          selection_mode = true;
-                          selected_tile = tile;
+                        
+                        if (mouse->IsClicking(&tile->rect)){                        
+                            tile->highlight = true;
+                            gui->tile_edit_mode = true;
+                            selected_tile = tile;
 
-                          if (selection_mode){
-                            selected_tile->highlight = true;
-                          }
                         }
-                        else {
-                          tile->highlight = false;
+                        else if (mouse->IsTouching(&tile->rect)){
+                            tile->highlight = true;
+                        }
+                        
+                        else if (!selected_tile){
+                            tile->highlight = false;
                         }
                       }
                     }

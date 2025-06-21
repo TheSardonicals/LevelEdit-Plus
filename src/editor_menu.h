@@ -30,6 +30,7 @@ class EditorMenu{
         bool loading_tileset = false;
         bool loading_project = false;
         bool tileset_import = false;
+        bool tile_edit_mode = false;
         int * window_width;
         int * window_height;
 

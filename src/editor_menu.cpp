@@ -206,6 +206,14 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         ImGui::End();
 
     }
+
+    // Tile Edit Mode 
+    if (tile_edit_mode){
+        if (ImGui::Begin("Tile Edit Window")){
+
+        }
+        ImGui::End();
+    }
 }
 
 
