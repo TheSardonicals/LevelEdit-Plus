@@ -99,37 +99,9 @@ void Editor::Process()
             ImGui_ImplSDL3_NewFrame();
             ImGui::NewFrame();
 
+            SetKeyMapping();
             gui->Process(ghost_tile, camera, tile_cache, selected_tile);
             keyboard->Process();
-
-            // Keyboard Inputs
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_ESCAPE)){
-                running = false;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_X)){
-                ghost_tile = NULL;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_UP)){
-                camera->ypos += camera->speed;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_DOWN)){
-                camera->ypos -= camera->speed;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_LEFT)){
-                camera->xpos += camera->speed;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_RIGHT)){
-                camera->xpos -= camera->speed;
-            }
-
-            if (ghost_tile){
-                ghost_tile->SetPos(mouse->xpos , mouse->ypos);
-            }
 
             // Handle every editor-related thing that works outside of the GUI underneath this conditional.
             if (!ImGui::GetIO().WantCaptureMouse){
@@ -261,6 +233,38 @@ void Editor::Render(){
             break;   
     }
     SDL_RenderPresent(renderer);
+}
+
+void Editor::SetKeyMapping(){
+            // Keyboard Inputs
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_ESCAPE)){
+                running = false;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_X)){
+                ghost_tile = NULL;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_UP)){
+                camera->ypos += camera->speed;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_DOWN)){
+                camera->ypos -= camera->speed;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_LEFT)){
+                camera->xpos += camera->speed;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_RIGHT)){
+                camera->xpos -= camera->speed;
+            }
+
+            if (ghost_tile){
+                ghost_tile->SetPos(mouse->xpos , mouse->ypos);
+            }
+
 }
 
 

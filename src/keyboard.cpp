@@ -23,3 +23,4 @@ bool KeyboardManager::KeyIsPressed(int scancode){
 bool KeyboardManager::KeyWasPressed(int scancode){
     return !previous_keystate[scancode] && current_keystate[scancode];
 }
+

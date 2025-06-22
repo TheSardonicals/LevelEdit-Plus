@@ -80,6 +80,7 @@ class Editor{
 
         void SetupImGuiStyleColor();
         void Process();
+        void SetKeyMapping();
 };
 
 
