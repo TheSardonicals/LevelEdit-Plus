@@ -15,6 +15,12 @@ class EditorMenu{
         ~EditorMenu();
         void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >>);
 
+        // Window Functions
+
+        void SavingMXWindow();
+        void LoadingMXWindow();
+        void TileEditWindow();
+
         string current_item = "";
 
         bool show_item_menu = false;
