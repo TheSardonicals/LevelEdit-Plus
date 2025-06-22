@@ -142,6 +142,10 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         ImGui::End();
     }
 
+    if(ghost_tile){
+      GhostTileWindow(ghost_tile, camera);
+    }
+
     if (saving_to_mx){
         string label_name = "(.mx)";
         if (ImGui::Begin("Please Enter a name for your tileset", NULL)){
@@ -151,23 +155,6 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
             } 
         }
         ImGui::End();
-    }
-
-    if (ghost_tile){
-        w_increase = ghost_tile->w;
-        h_increase = ghost_tile->h;
-        if (ImGui::Begin("Texture Properties", NULL)){
-            string x_string = "X: " + to_string(ghost_tile->x - camera->xpos);
-            string y_string = "Y: " + to_string(ghost_tile->y - camera->ypos);
-            ImGui::Text(x_string.c_str());
-            ImGui::Text(y_string.c_str());
-            ImGui::InputInt("Width", &w_increase);
-            ImGui::InputInt("Height", &h_increase);
-        }
-        ImGui::End();
-
-        ghost_tile->w = w_increase;
-        ghost_tile->h = h_increase;
     }
 
     // Saving MXPR settings and Booleans Statuses
@@ -215,4 +202,21 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
     }
 }
 
+void EditorMenu::GhostTileWindow(GameTile * ghost_tile, Camera * camera){
+  w_increase = ghost_tile->w;
+  h_increase = ghost_tile->h;
+ 
+  if (ImGui::Begin("Texture Properties", NULL)){
+    string x_string = "X: " + to_string(ghost_tile->x - camera->xpos);
+    string y_string = "Y: " + to_string(ghost_tile->y - camera->ypos);
+    ImGui::Text(x_string.c_str());
+    ImGui::Text(y_string.c_str());
+    ImGui::InputInt("Width", &w_increase);
+    ImGui::InputInt("Height", &h_increase);
+  }
 
+  ImGui::End();
+  ghost_tile->w = w_increase;
+  ghost_tile->h = h_increase;
+
+}

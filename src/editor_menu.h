@@ -20,6 +20,7 @@ class EditorMenu{
         void SavingMXWindow();
         void LoadingMXWindow();
         void TileEditWindow();
+        void GhostTileWindow(GameTile *, Camera *);
 
         string current_item = "";
 

@@ -160,7 +160,7 @@ void Editor::Process()
                             tile->highlight = true;
                         }
                         
-                        else if (!selected_tile){
+                        else {
                             tile->highlight = false;
                         }
                       }
