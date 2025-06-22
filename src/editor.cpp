@@ -99,8 +99,8 @@ void Editor::Process()
             ImGui_ImplSDL3_NewFrame();
             ImGui::NewFrame();
 
-            gui->Process(ghost_tile, camera, tile_cache);
-                        keyboard->Process();
+            gui->Process(ghost_tile, camera, tile_cache, selected_tile);
+            keyboard->Process();
 
             // Keyboard Inputs
             if (keyboard->KeyIsPressed(SDL_SCANCODE_ESCAPE)){

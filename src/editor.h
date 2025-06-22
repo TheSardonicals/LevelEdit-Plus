@@ -71,11 +71,11 @@ class Editor{
         vector<string> tile_stack;
         map<string, string> tile_paths;
         GameTile * ghost_tile = NULL;
+        GameTile * selected_tile = NULL;
         map<string, vector<GameTile *>> tile_cache;
         Camera * camera; 
         KeyboardManager * keyboard;
         ToJson * json_handler;
-        GameTile * selected_tile = NULL;
 
 
         void SetupImGuiStyleColor();
