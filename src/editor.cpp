@@ -105,7 +105,6 @@ void Editor::Process()
 
             // Handle every editor-related thing that works outside of the GUI underneath this conditional.
             if (!ImGui::GetIO().WantCaptureMouse){
-                // Functionality for Deletion on Right Click
                 if (ghost_tile){
                   // TODO QOL: Add a pre-place highlight to show where user will be placing the selected block.
                     if (mouse->has_clicked){
@@ -243,6 +242,7 @@ void Editor::SetKeyMapping(){
 
             if (keyboard->KeyIsPressed(SDL_SCANCODE_X)){
                 ghost_tile = NULL;
+                delete ghost_tile;
             }
 
             if (keyboard->KeyIsPressed(SDL_SCANCODE_UP)){
