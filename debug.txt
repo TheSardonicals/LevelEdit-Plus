@@ -1,0 +1,179 @@
+In file included from /usr/local/include/SDL3/SDL.h:88,
+                 from src/headers.h:7,
+                 from src/camera.h:2,
+                 from src/camera.cpp:1:
+src/keyboard.h:10:33: error: ‘SDL_NUM_SCANCODES_renamed_SDL_SCANCODE_COUNT’ was not declared in this scope
+   10 |         Uint8 previous_keystate[SDL_NUM_SCANCODES];
+      |                                 ^~~~~~~~~~~~~~~~~
+src/keyboard.h:11:33: error: ‘SDL_NUM_SCANCODES_renamed_SDL_SCANCODE_COUNT’ was not declared in this scope
+   11 |         Uint8 current_keystate [SDL_NUM_SCANCODES];
+      |                                 ^~~~~~~~~~~~~~~~~
+src/camera.cpp: In member function ‘void Camera::Show(SDL_Renderer*)’:
+src/camera.cpp:13:5: error: ‘SDL_RenderDrawRect_renamed_SDL_RenderRect’ was not declared in this scope
+   13 |     SDL_RenderDrawRect(renderer, &rect);
+      |     ^~~~~~~~~~~~~~~~~~
+In file included from /usr/local/include/SDL3/SDL.h:88,
+                 from src/headers.h:7,
+                 from src/editor.cpp:1:
+src/keyboard.h:10:33: error: ‘SDL_NUM_SCANCODES_renamed_SDL_SCANCODE_COUNT’ was not declared in this scope
+   10 |         Uint8 previous_keystate[SDL_NUM_SCANCODES];
+      |                                 ^~~~~~~~~~~~~~~~~
+src/keyboard.h:11:33: error: ‘SDL_NUM_SCANCODES_renamed_SDL_SCANCODE_COUNT’ was not declared in this scope
+   11 |         Uint8 current_keystate [SDL_NUM_SCANCODES];
+      |                                 ^~~~~~~~~~~~~~~~~
+In file included from src/editor.cpp:2:
+src/editor.h:41:9: error: ‘SDL_RendererFlags’ does not name a type; did you mean ‘SDL_RendererFlip’?
+   41 |         SDL_RendererFlags RENDERER_FLAGS = SDL_RENDERER_PRESENTVSYNC;
+      |         ^~~~~~~~~~~~~~~~~
+      |         SDL_RendererFlip
+src/editor.h:40:81: error: ‘SDL_WINDOW_ALLOW_HIGHDPI_renamed_SDL_WINDOW_HIGH_PIXEL_DENSITY’ was not declared in this scope
+   40 |         SDL_WindowFlags WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+      |                                                                                 ^~~~~~~~~~~~~~~~~~~~~~~~
+src/editor.cpp: In member function ‘int Editor::Start(int, char**)’:
+src/editor.cpp:10:31: error: ‘SDL_INIT_TIMER’ was not declared in this scope; did you mean ‘SDL_INIT_VIDEO’?
+   10 |     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER);
+      |                               ^~~~~~~~~~~~~~
+      |                               SDL_INIT_VIDEO
+src/editor.cpp:10:48: error: ‘SDL_INIT_GAMECONTROLLER_renamed_SDL_INIT_GAMEPAD’ was not declared in this scope
+   10 |     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER);
+      |                                                ^~~~~~~~~~~~~~~~~~~~~~~
+src/editor.cpp:13:30: error: too many arguments to function ‘SDL_Window* SDL_CreateWindow(const char*, int, int, SDL_WindowFlags)’
+   13 |     window = SDL_CreateWindow("LevelEdit++ - by Sardonicals", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      |              ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   14 |             SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_FLAGS);
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/local/include/SDL3/SDL_dialog.h:43,
+                 from /usr/local/include/SDL3/SDL.h:44:
+/usr/local/include/SDL3/SDL_video.h:1125:42: note: declared here
+ 1125 | extern SDL_DECLSPEC SDL_Window * SDLCALL SDL_CreateWindow(const char *title, int w, int h, SDL_WindowFlags flags);
+      |                                          ^~~~~~~~~~~~~~~~
+src/editor.cpp:16:19: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   16 |         ShowError("LevelEdit++ Error!", "Couldn't create window: ", "Window creation failed!: ", true);
+      |                   ^~~~~~~~~~~~~~~~~~~~
+src/editor.cpp:20:47: error: ‘SDL_RENDERER_PRESENTVSYNC’ was not declared in this scope
+   20 |     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~~~~
+src/editor.cpp:22:19: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   22 |         ShowError("LevelEdit++ Error!", "Couldn't create renderer: ", "Renderer creation failed!: ", true);
+      |                   ^~~~~~~~~~~~~~~~~~~~
+src/editor.cpp: In member function ‘void Editor::Process()’:
+src/editor.cpp:73:27: error: ‘SDL_QUIT_renamed_SDL_EVENT_QUIT’ was not declared in this scope
+   73 |         if (event.type == SDL_QUIT){
+      |                           ^~~~~~~~
+src/editor.cpp:78:27: error: ‘SDL_WINDOWEVENT’ was not declared in this scope; did you mean ‘SDL_WindowEvent’?
+   78 |         if (event.type == SDL_WINDOWEVENT){
+      |                           ^~~~~~~~~~~~~~~
+      |                           SDL_WindowEvent
+src/editor.cpp:79:30: error: ‘SDL_WindowEvent’ {aka ‘struct SDL_WindowEvent’} has no member named ‘event’
+   79 |             if (event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)){
+      |                              ^~~~~
+src/editor.cpp:79:39: error: ‘SDL_WINDOWEVENT_CLOSE_renamed_SDL_EVENT_WINDOW_CLOSE_REQUESTED’ was not declared in this scope
+   79 |             if (event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)){
+      |                                       ^~~~~~~~~~~~~~~~~~~~~
+src/editor.cpp:83:30: error: ‘SDL_WindowEvent’ {aka ‘struct SDL_WindowEvent’} has no member named ‘event’
+   83 |             if (event.window.event == SDL_WINDOWEVENT_RESIZED){
+      |                              ^~~~~
+src/editor.cpp:83:39: error: ‘SDL_WINDOWEVENT_RESIZED_renamed_SDL_EVENT_WINDOW_RESIZED’ was not declared in this scope
+   83 |             if (event.window.event == SDL_WINDOWEVENT_RESIZED){
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~~
+src/editor.cpp: In destructor ‘Editor::~Editor()’:
+src/editor.cpp:312:5: error: ‘SDL_FreeSurface_renamed_SDL_DestroySurface’ was not declared in this scope
+  312 |     SDL_FreeSurface(icon);
+      |     ^~~~~~~~~~~~~~~
+In file included from /usr/local/include/SDL3/SDL.h:88,
+                 from src/headers.h:7,
+                 from src/editor_menu.h:2,
+                 from src/editor_menu.cpp:1:
+src/keyboard.h:10:33: error: ‘SDL_NUM_SCANCODES_renamed_SDL_SCANCODE_COUNT’ was not declared in this scope
+   10 |         Uint8 previous_keystate[SDL_NUM_SCANCODES];
+      |                                 ^~~~~~~~~~~~~~~~~
+src/keyboard.h:11:33: error: ‘SDL_NUM_SCANCODES_renamed_SDL_SCANCODE_COUNT’ was not declared in this scope
+   11 |         Uint8 current_keystate [SDL_NUM_SCANCODES];
+      |                                 ^~~~~~~~~~~~~~~~~
+src/editor_menu.cpp: In member function ‘void EditorMenu::Process(GameTile*&, Camera*, std::map<std::__cxx11::basic_string<char>, std::vector<GameTile*> >)’:
+src/editor_menu.cpp:115:32: warning: format not a string literal and no format arguments [-Wformat-security]
+  115 |                     ImGui::Text(tile_paths[i][0].c_str());
+      |                     ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/editor_menu.cpp:162:24: warning: format not a string literal and no format arguments [-Wformat-security]
+  162 |             ImGui::Text(x_string.c_str());
+      |             ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~
+src/editor_menu.cpp:163:24: warning: format not a string literal and no format arguments [-Wformat-security]
+  163 |             ImGui::Text(y_string.c_str());
+      |             ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~
+src/functions.cpp: In function ‘void ShowError(char*, std::string, std::string, bool)’:
+src/functions.cpp:9:19: warning: format not a string literal and no format arguments [-Wformat-security]
+    9 |     SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, (log + error_string).c_str());
+      |     ~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/local/include/SDL3/SDL.h:88,
+                 from src/headers.h:7,
+                 from src/keyboard.h:2,
+                 from src/keyboard.cpp:1:
+src/keyboard.h:10:33: error: ‘SDL_NUM_SCANCODES_renamed_SDL_SCANCODE_COUNT’ was not declared in this scope
+   10 |         Uint8 previous_keystate[SDL_NUM_SCANCODES];
+      |                                 ^~~~~~~~~~~~~~~~~
+src/keyboard.h:11:33: error: ‘SDL_NUM_SCANCODES_renamed_SDL_SCANCODE_COUNT’ was not declared in this scope
+   11 |         Uint8 current_keystate [SDL_NUM_SCANCODES];
+      |                                 ^~~~~~~~~~~~~~~~~
+src/keyboard.cpp: In constructor ‘KeyboardManager::KeyboardManager()’:
+src/keyboard.cpp:4:16: error: ‘previous_keystate’ was not declared in this scope
+    4 |     SDL_memset(previous_keystate, 0, sizeof(Uint8)*SDL_NUM_SCANCODES);
+      |                ^~~~~~~~~~~~~~~~~
+src/keyboard.cpp:4:52: error: ‘SDL_NUM_SCANCODES_renamed_SDL_SCANCODE_COUNT’ was not declared in this scope
+    4 |     SDL_memset(previous_keystate, 0, sizeof(Uint8)*SDL_NUM_SCANCODES);
+      |                                                    ^~~~~~~~~~~~~~~~~
+src/keyboard.cpp:5:16: error: ‘current_keystate’ was not declared in this scope
+    5 |     SDL_memset(current_keystate, 0, sizeof(Uint8)*SDL_NUM_SCANCODES);
+      |                ^~~~~~~~~~~~~~~~
+src/keyboard.cpp:6:45: error: cannot convert ‘const bool*’ to ‘const Uint8*’ {aka ‘const unsigned char*’} in assignment
+    6 |     instance_keystate = SDL_GetKeyboardState(NULL);
+      |                         ~~~~~~~~~~~~~~~~~~~~^~~~~~
+      |                                             |
+      |                                             const bool*
+src/keyboard.cpp: In member function ‘void KeyboardManager::Process()’:
+src/keyboard.cpp:11:29: error: ‘SDL_NUM_SCANCODES_renamed_SDL_SCANCODE_COUNT’ was not declared in this scope
+   11 |     for (int key = 0; key < SDL_NUM_SCANCODES; key++){
+      |                             ^~~~~~~~~~~~~~~~~
+src/keyboard.cpp:12:9: error: ‘previous_keystate’ was not declared in this scope
+   12 |         previous_keystate[key] = current_keystate[key];
+      |         ^~~~~~~~~~~~~~~~~
+src/keyboard.cpp:12:34: error: ‘current_keystate’ was not declared in this scope
+   12 |         previous_keystate[key] = current_keystate[key];
+      |                                  ^~~~~~~~~~~~~~~~
+src/keyboard.cpp:14:29: error: ‘SDL_NUM_SCANCODES_renamed_SDL_SCANCODE_COUNT’ was not declared in this scope
+   14 |     for (int key = 0; key < SDL_NUM_SCANCODES; key++){
+      |                             ^~~~~~~~~~~~~~~~~
+src/keyboard.cpp:15:9: error: ‘current_keystate’ was not declared in this scope
+   15 |         current_keystate[key] = instance_keystate[key];
+      |         ^~~~~~~~~~~~~~~~
+src/keyboard.cpp: In member function ‘bool KeyboardManager::KeyIsPressed(int)’:
+src/keyboard.cpp:20:12: error: ‘current_keystate’ was not declared in this scope
+   20 |     return current_keystate[scancode];
+      |            ^~~~~~~~~~~~~~~~
+src/keyboard.cpp: In member function ‘bool KeyboardManager::KeyWasPressed(int)’:
+src/keyboard.cpp:24:13: error: ‘previous_keystate’ was not declared in this scope
+   24 |     return !previous_keystate[scancode] && current_keystate[scancode];
+      |             ^~~~~~~~~~~~~~~~~
+src/keyboard.cpp:24:44: error: ‘current_keystate’ was not declared in this scope
+   24 |     return !previous_keystate[scancode] && current_keystate[scancode];
+      |                                            ^~~~~~~~~~~~~~~~
+In file included from /usr/local/include/SDL3/SDL.h:88,
+                 from src/headers.h:7,
+                 from src/editor.h:1,
+                 from src/main.cpp:1:
+src/keyboard.h:10:33: error: ‘SDL_NUM_SCANCODES_renamed_SDL_SCANCODE_COUNT’ was not declared in this scope
+   10 |         Uint8 previous_keystate[SDL_NUM_SCANCODES];
+      |                                 ^~~~~~~~~~~~~~~~~
+src/keyboard.h:11:33: error: ‘SDL_NUM_SCANCODES_renamed_SDL_SCANCODE_COUNT’ was not declared in this scope
+   11 |         Uint8 current_keystate [SDL_NUM_SCANCODES];
+      |                                 ^~~~~~~~~~~~~~~~~
+src/editor.h:41:9: error: ‘SDL_RendererFlags’ does not name a type; did you mean ‘SDL_RendererFlip’?
+   41 |         SDL_RendererFlags RENDERER_FLAGS = SDL_RENDERER_PRESENTVSYNC;
+      |         ^~~~~~~~~~~~~~~~~
+      |         SDL_RendererFlip
+src/editor.h:40:81: error: ‘SDL_WINDOW_ALLOW_HIGHDPI_renamed_SDL_WINDOW_HIGH_PIXEL_DENSITY’ was not declared in this scope
+   40 |         SDL_WindowFlags WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+      |                                                                                 ^~~~~~~~~~~~~~~~~~~~~~~~
+src/tojson.cpp: In member function ‘nlohmann::json ToJson::LoadMXProject(std::string)’:
+src/tojson.cpp:127:1: warning: no return statement in function returning non-void [-Wreturn-type]
+  127 | }
+      | ^
