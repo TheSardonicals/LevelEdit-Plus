@@ -55,6 +55,7 @@ class Editor{
         bool removing_tile = false;
         bool show_size = true;
         bool import_finish = false;
+        bool selection_mode = false;
 
         int current_x = 0, current_y = 0;
 
@@ -67,9 +68,9 @@ class Editor{
         EditorMenu * gui;
         Pointer * mouse;
         TextureCache * cache;
-        vector<string> tile_stack;
         map<string, string> tile_paths;
         GameTile * ghost_tile = NULL;
+        GameTile * selected_tile = NULL;
         map<string, vector<GameTile *>> tile_cache;
         Camera * camera; 
         KeyboardManager * keyboard;
@@ -78,6 +79,7 @@ class Editor{
 
         void SetupImGuiStyleColor();
         void Process();
+        void SetKeyMapping();
 };
 
 

@@ -69,7 +69,9 @@ void Editor::Process()
     //Event Loop
     while (SDL_PollEvent(&event)) {
         ImGui_ImplSDL3_ProcessEvent(&event);
-        
+        mouse->Compute(&event);
+        mouse->Process();
+       
         if (event.type == SDL_EVENT_QUIT){
             running = false;
             break;
@@ -97,53 +99,14 @@ void Editor::Process()
             ImGui_ImplSDL3_NewFrame();
             ImGui::NewFrame();
 
-            gui->Process(ghost_tile, camera, tile_cache);
-            mouse->Compute(&event);
-            mouse->Process();
+            SetKeyMapping();
+            gui->Process(ghost_tile, camera, tile_cache, selected_tile);
             keyboard->Process();
-
-            // Keyboard Inputs
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_ESCAPE)){
-                running = false;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_X)){
-                ghost_tile = NULL;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_UP)){
-                camera->ypos += camera->speed;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_DOWN)){
-                camera->ypos -= camera->speed;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_LEFT)){
-                camera->xpos += camera->speed;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_RIGHT)){
-                camera->xpos -= camera->speed;
-            }
-
-            if (ghost_tile){
-                ghost_tile->SetPos(mouse->xpos, mouse->ypos);
-            }
 
             // Handle every editor-related thing that works outside of the GUI underneath this conditional.
             if (!ImGui::GetIO().WantCaptureMouse){
-                // Functionality for Deletion on Right Click
-                for (auto &tile : tile_cache){
-                    for (auto it = tile.second.begin(); it != tile.second.end(); it++) {
-                        if (mouse->IsRClicking(&(*it)->rect)){
-                            cout << "Right clicking on " << tile.first << endl;
-                            tile.second.erase(it);
-                            
-                        }
-                    }
-                }
                 if (ghost_tile){
+                  // TODO QOL: Add a pre-place highlight to show where user will be placing the selected block.
                     if (mouse->has_clicked){
                         if (tile_cache.count(ghost_tile->name) == 0){
                             tile_cache[ghost_tile->name] = {new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h)};
@@ -153,6 +116,27 @@ void Editor::Process()
                         }
                     }   
                 } 
+                else {
+                  // Functionality for a tile selection mode
+                  for (auto& tile_name : tile_cache){
+                      for (auto& tile : tile_name.second){
+                        
+                        if (mouse->IsClicking(&tile->rect)){                        
+                            tile->highlight = true;
+                            gui->tile_edit_mode = true;
+                            selected_tile = tile;
+
+                        }
+                        else if (mouse->IsTouching(&tile->rect)){
+                            tile->highlight = true;
+                        }
+                        
+                        else {
+                            tile->highlight = false;
+                        }
+                      }
+                    }
+                }
             }
 
             if (gui->tileset_import){
@@ -248,6 +232,39 @@ void Editor::Render(){
             break;   
     }
     SDL_RenderPresent(renderer);
+}
+
+void Editor::SetKeyMapping(){
+            // Keyboard Inputs
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_ESCAPE)){
+                running = false;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_X)){
+                ghost_tile = NULL;
+                delete ghost_tile;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_UP)){
+                camera->ypos += camera->speed;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_DOWN)){
+                camera->ypos -= camera->speed;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_LEFT)){
+                camera->xpos += camera->speed;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_RIGHT)){
+                camera->xpos -= camera->speed;
+            }
+
+            if (ghost_tile){
+                ghost_tile->SetPos(mouse->xpos , mouse->ypos);
+            }
+
 }
 
 

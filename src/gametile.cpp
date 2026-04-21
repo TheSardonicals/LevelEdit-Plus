@@ -32,6 +32,11 @@ void GameTile::Render(array<int, 2> camera_pos = {0, 0}, float alpha){
     // for consistency sake.
     SDL_SetTextureAlphaMod(this->texture, (alpha * 255));
     SDL_RenderTexture(cache->renderer, this->texture, NULL, &rect);
+
+    if (this->highlight){
+      SDL_SetRenderDrawColor(cache->renderer, 255, 255, 0, (alpha * 100));
+      SDL_RenderRect(cache->renderer, &this->rect);
+    }
 }
 
 void GameTile::SetPos(int xpos, int ypos){
