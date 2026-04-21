@@ -6,9 +6,9 @@
 
 class KeyboardManager {
     private:
-        const Uint8 * instance_keystate;
-        Uint8 previous_keystate[SDL_NUM_SCANCODES];
-        Uint8 current_keystate [SDL_NUM_SCANCODES];
+        bool previous_keystate[SDL_SCANCODE_COUNT];
+        bool current_keystate [SDL_SCANCODE_COUNT];
+        const bool* instance_keystate;
 
     public:
         KeyboardManager();

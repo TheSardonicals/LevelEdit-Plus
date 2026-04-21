@@ -14,7 +14,7 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
 }
 
-void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile *>> tile_cache){
+void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile *>> tile_cache, GameTile * selected_tile){
     // Menu Bar with options and such
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){
@@ -99,7 +99,7 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
                 texture = cache->LoadTexture(tile_paths[i][1]);
                 cache->SetTextureAlpha(texture, max(alpha, .5f));
                  ImGui::PushID(i);
-                if (ImGui::ImageButton((void *)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
+                if (ImGui::ImageButton("",(ImTextureID)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
                 {   
                     // Handle setting ghost tile when button is clicked
                     if (ghost_tile == nullptr){
@@ -142,6 +142,10 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         ImGui::End();
     }
 
+    if(ghost_tile){
+      GhostTileWindow(ghost_tile, camera);
+    }
+
     if (saving_to_mx){
         string label_name = "(.mx)";
         if (ImGui::Begin("Please Enter a name for your tileset", NULL)){
@@ -151,23 +155,6 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
             } 
         }
         ImGui::End();
-    }
-
-    if (ghost_tile){
-        w_increase = ghost_tile->w;
-        h_increase = ghost_tile->h;
-        if (ImGui::Begin("Texture Properties", NULL)){
-            string x_string = "X: " + to_string(ghost_tile->x - camera->xpos);
-            string y_string = "Y: " + to_string(ghost_tile->y - camera->ypos);
-            ImGui::Text(x_string.c_str());
-            ImGui::Text(y_string.c_str());
-            ImGui::InputInt("Width", &w_increase);
-            ImGui::InputInt("Height", &h_increase);
-        }
-        ImGui::End();
-
-        ghost_tile->w = w_increase;
-        ghost_tile->h = h_increase;
     }
 
     // Saving MXPR settings and Booleans Statuses
@@ -199,13 +186,61 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
     if (loading_tileset){
         if (ImGui::Begin("Input the filepath to the tileset you want to load")){
             ImGui::InputText(load_label.c_str(), &tileset_name);
-            if (ImGui::Button("Load")){
-                tileset_import = true;
-            }
+                if (ImGui::Button("Load")){
+                    tileset_import = true;
+                }                
         }
         ImGui::End();
 
     }
+
+    // Tile Edit Mode 
+    if (tile_edit_mode){
+        TileEditWindow(selected_tile, camera);
+    }
 }
 
+void EditorMenu::GhostTileWindow(GameTile * ghost_tile, Camera * camera){
+  w_increase = ghost_tile->w;
+  h_increase = ghost_tile->h;
+ 
+  if (ImGui::Begin("Texture Properties", NULL)){
+    string x_string = "X: " + to_string(ghost_tile->x - camera->xpos);
+    string y_string = "Y: " + to_string(ghost_tile->y - camera->ypos);
+    ImGui::Text(x_string.c_str());
+    ImGui::Text(y_string.c_str());
+    ImGui::InputInt("Width", &w_increase);
+    ImGui::InputInt("Height", &h_increase);
+  }
 
+  ImGui::End();
+  ghost_tile->w = w_increase;
+  ghost_tile->h = h_increase;
+
+}
+
+void EditorMenu::TileEditWindow(GameTile * selected_tile, Camera * camera){
+  x_delta = selected_tile->x;
+  y_delta = selected_tile->y;
+  w_increase = selected_tile->w;
+  h_increase = selected_tile->h;
+
+  if (ImGui::Begin("Tile Edit Window")){
+ 
+      string x_string = "X: " + to_string(selected_tile->x - camera->xpos);
+      string y_string = "Y: " + to_string(selected_tile->y - camera->ypos);
+      ImGui::InputInt("X: ", &x_delta);
+      ImGui::InputInt("Y: ", &y_delta);
+      ImGui::InputInt("Width", &w_increase);
+      ImGui::InputInt("Height", &h_increase);
+
+      selected_tile->x = x_delta;
+      selected_tile->y = y_delta;
+      selected_tile->w = w_increase;
+      selected_tile->h = h_increase;
+
+
+  }
+  ImGui::End();
+
+}

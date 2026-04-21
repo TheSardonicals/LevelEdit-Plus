@@ -1,7 +1,7 @@
 #include "pointer.h"
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_mouse.h>
-#include <SDL2/SDL_video.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_video.h>
 
 #include <iostream>
 
@@ -23,13 +23,14 @@ void Pointer::Compute(SDL_Event* event){
         this->ypos = event->motion.y;
     }
 
+    
 }
 
 void Pointer::Process(){
     
-    clicking = SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(1);
+    clicking = SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON_MASK(1);
 
-    r_clicking = SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(2);
+    r_clicking = SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON_MASK(3);
     
     has_clicked = clicked && !clicking;
     
@@ -39,21 +40,23 @@ void Pointer::Process(){
 
     r_clicked = r_clicking;
 
+    pointer_rect = {this->xpos, this->ypos, 10, 10};
+
 }
 
-bool Pointer::IsClicking(SDL_Rect* rect){
+bool Pointer::IsClicking(SDL_FRect* rect){
     return IsTouching(rect) && clicking;
 }
 
-bool Pointer::IsRClicking(SDL_Rect* rect){
+bool Pointer::IsRClicking(SDL_FRect* rect){
     return IsTouching(rect) && r_clicking;
 }
 
-bool Pointer::IsTouching(SDL_Rect* rect){
-    return SDL_HasIntersection(&pointer_rect, rect);
+bool Pointer::IsTouching(SDL_FRect* rect){
+    return SDL_HasRectIntersectionFloat(&pointer_rect, rect);
 }
 
-bool Pointer::HasClicked(SDL_Rect* rect){
+bool Pointer::HasClicked(SDL_FRect* rect){
     return IsTouching(rect) && has_clicked;
 }
 

@@ -1,5 +1,5 @@
 #pragma once
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #include <map>
 #include <string>
 
@@ -16,21 +16,21 @@ class Pointer{
         void init();
 
         void Compute(SDL_Event* event);
-
+        
         void Set_Cursor(SDL_Cursor*);
         
-        bool IsTouchingRect(SDL_Rect* rect);
-        bool IsClickingRect(SDL_Rect* rect);
-        bool IsTouching(SDL_Rect* rect);
-        bool IsClicking(SDL_Rect*);
-        bool IsRClicking(SDL_Rect*);
-        bool HasClicked(SDL_Rect*);
+        bool IsTouchingRect(SDL_FRect*);
+        bool IsClickingRect(SDL_FRect*);
+        bool IsTouching(SDL_FRect*);
+        bool IsClicking(SDL_FRect*);
+        bool IsRClicking(SDL_FRect*);
+        bool HasClicked(SDL_FRect*);
 
         void Render(SDL_Renderer*);
 
         void Process();
         
-        int xpos = 0, ypos = 0;
+        float xpos = 0, ypos = 0;
         map<string, SDL_Cursor*> cursor;
 
         bool has_clicked;
@@ -38,7 +38,7 @@ class Pointer{
         
 
     private:
-        SDL_Rect pointer_rect;
+        SDL_FRect pointer_rect;
         bool clicking;
         bool r_clicking;
         bool r_clicked;

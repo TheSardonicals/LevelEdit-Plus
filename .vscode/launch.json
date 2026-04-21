@@ -6,7 +6,7 @@
 	"configurations": [
 		
 		{
-			"name": "launch (debug)",
+			"name": "(gdb) Launch",
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/bin/LevelEdit++DEBUG.x86_64",

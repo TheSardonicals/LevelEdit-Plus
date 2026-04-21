@@ -13,7 +13,12 @@ class EditorMenu{
         bool edit_texture_window = false;
         EditorMenu(int *, int *, ImVec4 *, Pointer *, map<string, string> *, TextureCache *);
         ~EditorMenu();
-        void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >>);
+        void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >>, GameTile *);
+
+        // Window Functions
+
+        void TileEditWindow(GameTile *, Camera *);
+        void GhostTileWindow(GameTile *, Camera *);
 
         string current_item = "";
 
@@ -30,6 +35,7 @@ class EditorMenu{
         bool loading_tileset = false;
         bool loading_project = false;
         bool tileset_import = false;
+        bool tile_edit_mode = false;
         int * window_width;
         int * window_height;
 
@@ -48,14 +54,13 @@ class EditorMenu{
         ImVec4 original_button_color;
         TextureCache * cache;
         SDL_Renderer * renderer;
+
+        //  Tile Properties
+
+        int x_delta;
+        int y_delta;
         int w_increase;
         int h_increase;
-
-
-
-        
-            
-
 
         
 };

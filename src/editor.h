@@ -16,7 +16,7 @@ class Editor{
         void WindowState(SDL_Window*, SDL_Renderer*, bool);
         void Deleter(map<string, SDL_Renderer*>);
         void SavetoFile(string, string, SDL_Renderer*, int);
-        void LoadFromFile(string, map<string, SDL_Texture*>, SDL_Renderer*);
+        void LoadMX();
         void Render();
         void Loop();
         void SetClearColor();
@@ -37,8 +37,8 @@ class Editor{
         
         int SCREEN_WIDTH = 1280, SCREEN_HEIGHT = 720;
         
-        SDL_WindowFlags WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-        SDL_RendererFlags RENDERER_FLAGS = SDL_RENDERER_PRESENTVSYNC;
+        SDL_WindowFlags WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+        //SDL_Render RENDERER_FLAGS = SDL_RENDERER_PRESENTVSYNC;
 
         SDL_Event event;
 
@@ -55,6 +55,7 @@ class Editor{
         bool removing_tile = false;
         bool show_size = true;
         bool import_finish = false;
+        bool selection_mode = false;
 
         int current_x = 0, current_y = 0;
 
@@ -67,9 +68,9 @@ class Editor{
         EditorMenu * gui;
         Pointer * mouse;
         TextureCache * cache;
-        vector<string> tile_stack;
         map<string, string> tile_paths;
         GameTile * ghost_tile = NULL;
+        GameTile * selected_tile = NULL;
         map<string, vector<GameTile *>> tile_cache;
         Camera * camera; 
         KeyboardManager * keyboard;
@@ -78,6 +79,7 @@ class Editor{
 
         void SetupImGuiStyleColor();
         void Process();
+        void SetKeyMapping();
 };
 
 

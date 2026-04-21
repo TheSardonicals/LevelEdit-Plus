@@ -3,7 +3,7 @@
 #include "texturecache.h"
 
 #include <array>
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 using namespace std;
 
@@ -19,7 +19,7 @@ class GameTile{
         string filename;
         string filepath;
         int x, y, w = 32, h = 32;
-        SDL_Rect rect = {};
+        SDL_FRect rect = {};
         TextureCache * cache;
         SDL_Texture * texture;
 
@@ -29,5 +29,6 @@ class GameTile{
         array<int, 2> GetPos();
         array<int, 4> GetInfo();
 
+        bool highlight = false;
 };
 #endif

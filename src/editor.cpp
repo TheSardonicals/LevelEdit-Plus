@@ -7,17 +7,16 @@ Editor::Editor(){}
 
 int Editor::Start(int argc, char** argv){
 
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD);
 
     // Create Window and Renderer
-    window = SDL_CreateWindow("LevelEdit++ - by Sardonicals", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-            SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_FLAGS);
+    window = SDL_CreateWindow("LevelEdit++ - by Sardonicals", SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_FLAGS);
     if (!window){
         ShowError("LevelEdit++ Error!", "Couldn't create window: ", "Window creation failed!: ", true);
         return 0;
     }
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(window, NULL);
     if (!renderer){
         ShowError("LevelEdit++ Error!", "Couldn't create renderer: ", "Renderer creation failed!: ", true);
         return 0;
@@ -29,12 +28,15 @@ int Editor::Start(int argc, char** argv){
 
     // ImGui Initialization.
     IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
+    ImGuiContext* ctx = ImGui::CreateContext();
+    ImGui::SetCurrentContext(ctx);
     ImGuiIO& io = ImGui::GetIO(); (void) io;
     io.Fonts->AddFontFromFileTTF("misc/fonts/joystix.ttf", 16.0f);
+    
     SetupImGuiStyleColor();
-    ImGui_ImplSDL2_InitStandalone(window);
-    ImGui_ImplSDLRenderer_Init(renderer);
+    
+    ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
+    ImGui_ImplSDLRenderer3_Init(renderer);
 
     // VARIABLES
     state = EDITING;
@@ -64,23 +66,23 @@ void Editor::Loop(){
 
 void Editor::Process()
 {
-    //mouse->Process();
-
     //Event Loop
     while (SDL_PollEvent(&event)) {
-        ImGui_ImplSDL2_ProcessEvent(&event);
-        
-        if (event.type == SDL_QUIT){
+        ImGui_ImplSDL3_ProcessEvent(&event);
+        mouse->Compute(&event);
+        mouse->Process();
+       
+        if (event.type == SDL_EVENT_QUIT){
             running = false;
             break;
         }
 
-        if (event.type == SDL_WINDOWEVENT){
-            if (event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window)){
+        if (event.type == event.window.type){
+            if (event.window.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window)){
                 running = false;
                 break;
             }
-            if (event.window.event == SDL_WINDOWEVENT_RESIZED){
+            if (event.window.type == SDL_EVENT_WINDOW_RESIZED){
                 SCREEN_WIDTH = event.window.data1;
                 SCREEN_HEIGHT = event.window.data2;
             }
@@ -93,46 +95,18 @@ void Editor::Process()
         case MENU:{}break;
         case EDITING:{
             // Start the Dear ImGui frame
-            ImGui_ImplSDL2_NewFrame(window);
+            ImGui_ImplSDLRenderer3_NewFrame();
+            ImGui_ImplSDL3_NewFrame();
             ImGui::NewFrame();
 
-            gui->Process(ghost_tile, camera, tile_cache);
-            mouse->Compute(&event);
-            mouse->Process();
+            SetKeyMapping();
+            gui->Process(ghost_tile, camera, tile_cache, selected_tile);
             keyboard->Process();
-
-            // Keyboard Inputs
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_ESCAPE)){
-            running = false;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_X)){
-                ghost_tile = NULL;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_UP)){
-                camera->ypos += camera->speed;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_DOWN)){
-                camera->ypos -= camera->speed;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_LEFT)){
-                camera->xpos += camera->speed;
-            }
-
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_RIGHT)){
-                camera->xpos -= camera->speed;
-            }
-
-            if (ghost_tile){
-                ghost_tile->SetPos(mouse->xpos, mouse->ypos);
-            }
 
             // Handle every editor-related thing that works outside of the GUI underneath this conditional.
             if (!ImGui::GetIO().WantCaptureMouse){
                 if (ghost_tile){
+                  // TODO QOL: Add a pre-place highlight to show where user will be placing the selected block.
                     if (mouse->has_clicked){
                         if (tile_cache.count(ghost_tile->name) == 0){
                             tile_cache[ghost_tile->name] = {new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h)};
@@ -141,41 +115,39 @@ void Editor::Process()
                             tile_cache[ghost_tile->name].push_back(new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h));
                         }
                     }   
-                }
+                } 
+                else {
+                  // Functionality for a tile selection mode
+                  for (auto& tile_name : tile_cache){
+                      for (auto& tile : tile_name.second){
+                        
+                        if (mouse->IsClicking(&tile->rect)){                        
+                            tile->highlight = true;
+                            gui->tile_edit_mode = true;
+                            selected_tile = tile;
 
-            }
-
-            //TODO Code Project and Tile Json Processes here and remove from editor_menu.cpp file.  Make tile clean!!            
-            if (gui->tileset_import){
-                //Call gui->ImportMX() for the tile_cache import logic to happen here
-                json_handler->ImportMX(gui->tileset_name);
-
-                // Debug of json ingest 
-                //cout << json_handler->json_blocks.dump() << endl;
-
-                if (!tile_cache.empty()){
-                    tile_cache.clear();
-                }
-
-                // Iterating through json_blocks json structure to pull its tile's name and locations to add to the tile_cache
-                for (auto& tile : json_handler->json_blocks["tiles"].items()){
-                    cout << tile.key() << endl;
-                    for (auto& locations : json_handler->json_blocks["tiles"][tile.key()]["locations"].items()){
-                        cout << locations.value() << endl;
-                        cout << json_handler->json_blocks["tiles"][tile.key()]["filepath"] << endl;
-                        if (tile_cache.count(tile.key()) == 0){
-                            //cout << "New Import " << tile.key() << endl; 
-                            tile_cache[tile.key().c_str()] = {new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3])};
-                            cout << tile_cache.count(tile.key()) << endl;
-                        } 
-                        else{
-                            //cout << "Adding to existing vector of " << tile.key() << endl;
-                            tile_cache[tile.key().c_str()].push_back(new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3]));
-                            cout << tile_cache.count(tile.key()) << endl;
                         }
+                        else if (mouse->IsTouching(&tile->rect)){
+                            tile->highlight = true;
+                        }
+                        
+                        else {
+                            tile->highlight = false;
+                        }
+                      }
                     }
                 }
-                gui->tileset_import = false;
+            }
+
+            if (gui->tileset_import){
+                try {
+                    LoadMX();
+                    gui->tileset_import = false;
+                }
+                catch (nlohmann::detail::parse_error) {
+                    // Present the user a message on the screen to let them know that it failed.
+                    cout << "Error: Tileset Does Not Exist" << endl;
+                }
             }
 
             if (gui->save_to_mxpr){
@@ -201,6 +173,33 @@ void Editor::Process()
     }
     SetClearColor();  
 }
+
+void Editor::LoadMX(){
+    json_handler->ImportMX(gui->tileset_name);
+
+    if (!tile_cache.empty()){
+        tile_cache.clear();
+    }
+
+    for (auto& tile : json_handler->json_blocks["tiles"].items()){
+        //cout << tile.key() << endl;
+        for (auto& locations : json_handler->json_blocks["tiles"][tile.key()]["locations"].items()){
+            //cout << locations.value() << endl;
+            //cout << json_handler->json_blocks["tiles"][tile.key()]["filepath"] << endl;
+            if (tile_cache.count(tile.key()) == 0){
+                //cout << "New Import " << tile.key() << endl; 
+                tile_cache[tile.key().c_str()] = {new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3])};
+                //cout << tile_cache.count(tile.key()) << endl;
+            } 
+            else{
+                //cout << "Adding to existing vector of " << tile.key() << endl;
+                tile_cache[tile.key().c_str()].push_back(new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3]));
+                
+            }
+        }
+    }
+
+}
         
 
 
@@ -215,13 +214,13 @@ void Editor::Render(){
             if (tile_cache.size() > 0 || import_finish){
                 for (auto tile_list: tile_cache){
                     for (auto tile: tile_list.second){
-                        tile->Render({camera->xpos, camera->ypos});
+                        tile->Render({static_cast<int>(camera->xpos), static_cast<int>(camera->ypos)});
                     }
                 }
             }
             camera->Show(renderer);
             // Send the data imgui stored from "Imgui::Render" to the screen using the specified render api.
-            ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+            ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
             // Anything that should render after the Imgui-based menu, render underneath this line.
             if (ghost_tile){
                 ghost_tile->Render({0, 0}, .6);
@@ -233,6 +232,39 @@ void Editor::Render(){
             break;   
     }
     SDL_RenderPresent(renderer);
+}
+
+void Editor::SetKeyMapping(){
+            // Keyboard Inputs
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_ESCAPE)){
+                running = false;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_X)){
+                ghost_tile = NULL;
+                delete ghost_tile;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_UP)){
+                camera->ypos += camera->speed;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_DOWN)){
+                camera->ypos -= camera->speed;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_LEFT)){
+                camera->xpos += camera->speed;
+            }
+
+            if (keyboard->KeyIsPressed(SDL_SCANCODE_RIGHT)){
+                camera->xpos -= camera->speed;
+            }
+
+            if (ghost_tile){
+                ghost_tile->SetPos(mouse->xpos , mouse->ypos);
+            }
+
 }
 
 
@@ -285,7 +317,7 @@ void Editor::SetupImGuiStyleColor(){
     colors[ImGuiCol_PlotHistogram]          = ImVec4(0.73f, 0.60f, 0.15f, 1.00f);
     colors[ImGuiCol_PlotHistogramHovered]   = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
     colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.87f, 0.87f, 0.87f, 0.35f);
-    colors[ImGuiCol_ModalWindowDarkening]   = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+    //colors[ImGuiCol_ModalWindowDarkening]   = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
     colors[ImGuiCol_DragDropTarget]         = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
     colors[ImGuiCol_NavHighlight]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
     colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
@@ -300,11 +332,11 @@ Editor::~Editor(){
         }
     }
     delete cache;
-    ImGui_ImplSDLRenderer_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
+    ImGui_ImplSDLRenderer3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 
     SDL_DestroyRenderer(renderer);
-    SDL_FreeSurface(icon);
+    SDL_DestroySurface(icon);
     SDL_DestroyWindow(window);
 }
