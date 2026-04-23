@@ -35,6 +35,6 @@ The editor features a streamlined UI built on Dear ImGui, offering:
 * **Layer Management:** Tools to organize and toggle the visibility of different level segments, reducing visual clutter during the design process.
 * **Optimized Serialization:** A backend process that validates level data during the save operation to ensure compatibility with the target game engine and prevent data corruption.
 
-<pictureimg src"./imgs/Screenshot1.png">
-<picture src"./imgs/Screenshot2.png">
+<img src"./imgs/Screenshot1.png">
+<img src"./imgs/Screenshot2.png">
 <picture src"./imgs/Screenshot3.png">
