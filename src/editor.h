@@ -23,6 +23,17 @@ class Editor{
         void SaveMXProject(string, ToJson,  map<string, bool>);
         void LoadMXProject();
 
+        // Removes every tile in the current selection from the tile cache and drops the
+        // selection with it. The editor owns every tile in the cache, so the menu only
+        // asks for the deletion and this does the freeing.
+        void DeleteSelection();
+
+        // Selection helpers. Selecting is additive when the user is holding Ctrl, which
+        // toggles the tile in and out of the selection instead of replacing it.
+        bool IsSelected(GameTile *);
+        void Select(GameTile *, bool additive);
+        void ClearSelection();
+
         int Start(int argc, char* args[]);
         ImVec4 clear_color;
         SDL_Color r_clear_color{};
@@ -70,7 +81,16 @@ class Editor{
         TextureCache * cache;
         map<string, string> tile_paths;
         GameTile * ghost_tile = NULL;
-        GameTile * selected_tile = NULL;
+
+        // Everything currently selected. Order is selection order, so the last entry is
+        // the one the inspector treats as the primary tile.
+        vector<GameTile *> selected_tiles;
+
+        // Rubber band box. Held in screen space, the same space the tile rects are in
+        // once the camera offset has been applied.
+        bool marquee_active = false;
+        float marquee_start_x = 0, marquee_start_y = 0;
+        SDL_FRect marquee_rect = {};
         map<string, vector<GameTile *>> tile_cache;
         Camera * camera; 
         KeyboardManager * keyboard;

@@ -12,7 +12,12 @@ Pointer::Pointer(){
     r_clicking = false;
     clicked = false;
     has_clicked = false;
+    has_pressed = false;
     pointer_rect = {0, 0, 10, 10};
+}
+
+bool Pointer::IsDown(){
+    return clicking;
 }
 
 void Pointer::Compute(SDL_Event* event){
@@ -33,7 +38,11 @@ void Pointer::Process(){
     r_clicking = SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON_MASK(3);
     
     has_clicked = clicked && !clicking;
-    
+
+    // Press edge, the mirror of has_clicked. Has to be worked out before 'clicked' is
+    // brought up to date, same as the release edge above.
+    has_pressed = clicking && !clicked;
+
     clicked = clicking;
 
     has_rclicked = r_clicking && !r_clicking;
