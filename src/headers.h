@@ -9,6 +9,7 @@ using namespace std;
 
 //STANDARD INCLUDES
 #include <algorithm>
+#include <cmath>
 #include <map>
 #include <iostream>
 #include <fstream>

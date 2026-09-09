@@ -15,7 +15,7 @@ class EditorMenu{
         ~EditorMenu();
         // The tile cache and the selection are taken by reference now, so the panels can
         // browse the level and change what is selected instead of working off of a copy.
-        void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >> &, GameTile * &);
+        void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >> &, vector<GameTile *> &);
 
         // Window Functions
 
@@ -24,21 +24,28 @@ class EditorMenu{
 
         // Unity-style layout. Every panel pins itself to an edge of the viewport, which
         // leaves the middle of the screen free for the scene to be edited in.
-        void MainMenuBar(GameTile * &, GameTile * &);
-        void Toolbar(GameTile * &, GameTile * &);
-        void HierarchyPanel(map<string, vector<GameTile *>> &, GameTile * &);
-        void InspectorPanel(GameTile * &, GameTile *, Camera *);
+        void MainMenuBar(GameTile * &, map<string, vector<GameTile *>> &, vector<GameTile *> &);
+        void Toolbar(GameTile * &, vector<GameTile *> &);
+        void HierarchyPanel(map<string, vector<GameTile *>> &, vector<GameTile *> &);
+        void InspectorPanel(vector<GameTile *> &, GameTile *, Camera *);
         void ProjectPanel(GameTile * &);
-        void StatusBar(map<string, vector<GameTile *>> &, GameTile *);
+        void StatusBar(map<string, vector<GameTile *>> &, vector<GameTile *> &);
         void SceneOutline();
 
         // Pieces shared between the docked layout and the original floating menus.
         void AssetBrowser(GameTile * &, ImVec2);
         void Dialogs();
-        void ClassicMenus(GameTile * &, Camera *, GameTile *);
+        void ClassicMenus(GameTile * &, Camera *, vector<GameTile *> &);
 
         // Drops the brush, the same way the X key does.
         void ClearGhostTile(GameTile * &);
+
+        // Selection helpers, matching what the editor does for clicks in the scene:
+        // additive (Ctrl) toggles a tile in and out, otherwise the click replaces the
+        // whole selection. The editor re-syncs the outlines from this list every frame.
+        bool IsSelected(vector<GameTile *> &, GameTile *);
+        void SelectTile(vector<GameTile *> &, GameTile *, bool additive);
+        void SelectAll(map<string, vector<GameTile *>> &, vector<GameTile *> &);
 
         string current_item = "";
 
@@ -57,10 +64,10 @@ class EditorMenu{
         bool tileset_import = false;
         bool tile_edit_mode = false;
 
-        // Raised by the UI when the user asks for the selected tile to be removed. The
-        // editor owns every tile in the tile cache, so it is the one that does the
-        // deleting, the same way it handles the save/import flags.
-        bool delete_selected_tile = false;
+        // Raised by the UI when the user asks for the selection to be removed. The editor
+        // owns every tile in the tile cache, so it is the one that does the deleting, the
+        // same way it handles the save and import flags.
+        bool delete_selection = false;
 
         // Docked layout on by default. Switch it off to get the original floating menus.
         bool unity_layout = true;

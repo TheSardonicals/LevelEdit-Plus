@@ -70,8 +70,7 @@ void Editor::Process()
     while (SDL_PollEvent(&event)) {
         ImGui_ImplSDL3_ProcessEvent(&event);
         mouse->Compute(&event);
-        mouse->Process();
-       
+
         if (event.type == SDL_EVENT_QUIT){
             running = false;
             break;
@@ -90,6 +89,11 @@ void Editor::Process()
 
     }
 
+    // Once per frame, not once per event. Inside the event loop the press and release
+    // edges fired once per event that happened to arrive, and stayed set on frames with
+    // no events at all, which the marquee drag cannot work with.
+    mouse->Process();
+
     //Application Loop
     switch (state) {
         case MENU:{}break;
@@ -100,15 +104,21 @@ void Editor::Process()
             ImGui::NewFrame();
 
             SetKeyMapping();
-            gui->Process(ghost_tile, camera, tile_cache, selected_tile);
+            gui->Process(ghost_tile, camera, tile_cache, selected_tiles);
             keyboard->Process();
 
             // Deleting has to happen before anything else walks the tile cache this frame,
             // otherwise the selection loop and the renderer would be working with a tile
             // that is on its way out.
-            if (gui->delete_selected_tile){
-                DeleteSelectedTile();
-                gui->delete_selected_tile = false;
+            if (gui->delete_selection){
+                DeleteSelection();
+                gui->delete_selection = false;
+            }
+
+            // The rubber band belongs to the selection tool over the scene, so drop it if
+            // the mouse has gone to the GUI or the user has picked up a brush mid-drag.
+            if (ImGui::GetIO().WantCaptureMouse || ghost_tile){
+                marquee_active = false;
             }
 
             // Handle every editor-related thing that works outside of the GUI underneath this conditional.
@@ -126,28 +136,83 @@ void Editor::Process()
                 } 
                 else {
                   // Functionality for a tile selection mode
-                  for (auto& tile_name : tile_cache){
-                      for (auto& tile : tile_name.second){
-                        
-                        if (mouse->IsClicking(&tile->rect)){                        
-                            tile->highlight = true;
-                            gui->tile_edit_mode = true;
-                            selected_tile = tile;
+                  // Holding Ctrl adds to the selection instead of replacing it, the way it
+                  // works in Unity.
+                  bool additive = keyboard->KeyIsPressed(SDL_SCANCODE_LCTRL) || keyboard->KeyIsPressed(SDL_SCANCODE_RCTRL);
 
-                        }
-                        else if (mouse->IsTouching(&tile->rect)){
-                            tile->highlight = true;
-                        }
+                  // Pressing down starts a rubber band. Whether it turns out to be a drag
+                  // or just a click is decided on release, by how far the mouse travelled.
+                  if (mouse->has_pressed){
+                      marquee_active = true;
+                      marquee_start_x = mouse->xpos;
+                      marquee_start_y = mouse->ypos;
+                  }
 
-                        // Everything the mouse is not on deselects, same as before, except
-                        // for the tile that is currently selected: it keeps its highlight so
-                        // the user can still see which tile the Inspector is editing and
-                        // which one Delete is about to remove.
-                        else {
-                            tile->highlight = (tile == selected_tile);
-                        }
+                  if (marquee_active){
+                      // Built from the two corners so it works dragging in any direction.
+                      marquee_rect.x = min(marquee_start_x, mouse->xpos);
+                      marquee_rect.y = min(marquee_start_y, mouse->ypos);
+                      marquee_rect.w = fabs(mouse->xpos - marquee_start_x);
+                      marquee_rect.h = fabs(mouse->ypos - marquee_start_y);
+                  }
+
+                  // A few pixels of travel separates a sloppy click from a real drag.
+                  bool dragging = marquee_active && (marquee_rect.w > 4 || marquee_rect.h > 4);
+
+                  if (mouse->has_clicked && marquee_active){
+                      if (dragging){
+                          // Band select: everything the box touches, replacing the old
+                          // selection unless Ctrl is being held.
+                          if (!additive){
+                              ClearSelection();
+                          }
+                          for (auto& tile_name : tile_cache){
+                              for (auto& tile : tile_name.second){
+                                  if (SDL_HasRectIntersectionFloat(&marquee_rect, &tile->rect) && !IsSelected(tile)){
+                                      Select(tile, true);
+                                  }
+                              }
+                          }
                       }
-                    }
+                      else {
+                          // Plain click. Clicking empty space clears the selection, which is
+                          // how the user gets back to nothing selected.
+                          GameTile * hit = NULL;
+                          for (auto& tile_name : tile_cache){
+                              for (auto& tile : tile_name.second){
+                                  if (mouse->IsTouching(&tile->rect)){
+                                      hit = tile;
+                                  }
+                              }
+                          }
+
+                          if (hit){
+                              Select(hit, additive);
+                          }
+                          else if (!additive){
+                              ClearSelection();
+                          }
+                      }
+
+                      marquee_active = false;
+                  }
+                }
+            }
+
+            // Outlines: selected tiles keep theirs, the tile under the mouse gets the hover
+            // one, and anything the rubber band is currently over previews as hovered so the
+            // user can see what the drag is about to catch. This runs outside the mouse
+            // check above, because a tile selected from the Hierarchy has to show its
+            // outline while the mouse is still sitting over the panel.
+            bool over_gui = ImGui::GetIO().WantCaptureMouse;
+            bool previewing = marquee_active && (marquee_rect.w > 4 || marquee_rect.h > 4);
+
+            for (auto& tile_name : tile_cache){
+                for (auto& tile : tile_name.second){
+                    tile->selected = IsSelected(tile);
+                    tile->highlight = !over_gui
+                                   && (mouse->IsTouching(&tile->rect)
+                                       || (previewing && SDL_HasRectIntersectionFloat(&marquee_rect, &tile->rect)));
                 }
             }
 
@@ -193,8 +258,7 @@ void Editor::LoadMX(){
         // The selection points into the level that is about to be replaced, so it has to
         // go before the cache does, otherwise the inspector would keep editing a tile that
         // is no longer part of the level.
-        selected_tile = NULL;
-        gui->tile_edit_mode = false;
+        ClearSelection();
 
         // The cache owns these tiles, so free them instead of just dropping the pointers.
         for (auto tile_list : tile_cache){
@@ -227,39 +291,84 @@ void Editor::LoadMX(){
         
 
 
-void Editor::DeleteSelectedTile(){
-    if (!selected_tile){
+bool Editor::IsSelected(GameTile * tile){
+    return find(selected_tiles.begin(), selected_tiles.end(), tile) != selected_tiles.end();
+}
+
+void Editor::Select(GameTile * tile, bool additive){
+    if (!tile){
+        return;
+    }
+
+    if (!additive){
+        // Plain click replaces whatever was selected before.
+        ClearSelection();
+        selected_tiles.push_back(tile);
+    }
+    else {
+        // Ctrl click toggles, so the same click can take a tile back out of the selection.
+        vector<GameTile *>::iterator found = find(selected_tiles.begin(), selected_tiles.end(), tile);
+        if (found != selected_tiles.end()){
+            (*found)->selected = false;
+            selected_tiles.erase(found);
+        }
+        else {
+            selected_tiles.push_back(tile);
+        }
+    }
+
+    // The edit window follows the selection: open while something is selected, shut once
+    // the last tile has been toggled back off.
+    gui->tile_edit_mode = !selected_tiles.empty();
+}
+
+void Editor::ClearSelection(){
+    // Clear the outlines before dropping the pointers, otherwise the tiles keep drawing
+    // as selected with nothing pointing at them.
+    for (auto tile : selected_tiles){
+        tile->selected = false;
+    }
+    selected_tiles.clear();
+    gui->tile_edit_mode = false;
+}
+
+void Editor::DeleteSelection(){
+    if (selected_tiles.empty()){
         // Nothing is selected, so make sure the edit window is not left open on a tile
         // that is not there.
         gui->tile_edit_mode = false;
         return;
     }
 
-    // Search for the pointer itself rather than looking the tile up by tile_cache[name].
-    // A tile imported from an .mx file takes its name from the folder it was exported to,
-    // so its name does not always match the key it is filed under in the cache.
-    for (auto entry = tile_cache.begin(); entry != tile_cache.end(); ++entry){
-        vector<GameTile *> & tiles = entry->second;
-        vector<GameTile *>::iterator tile = find(tiles.begin(), tiles.end(), selected_tile);
+    for (auto selected : selected_tiles){
+        // Search for the pointer itself rather than looking the tile up by
+        // tile_cache[name]. A tile imported from an .mx file takes its name from the
+        // folder it was exported to, so its name does not always match the key it is
+        // filed under in the cache.
+        for (auto entry = tile_cache.begin(); entry != tile_cache.end(); ++entry){
+            vector<GameTile *> & tiles = entry->second;
+            vector<GameTile *>::iterator tile = find(tiles.begin(), tiles.end(), selected);
 
-        if (tile != tiles.end()){
-            // The texture belongs to the cache and is shared with every other tile of the
-            // same type, so only the tile itself gets freed here.
-            delete *tile;
-            tiles.erase(tile);
+            if (tile != tiles.end()){
+                // The texture belongs to the cache and is shared with every other tile of
+                // the same type, so only the tile itself gets freed here.
+                delete *tile;
+                tiles.erase(tile);
 
-            // Drop the whole entry once its last tile is gone, so saving and exporting
-            // never write out a tile type that has nothing left in the level.
-            if (tiles.empty()){
-                tile_cache.erase(entry);
+                // Drop the whole entry once its last tile is gone, so saving and exporting
+                // never write out a tile type that has nothing left in the level.
+                if (tiles.empty()){
+                    tile_cache.erase(entry);
+                }
+                break;
             }
-            break;
         }
     }
 
-    // Deselect: the tile the Inspector was pointing at does not exist anymore. Its
-    // highlight goes with it, since the tile it was drawn on is gone.
-    selected_tile = NULL;
+    // Deselect: the tiles the Inspector was pointing at do not exist anymore. Their
+    // outlines go with them, since the tiles they were drawn on are gone. Cleared
+    // directly rather than through ClearSelection(), which would touch freed tiles.
+    selected_tiles.clear();
     gui->tile_edit_mode = false;
 }
 
@@ -279,6 +388,16 @@ void Editor::Render(){
                     }
                 }
             }
+            // Rubber band, drawn over the tiles but under the GUI so it reads as part of
+            // the scene. Only worth drawing once the drag is big enough to count as one.
+            if (marquee_active && (marquee_rect.w > 4 || marquee_rect.h > 4)){
+                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+                SDL_SetRenderDrawColor(renderer, 255, 145, 0, 40);
+                SDL_RenderFillRect(renderer, &marquee_rect);
+                SDL_SetRenderDrawColor(renderer, 255, 145, 0, 200);
+                SDL_RenderRect(renderer, &marquee_rect);
+            }
+
             camera->Show(renderer);
             // Send the data imgui stored from "Imgui::Render" to the screen using the specified render api.
             ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
@@ -314,8 +433,20 @@ void Editor::SetKeyMapping(){
 
             // Delete the selected tile, the way Unity does it. KeyWasPressed keeps this to
             // one deletion per press instead of one per frame the key is held.
-            if (!typing && selected_tile && keyboard->KeyWasPressed(SDL_SCANCODE_DELETE)){
-                gui->delete_selected_tile = true;
+            if (!typing && !selected_tiles.empty() && keyboard->KeyWasPressed(SDL_SCANCODE_DELETE)){
+                gui->delete_selection = true;
+            }
+
+            // Ctrl+A selects the whole level, Unity style.
+            bool ctrl_held = keyboard->KeyIsPressed(SDL_SCANCODE_LCTRL) || keyboard->KeyIsPressed(SDL_SCANCODE_RCTRL);
+            if (!typing && ctrl_held && keyboard->KeyWasPressed(SDL_SCANCODE_A)){
+                ClearSelection();
+                for (auto& tile_list : tile_cache){
+                    for (auto& tile : tile_list.second){
+                        selected_tiles.push_back(tile);
+                    }
+                }
+                gui->tile_edit_mode = !selected_tiles.empty();
             }
 
             if (keyboard->KeyIsPressed(SDL_SCANCODE_UP)){

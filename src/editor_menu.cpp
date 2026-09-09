@@ -21,9 +21,9 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
 }
 
-void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile *>> & tile_cache, GameTile * & selected_tile){
+void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile *>> & tile_cache, vector<GameTile *> & selected_tiles){
 
-    MainMenuBar(ghost_tile, selected_tile);
+    MainMenuBar(ghost_tile, tile_cache, selected_tiles);
 
     if (unity_layout){
         // Work out what each edge takes before any panel is drawn, so they all agree on
@@ -38,15 +38,15 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
         scene_size = ImVec2(max(viewport->WorkSize.x - hierarchy_width - inspector_width, 1.0f),
                             max(viewport->WorkSize.y - toolbar_height - status_height - project_height, 1.0f));
 
-        Toolbar(ghost_tile, selected_tile);
-        HierarchyPanel(tile_cache, selected_tile);
-        InspectorPanel(selected_tile, ghost_tile, camera);
+        Toolbar(ghost_tile, selected_tiles);
+        HierarchyPanel(tile_cache, selected_tiles);
+        InspectorPanel(selected_tiles, ghost_tile, camera);
         ProjectPanel(ghost_tile);
-        StatusBar(tile_cache, selected_tile);
+        StatusBar(tile_cache, selected_tiles);
         SceneOutline();
     }
     else {
-        ClassicMenus(ghost_tile, camera, selected_tile);
+        ClassicMenus(ghost_tile, camera, selected_tiles);
     }
 
     Dialogs();
@@ -59,7 +59,45 @@ void EditorMenu::ClearGhostTile(GameTile * & ghost_tile){
     ghost_tile = NULL;
 }
 
-void EditorMenu::MainMenuBar(GameTile * & ghost_tile, GameTile * & selected_tile){
+bool EditorMenu::IsSelected(vector<GameTile *> & selected_tiles, GameTile * tile){
+    return find(selected_tiles.begin(), selected_tiles.end(), tile) != selected_tiles.end();
+}
+
+void EditorMenu::SelectTile(vector<GameTile *> & selected_tiles, GameTile * tile, bool additive){
+    if (!tile){
+        return;
+    }
+
+    if (!additive){
+        selected_tiles.clear();
+        selected_tiles.push_back(tile);
+    }
+    else {
+        // Ctrl click toggles, so the same click can take a tile back out of the selection.
+        vector<GameTile *>::iterator found = find(selected_tiles.begin(), selected_tiles.end(), tile);
+        if (found != selected_tiles.end()){
+            selected_tiles.erase(found);
+        }
+        else {
+            selected_tiles.push_back(tile);
+        }
+    }
+
+    // The outlines themselves are re-synced by the editor every frame from this list.
+    tile_edit_mode = !selected_tiles.empty();
+}
+
+void EditorMenu::SelectAll(map<string, vector<GameTile *>> & tile_cache, vector<GameTile *> & selected_tiles){
+    selected_tiles.clear();
+    for (auto & entry : tile_cache){
+        for (auto & tile : entry.second){
+            selected_tiles.push_back(tile);
+        }
+    }
+    tile_edit_mode = !selected_tiles.empty();
+}
+
+void EditorMenu::MainMenuBar(GameTile * & ghost_tile, map<string, vector<GameTile *>> & tile_cache, vector<GameTile *> & selected_tiles){
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){
             ImGui::Checkbox("Save File", &saving_to_mx);
@@ -71,13 +109,20 @@ void EditorMenu::MainMenuBar(GameTile * & ghost_tile, GameTile * & selected_tile
 
         // Everything that acts on the current selection lives here, like the Unity Edit menu.
         if (ImGui::BeginMenu("Edit")){
-            if (ImGui::MenuItem("Delete Tile", "Del", false, selected_tile != NULL)){
-                delete_selected_tile = true;
+            string delete_label = selected_tiles.size() > 1
+                                ? "Delete " + to_string(selected_tiles.size()) + " Tiles"
+                                : string("Delete Tile");
+
+            if (ImGui::MenuItem(delete_label.c_str(), "Del", false, !selected_tiles.empty())){
+                delete_selection = true;
             }
-            if (ImGui::MenuItem("Deselect", "X", false, selected_tile != NULL || ghost_tile != NULL)){
+            if (ImGui::MenuItem("Select All", "Ctrl+A", false, !tile_cache.empty())){
+                SelectAll(tile_cache, selected_tiles);
+            }
+            if (ImGui::MenuItem("Deselect", "X", false, !selected_tiles.empty() || ghost_tile != NULL)){
                 // Dropping the selection here is enough: the selection pass in the editor
-                // clears the leftover highlight on the next frame.
-                selected_tile = NULL;
+                // clears the leftover outlines on the next frame.
+                selected_tiles.clear();
                 tile_edit_mode = false;
                 ClearGhostTile(ghost_tile);
             }
@@ -104,7 +149,7 @@ void EditorMenu::MainMenuBar(GameTile * & ghost_tile, GameTile * & selected_tile
     }
 }
 
-void EditorMenu::Toolbar(GameTile * & ghost_tile, GameTile * & selected_tile){
+void EditorMenu::Toolbar(GameTile * & ghost_tile, vector<GameTile *> & selected_tiles){
     const ImGuiViewport * viewport = ImGui::GetMainViewport();
 
     ImGui::SetNextWindowPos(viewport->WorkPos);
@@ -120,7 +165,7 @@ void EditorMenu::Toolbar(GameTile * & ghost_tile, GameTile * & selected_tile){
             ClearGhostTile(ghost_tile);
         }
         ImGui::PopStyleColor(1);
-        if (ImGui::IsItemHovered()){ImGui::SetTooltip("Put the brush down so tiles can be picked (X)");}
+        if (ImGui::IsItemHovered()){ImGui::SetTooltip("Put the brush down so tiles can be picked (X). Drag a box to select several, Ctrl+click to add one");}
 
         ImGui::SameLine();
         if (ghost_tile != NULL){ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.46f, 0.47f, 0.48f, 1.00f));}
@@ -135,21 +180,25 @@ void EditorMenu::Toolbar(GameTile * & ghost_tile, GameTile * & selected_tile){
 
         // Delete stays greyed out until something is actually selected, so it can never
         // be pressed against a stale pointer.
-        ImGui::BeginDisabled(selected_tile == NULL);
+        ImGui::BeginDisabled(selected_tiles.empty());
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.60f, 0.16f, 0.16f, 1.00f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.75f, 0.22f, 0.22f, 1.00f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.50f, 0.12f, 0.12f, 1.00f));
-        if (ImGui::Button("Delete")){
-            delete_selected_tile = true;
+
+        string delete_label = selected_tiles.size() > 1
+                            ? "Delete (" + to_string(selected_tiles.size()) + ")"
+                            : string("Delete");
+        if (ImGui::Button(delete_label.c_str())){
+            delete_selection = true;
         }
         ImGui::PopStyleColor(3);
         ImGui::EndDisabled();
-        if (ImGui::IsItemHovered()){ImGui::SetTooltip("Remove the selected tile from the level (Del)");}
+        if (ImGui::IsItemHovered()){ImGui::SetTooltip("Remove the selected tiles from the level (Del)");}
 
         ImGui::SameLine();
-        ImGui::BeginDisabled(selected_tile == NULL && ghost_tile == NULL);
+        ImGui::BeginDisabled(selected_tiles.empty() && ghost_tile == NULL);
         if (ImGui::Button("Deselect")){
-            selected_tile = NULL;
+            selected_tiles.clear();
             tile_edit_mode = false;
             ClearGhostTile(ghost_tile);
         }
@@ -166,7 +215,7 @@ void EditorMenu::Toolbar(GameTile * & ghost_tile, GameTile * & selected_tile){
     ImGui::End();
 }
 
-void EditorMenu::HierarchyPanel(map<string, vector<GameTile *>> & tile_cache, GameTile * & selected_tile){
+void EditorMenu::HierarchyPanel(map<string, vector<GameTile *>> & tile_cache, vector<GameTile *> & selected_tiles){
     const ImGuiViewport * viewport = ImGui::GetMainViewport();
 
     ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y + toolbar_height));
@@ -179,6 +228,10 @@ void EditorMenu::HierarchyPanel(map<string, vector<GameTile *>> & tile_cache, Ga
             tile_count += entry.second.size();
         }
         ImGui::Text("Level (%d tiles)", tile_count);
+        // On its own line: at the panel width this gets cut off if it trails the count.
+        if (!selected_tiles.empty()){
+            ImGui::TextDisabled("%d selected", (int)selected_tiles.size());
+        }
         ImGui::Separator();
 
         if (tile_cache.empty()){
@@ -196,18 +249,23 @@ void EditorMenu::HierarchyPanel(map<string, vector<GameTile *>> & tile_cache, Ga
                     // to carry the position. Keeps rows readable at the panel width.
                     string label = "[" + to_string(tile->x) + ", " + to_string(tile->y) + "]";
 
-                    if (ImGui::Selectable(label.c_str(), tile == selected_tile)){
-                        selected_tile = tile;
-                        tile_edit_mode = true;
+                    if (ImGui::Selectable(label.c_str(), IsSelected(selected_tiles, tile))){
+                        // Ctrl adds to the selection, same as clicking in the scene does.
+                        SelectTile(selected_tiles, tile, ImGui::GetIO().KeyCtrl);
                     }
 
-                    // Right clicking a row selects it first, so the delete always lands on
-                    // the row that was clicked rather than whatever was selected before.
+                    // Right clicking a row that is not already part of the selection makes
+                    // it the selection, so the delete lands on the row that was clicked.
                     if (ImGui::BeginPopupContextItem()){
-                        selected_tile = tile;
-                        tile_edit_mode = true;
-                        if (ImGui::MenuItem("Delete Tile", "Del")){
-                            delete_selected_tile = true;
+                        if (!IsSelected(selected_tiles, tile)){
+                            SelectTile(selected_tiles, tile, false);
+                        }
+
+                        string menu_label = selected_tiles.size() > 1
+                                          ? "Delete " + to_string(selected_tiles.size()) + " Tiles"
+                                          : string("Delete Tile");
+                        if (ImGui::MenuItem(menu_label.c_str(), "Del")){
+                            delete_selection = true;
                         }
                         ImGui::EndPopup();
                     }
@@ -220,7 +278,7 @@ void EditorMenu::HierarchyPanel(map<string, vector<GameTile *>> & tile_cache, Ga
     ImGui::End();
 }
 
-void EditorMenu::InspectorPanel(GameTile * & selected_tile, GameTile * ghost_tile, Camera * camera){
+void EditorMenu::InspectorPanel(vector<GameTile *> & selected_tiles, GameTile * ghost_tile, Camera * camera){
     const ImGuiViewport * viewport = ImGui::GetMainViewport();
 
     ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x + viewport->WorkSize.x - inspector_width, viewport->WorkPos.y + toolbar_height));
@@ -229,7 +287,10 @@ void EditorMenu::InspectorPanel(GameTile * & selected_tile, GameTile * ghost_til
 
     if (ImGui::Begin("Inspector", NULL, PANEL_FLAGS)){
 
-        if (selected_tile){
+        if (selected_tiles.size() == 1){
+            // Single tile: the full transform, editable.
+            GameTile * selected_tile = selected_tiles[0];
+
             ImGui::SeparatorText("Selected Tile");
             ImGui::Text("Name: %s", selected_tile->name.c_str());
             ImGui::Text("Screen: %d, %d", static_cast<int>(selected_tile->x + camera->xpos), static_cast<int>(selected_tile->y + camera->ypos));
@@ -251,29 +312,66 @@ void EditorMenu::InspectorPanel(GameTile * & selected_tile, GameTile * ghost_til
             selected_tile->w = w_increase;
             selected_tile->h = h_increase;
             ImGui::PopID();
+        }
+        else if (selected_tiles.size() > 1){
+            // Several tiles: no single position to show, so the inspector offers the
+            // things that do make sense across a whole selection.
+            ImGui::SeparatorText("Selected Tiles");
+            ImGui::Text("%d tiles selected", (int)selected_tiles.size());
+            ImGui::Spacing();
 
+            if (ImGui::BeginChild("selection_list", ImVec2(0.0f, 110.0f), ImGuiChildFlags_Borders)){
+                for (auto & tile : selected_tiles){
+                    ImGui::Text("%s  [%d, %d]", tile->name.c_str(), tile->x, tile->y);
+                }
+            }
+            ImGui::EndChild();
+
+            ImGui::Spacing();
+            ImGui::TextDisabled("Resize all:");
+
+            // Seeded from the first tile, and only written back when the user actually
+            // changes the field, so opening the panel does not resize the whole selection.
+            ImGui::PushID("multi_transform");
+            w_increase = selected_tiles[0]->w;
+            h_increase = selected_tiles[0]->h;
+
+            if (ImGui::InputInt("Width", &w_increase)){
+                for (auto & tile : selected_tiles){ tile->w = w_increase; }
+            }
+            if (ImGui::InputInt("Height", &h_increase)){
+                for (auto & tile : selected_tiles){ tile->h = h_increase; }
+            }
+            ImGui::PopID();
+        }
+
+        if (!selected_tiles.empty()){
             ImGui::Spacing();
             ImGui::Separator();
             ImGui::Spacing();
 
             // The editor owns the tiles, so the button only raises a flag and lets
-            // Editor::DeleteSelectedTile() free it and drop the selection.
+            // Editor::DeleteSelection() free them and drop the selection.
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.60f, 0.16f, 0.16f, 1.00f));
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.75f, 0.22f, 0.22f, 1.00f));
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.50f, 0.12f, 0.12f, 1.00f));
-            if (ImGui::Button("Delete Tile", ImVec2(-1.0f, 32.0f))){
-                delete_selected_tile = true;
+
+            string delete_label = selected_tiles.size() > 1
+                                ? "Delete " + to_string(selected_tiles.size()) + " Tiles"
+                                : string("Delete Tile");
+            if (ImGui::Button(delete_label.c_str(), ImVec2(-1.0f, 32.0f))){
+                delete_selection = true;
             }
             ImGui::PopStyleColor(3);
 
             if (ImGui::Button("Deselect", ImVec2(-1.0f, 0.0f))){
-                selected_tile = NULL;
+                selected_tiles.clear();
                 tile_edit_mode = false;
             }
         }
         else {
             ImGui::TextDisabled("Nothing selected.");
-            ImGui::TextWrapped("Put the brush down (X), then click a tile in the scene or a row in the Hierarchy to select it.");
+            ImGui::TextWrapped("Put the brush down (X), then click a tile, drag a box around several, or Ctrl+click to add to the selection.");
         }
 
         if (ghost_tile){
@@ -295,7 +393,7 @@ void EditorMenu::InspectorPanel(GameTile * & selected_tile, GameTile * ghost_til
             ImGui::PopID();
         }
 
-        if (!selected_tile && !ghost_tile){
+        if (selected_tiles.empty() && !ghost_tile){
             ImGui::Spacing();
             ImGui::SeparatorText("Scene");
             // NoInputs keeps this to a swatch plus its label: the three number boxes do
@@ -319,7 +417,7 @@ void EditorMenu::ProjectPanel(GameTile * & ghost_tile){
     ImGui::End();
 }
 
-void EditorMenu::StatusBar(map<string, vector<GameTile *>> & tile_cache, GameTile * selected_tile){
+void EditorMenu::StatusBar(map<string, vector<GameTile *>> & tile_cache, vector<GameTile *> & selected_tiles){
     const ImGuiViewport * viewport = ImGui::GetMainViewport();
 
     ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y + viewport->WorkSize.y - status_height));
@@ -332,10 +430,22 @@ void EditorMenu::StatusBar(map<string, vector<GameTile *>> & tile_cache, GameTil
             tile_count += entry.second.size();
         }
 
-        ImGui::Text("%.1f FPS   |   Tiles: %d   |   Selected: %s   |   Del: delete selected tile    X: put the brush down",
+        string selection;
+        if (selected_tiles.empty()){
+            selection = "none";
+        }
+        else if (selected_tiles.size() == 1){
+            selection = selected_tiles[0]->name;
+        }
+        else {
+            selection = to_string(selected_tiles.size()) + " tiles";
+        }
+
+        // Kept short enough to survive at the default window width.
+        ImGui::Text("%.1f FPS  |  Tiles: %d  |  Selected: %s  |  Drag: box  Ctrl+click: add  Del: delete  X: brush",
                     ImGui::GetIO().Framerate,
                     tile_count,
-                    selected_tile ? selected_tile->name.c_str() : "none");
+                    selection.c_str());
     }
     ImGui::End();
 }
@@ -357,7 +467,9 @@ void EditorMenu::AssetBrowser(GameTile * & ghost_tile, ImVec2 button_size){
         texture = cache->LoadTexture(tile_paths[i][1]);
         cache->SetTextureAlpha(texture, max(alpha, .5f));
          ImGui::PushID(i);
-        if (ImGui::ImageButton("",(ImTextureID)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(32.0f, 32), ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
+        // UVs run 0..1 over the whole texture. The old (32, 32) made each thumbnail repeat
+        // its tile 32 times over, which is why the assets showed up as stripes.
+        if (ImGui::ImageButton("",(ImTextureID)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
         {
             // Handle setting ghost tile when button is clicked
             if (ghost_tile == nullptr){
@@ -382,7 +494,7 @@ void EditorMenu::AssetBrowser(GameTile * & ghost_tile, ImVec2 button_size){
     }
 }
 
-void EditorMenu::ClassicMenus(GameTile * & ghost_tile, Camera * camera, GameTile * selected_tile){
+void EditorMenu::ClassicMenus(GameTile * & ghost_tile, Camera * camera, vector<GameTile *> & selected_tiles){
     // Stats and information.
     if (!hide_stats){
         ImGui::SetNextWindowBgAlpha(alpha);
@@ -439,9 +551,10 @@ void EditorMenu::ClassicMenus(GameTile * & ghost_tile, Camera * camera, GameTile
       GhostTileWindow(ghost_tile, camera);
     }
 
-    // Tile Edit Mode
-    if (tile_edit_mode && selected_tile){
-        TileEditWindow(selected_tile, camera);
+    // Tile Edit Mode. The floating window edits one tile, so it follows the last tile
+    // added to the selection.
+    if (tile_edit_mode && !selected_tiles.empty()){
+        TileEditWindow(selected_tiles.back(), camera);
     }
 }
 
@@ -459,8 +572,9 @@ void EditorMenu::Dialogs(){
         if (ImGui::Begin("Instruction Manual", NULL)){
             ImGui::TextWrapped("Pick a tile in the Project panel, then click in the scene to place it.");
             ImGui::TextWrapped("Press X, or the Select tool, to put the brush down.");
-            ImGui::TextWrapped("With no brush held, click a tile in the scene or a row in the Hierarchy to select it.");
-            ImGui::TextWrapped("Press Del, or use the Delete Tile button in the Inspector, to remove the selected tile.");
+            ImGui::TextWrapped("With no brush held, click a tile to select it, drag a box to select several, or Ctrl+click to add one to the selection.");
+            ImGui::TextWrapped("Ctrl+A selects the whole level, and clicking empty space clears the selection.");
+            ImGui::TextWrapped("Press Del, or use the Delete button in the Inspector, to remove everything selected.");
         }
         ImGui::End();
     }
@@ -556,7 +670,7 @@ void EditorMenu::TileEditWindow(GameTile * selected_tile, Camera * camera){
 
       // Same delete path as the docked Inspector: raise the flag, let the editor free it.
       if (ImGui::Button("Delete Tile")){
-          delete_selected_tile = true;
+          delete_selection = true;
       }
 
   }

@@ -29,6 +29,9 @@ class GameTile{
         array<int, 2> GetPos();
         array<int, 4> GetInfo();
 
+        // highlight is the hover outline, selected is the stronger one drawn around every
+        // tile in the current selection.
         bool highlight = false;
+        bool selected = false;
 };
 #endif
