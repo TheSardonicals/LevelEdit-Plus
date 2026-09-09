@@ -8,6 +8,7 @@ using namespace std;
 #include <SDL3_image/SDL_image.h>
 
 //STANDARD INCLUDES
+#include <algorithm>
 #include <map>
 #include <iostream>
 #include <fstream>

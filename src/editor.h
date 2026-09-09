@@ -23,6 +23,11 @@ class Editor{
         void SaveMXProject(string, ToJson,  map<string, bool>);
         void LoadMXProject();
 
+        // Removes whatever tile is currently selected from the tile cache and drops the
+        // selection with it. The editor owns every tile in the cache, so the menu only
+        // asks for the deletion and this does the freeing.
+        void DeleteSelectedTile();
+
         int Start(int argc, char* args[]);
         ImVec4 clear_color;
         SDL_Color r_clear_color{};

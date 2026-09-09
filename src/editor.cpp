@@ -103,6 +103,14 @@ void Editor::Process()
             gui->Process(ghost_tile, camera, tile_cache, selected_tile);
             keyboard->Process();
 
+            // Deleting has to happen before anything else walks the tile cache this frame,
+            // otherwise the selection loop and the renderer would be working with a tile
+            // that is on its way out.
+            if (gui->delete_selected_tile){
+                DeleteSelectedTile();
+                gui->delete_selected_tile = false;
+            }
+
             // Handle every editor-related thing that works outside of the GUI underneath this conditional.
             if (!ImGui::GetIO().WantCaptureMouse){
                 if (ghost_tile){
@@ -130,9 +138,13 @@ void Editor::Process()
                         else if (mouse->IsTouching(&tile->rect)){
                             tile->highlight = true;
                         }
-                        
+
+                        // Everything the mouse is not on deselects, same as before, except
+                        // for the tile that is currently selected: it keeps its highlight so
+                        // the user can still see which tile the Inspector is editing and
+                        // which one Delete is about to remove.
                         else {
-                            tile->highlight = false;
+                            tile->highlight = (tile == selected_tile);
                         }
                       }
                     }
@@ -178,6 +190,18 @@ void Editor::LoadMX(){
     json_handler->ImportMX(gui->tileset_name);
 
     if (!tile_cache.empty()){
+        // The selection points into the level that is about to be replaced, so it has to
+        // go before the cache does, otherwise the inspector would keep editing a tile that
+        // is no longer part of the level.
+        selected_tile = NULL;
+        gui->tile_edit_mode = false;
+
+        // The cache owns these tiles, so free them instead of just dropping the pointers.
+        for (auto tile_list : tile_cache){
+            for (auto tile : tile_list.second){
+                delete tile;
+            }
+        }
         tile_cache.clear();
     }
 
@@ -201,6 +225,43 @@ void Editor::LoadMX(){
 
 }
         
+
+
+void Editor::DeleteSelectedTile(){
+    if (!selected_tile){
+        // Nothing is selected, so make sure the edit window is not left open on a tile
+        // that is not there.
+        gui->tile_edit_mode = false;
+        return;
+    }
+
+    // Search for the pointer itself rather than looking the tile up by tile_cache[name].
+    // A tile imported from an .mx file takes its name from the folder it was exported to,
+    // so its name does not always match the key it is filed under in the cache.
+    for (auto entry = tile_cache.begin(); entry != tile_cache.end(); ++entry){
+        vector<GameTile *> & tiles = entry->second;
+        vector<GameTile *>::iterator tile = find(tiles.begin(), tiles.end(), selected_tile);
+
+        if (tile != tiles.end()){
+            // The texture belongs to the cache and is shared with every other tile of the
+            // same type, so only the tile itself gets freed here.
+            delete *tile;
+            tiles.erase(tile);
+
+            // Drop the whole entry once its last tile is gone, so saving and exporting
+            // never write out a tile type that has nothing left in the level.
+            if (tiles.empty()){
+                tile_cache.erase(entry);
+            }
+            break;
+        }
+    }
+
+    // Deselect: the tile the Inspector was pointing at does not exist anymore. Its
+    // highlight goes with it, since the tile it was drawn on is gone.
+    selected_tile = NULL;
+    gui->tile_edit_mode = false;
+}
 
 
 void Editor::Render(){
@@ -240,9 +301,21 @@ void Editor::SetKeyMapping(){
                 running = false;
             }
 
-            if (keyboard->KeyIsPressed(SDL_SCANCODE_X)){
-                ghost_tile = NULL;
+            // Ignore shortcuts while a text box has the keyboard, so typing a tileset name
+            // does not delete tiles out from under the user.
+            bool typing = ImGui::GetIO().WantCaptureKeyboard;
+
+            if (!typing && keyboard->KeyIsPressed(SDL_SCANCODE_X)){
+                // Delete first, then drop the pointer. The other way around leaks the tile,
+                // because deleting a pointer that has already been set to NULL does nothing.
                 delete ghost_tile;
+                ghost_tile = NULL;
+            }
+
+            // Delete the selected tile, the way Unity does it. KeyWasPressed keeps this to
+            // one deletion per press instead of one per frame the key is held.
+            if (!typing && selected_tile && keyboard->KeyWasPressed(SDL_SCANCODE_DELETE)){
+                gui->delete_selected_tile = true;
             }
 
             if (keyboard->KeyIsPressed(SDL_SCANCODE_UP)){

@@ -13,12 +13,32 @@ class EditorMenu{
         bool edit_texture_window = false;
         EditorMenu(int *, int *, ImVec4 *, Pointer *, map<string, string> *, TextureCache *);
         ~EditorMenu();
-        void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >>, GameTile *);
+        // The tile cache and the selection are taken by reference now, so the panels can
+        // browse the level and change what is selected instead of working off of a copy.
+        void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >> &, GameTile * &);
 
         // Window Functions
 
         void TileEditWindow(GameTile *, Camera *);
         void GhostTileWindow(GameTile *, Camera *);
+
+        // Unity-style layout. Every panel pins itself to an edge of the viewport, which
+        // leaves the middle of the screen free for the scene to be edited in.
+        void MainMenuBar(GameTile * &, GameTile * &);
+        void Toolbar(GameTile * &, GameTile * &);
+        void HierarchyPanel(map<string, vector<GameTile *>> &, GameTile * &);
+        void InspectorPanel(GameTile * &, GameTile *, Camera *);
+        void ProjectPanel(GameTile * &);
+        void StatusBar(map<string, vector<GameTile *>> &, GameTile *);
+        void SceneOutline();
+
+        // Pieces shared between the docked layout and the original floating menus.
+        void AssetBrowser(GameTile * &, ImVec2);
+        void Dialogs();
+        void ClassicMenus(GameTile * &, Camera *, GameTile *);
+
+        // Drops the brush, the same way the X key does.
+        void ClearGhostTile(GameTile * &);
 
         string current_item = "";
 
@@ -36,6 +56,15 @@ class EditorMenu{
         bool loading_project = false;
         bool tileset_import = false;
         bool tile_edit_mode = false;
+
+        // Raised by the UI when the user asks for the selected tile to be removed. The
+        // editor owns every tile in the tile cache, so it is the one that does the
+        // deleting, the same way it handles the save/import flags.
+        bool delete_selected_tile = false;
+
+        // Docked layout on by default. Switch it off to get the original floating menus.
+        bool unity_layout = true;
+
         int * window_width;
         int * window_height;
 
@@ -62,6 +91,19 @@ class EditorMenu{
         int w_increase;
         int h_increase;
 
-        
+        //  Layout Metrics
+
+        float hierarchy_width = 260.0f;
+        float inspector_width = 320.0f;
+        float project_height = 190.0f;
+        float toolbar_height = 0.0f;
+        float status_height = 0.0f;
+
+        // What is left over in the middle once the panels have taken their edges. Kept
+        // around so the editor can eventually clip the scene render to it.
+        ImVec2 scene_pos = ImVec2(0.0f, 0.0f);
+        ImVec2 scene_size = ImVec2(0.0f, 0.0f);
+
+
 };
 #endif
