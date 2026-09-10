@@ -73,17 +73,55 @@ void ToJson::ExportMX(map<string, vector<GameTile *>> tile_cache, string filenam
     //serialize the json string.
     string json_serialized = json_blocks.dump(4);
     
-    //Copying the tiles in the tile cache from the editor resources to project folder
+    // Copying the tiles in the tile cache from the editor resources to project folder.
+    //
+    // One copy per tile type rather than per placement: every placement of a tile
+    // shares the same source .bmp, so copying per placement just re-copies the same
+    // file over and over. The destination filename has to match what SaveToJson wrote
+    // into "filepath", which is built from the tile's own name.
+    //
+    // copy() onto a directory is not used here: it reports "File exists" against an
+    // existing destination directory on some standard library versions, so the export
+    // silently produced an assets folder with nothing in it. copy_file() with an
+    // explicit destination path does what was meant.
+    vector<string> copied;
+    int copy_failures = 0;
+
     for (auto it : tile_cache){
-        for(auto tile : it.second){
-            try{
-                experimental::filesystem::copy(tile->filepath, tile_dir);
+        for (auto tile : it.second){
+            if (find(copied.begin(), copied.end(), tile->name) != copied.end()){
+                continue;
             }
-            //Error thrown when copying a file that already exists in the folder. ie. multples of lava puddle will throw error on second lava
-            catch(experimental::filesystem::filesystem_error){
-                break;
+            copied.push_back(tile->name);
+
+            string destination = tile_dir + "/" + tile->name + ".bmp";
+
+            // Re-exporting a project should not trip over the assets a previous export
+            // already put there.
+            if (experimental::filesystem::exists(destination)){
+                continue;
+            }
+
+            error_code error;
+            experimental::filesystem::copy_file(tile->filepath, destination, error);
+
+            if (error){
+                // A tile whose art never made it across leaves an export the game
+                // cannot load, so this gets reported rather than quietly skipped.
+                cout << "couldn't copy " << tile->filepath << " -> " << destination
+                     << ": " << error.message() << endl;
+                copy_failures++;
             }
         }
+    }
+
+    if (copy_failures > 0){
+        string asset_error = to_string(copy_failures) +
+                             " tile image(s) could not be copied into " + tile_dir +
+                             ". The exported map will be missing art.";
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING,
+                                 "LevelEdit++ : Asset Export Warning",
+                                 asset_error.c_str(), NULL);
     }
 
     //create the file within the path, and output the json to it.

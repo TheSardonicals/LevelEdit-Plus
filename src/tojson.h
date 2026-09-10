@@ -1,10 +1,13 @@
 #pragma once
 #include "json.hpp"
 #include "gametile.h"
+#include <algorithm>
 #include <iostream>
 #include <experimental/filesystem>
 #include <fstream>
 #include <iomanip>
+#include <system_error>
+#include <vector>
 
 using namespace std;
 using nlohmann::json;
