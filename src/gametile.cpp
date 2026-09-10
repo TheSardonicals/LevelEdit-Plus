@@ -33,7 +33,13 @@ void GameTile::Render(array<int, 2> camera_pos = {0, 0}, float alpha){
     SDL_SetTextureAlphaMod(this->texture, (alpha * 255));
     SDL_RenderTexture(cache->renderer, this->texture, NULL, &rect);
 
-    if (this->highlight){
+    // Selection wins over hover, so a selected tile does not change colour just because
+    // the mouse happens to be sitting on it.
+    if (this->selected){
+      SDL_SetRenderDrawColor(cache->renderer, 255, 145, 0, (alpha * 255));
+      SDL_RenderRect(cache->renderer, &this->rect);
+    }
+    else if (this->highlight){
       SDL_SetRenderDrawColor(cache->renderer, 255, 255, 0, (alpha * 100));
       SDL_RenderRect(cache->renderer, &this->rect);
     }

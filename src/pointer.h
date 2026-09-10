@@ -29,11 +29,16 @@ class Pointer{
         void Render(SDL_Renderer*);
 
         void Process();
-        
+
+        // True on the frame the button goes down / is currently held. The marquee needs
+        // both: one to know where the drag started, one to know it is still going.
+        bool IsDown();
+
         float xpos = 0, ypos = 0;
         map<string, SDL_Cursor*> cursor;
 
         bool has_clicked;
+        bool has_pressed;
         bool has_rclicked;
         
 
