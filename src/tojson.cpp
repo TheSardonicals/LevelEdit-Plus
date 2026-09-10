@@ -35,15 +35,21 @@ void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache)
         this->json_blocks["name"] = name;
     }
     
+    // Locations are [x, y, w, h, height]. The height is a fifth element rather than a
+    // new object field on purpose: readers that only know the original four-element
+    // form index 0..3 and ignore the rest, so maps saved here still load in anything
+    // built against the old format, just flat.
+    this->json_blocks["formatVersion"] = kMXFormatVersion;
+
     for (auto it : tile_cache){
         for (auto tile : it.second){
             auto it_tiles = json_blocks["tiles"].find(tile->name);
             if (it_tiles != json_blocks["tiles"].end() == true){
-                this->json_blocks["tiles"][tile->name]["locations"].push_back({tile->x, tile->y, tile->w, tile->h});
-                
+                this->json_blocks["tiles"][tile->name]["locations"].push_back({tile->x, tile->y, tile->w, tile->h, tile->elevation});
+
             }else{
                 this->json_blocks["tiles"][tile->name]["filepath"] = "exports/" + name + "/assets/" + tile->name + ".bmp";
-                this->json_blocks["tiles"][tile->name]["locations"] = {{tile->x, tile->y, tile->w, tile->h}};
+                this->json_blocks["tiles"][tile->name]["locations"] = {{tile->x, tile->y, tile->w, tile->h, tile->elevation}};
             }
         }
     }

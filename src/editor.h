@@ -72,6 +72,10 @@ class Editor{
 
         float button_cooldown = 1.0;
 
+        // Pixels the [ and ] keys raise or lower a tile by. A quarter of a 32px tile,
+        // so four presses stack up to one tile of height.
+        static constexpr int kHeightStep = 8;
+
         array<int, 2> tile_size = {32, 32};
         array<int, 2> pos_at_push = {0, 0};
 
