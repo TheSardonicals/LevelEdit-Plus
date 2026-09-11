@@ -23,6 +23,17 @@ struct TileType {
     // fixed list; see kKnownTileFlags for the ones the Inspector offers as checkboxes.
     vector<string> flags;
 
+    // Whether anyone has actually said what this tile means - the map it came from
+    // had a "flags" key, or an author has set them here. Until then `flags` holds
+    // only a guess from the tile's name, which is shown but never saved.
+    //
+    // That distinction is the whole point. Games read a map with no "flags" key
+    // the way they always have (BoxDead from tile names, DreamQuest from its own
+    // block), and those disagree: writing BoxDead's guess into a DreamQuest map
+    // would turn 11 of its tile types solid or explosive just because the map was
+    // opened and saved here.
+    bool declared = false;
+
     // Optional collision box smaller than the art, as [x, y, w, h] relative to the
     // top-left corner of the tile's quad - so a tree can block at its trunk and not
     // its canopy. When has_collision is false the whole quad is the box.
@@ -44,16 +55,15 @@ bool IsKnownTileFlag(const string & flag);
 // "blocks_shots" are the same flag to every game that reads the map.
 string NormaliseTileFlag(const string & flag);
 
-// The flags a tile type starts with when its map declares none: the same name
-// keywords games were inferring collision from before maps could say it outright.
-// A map saved before flags existed therefore keeps behaving exactly as it did -
-// the difference is that the guess is now visible in the Inspector and can be
-// corrected, instead of being made silently at runtime.
+// A guess at what a tile means from its name, using the keywords BoxDead inferred
+// collision from before maps could say it outright. Shown in the Inspector as a
+// starting point for an author; it is not written to the map until they accept or
+// change it, because other games never guessed from names at all.
 vector<string> SuggestFlagsFromName(const string & name);
 
-// The type for `key`, created with suggested flags if this is the first time the
-// editor has seen it. Used everywhere a type is looked up, so the editor and its
-// panels can never disagree about what an unseen type starts as.
+// The type for `key`, created undeclared with a suggested guess if this is the
+// first time the editor has seen it. Used everywhere a type is looked up, so the
+// editor and its panels can never disagree about what an unseen type starts as.
 TileType & EnsureTileType(map<string, TileType> & types, const string & key);
 
 #endif

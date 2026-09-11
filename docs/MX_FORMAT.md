@@ -90,21 +90,29 @@ rest; it does nothing until a game is taught what it means.
 
 1. **The entry has a `flags` key** (even `[]`): that is the complete, authoritative
    list. An empty list is the author saying the tile means nothing special. Do not
-   add anything to it.
-2. **The entry has no `flags` key**: the map predates version 3. Infer the flags from
-   the tile's name, exactly as games did before flags existed:
-   - name contains `barrel`, `drum`, `explosive` or `tnt` → `["explosive"]`
-     (checked first, so "Explosive Barrel" is not a wall)
-   - otherwise, name contains `wall`, `block`, `rock`, `stone`, `barrier`, `fence`,
-     `crate`, `pillar` or `obstacle` → `["solid"]`
-   - otherwise → `[]`
+   add anything to it, and do not let the game's own older mechanism override it.
+2. **The entry has no `flags` key**: nobody has said what the tile means. Keep doing
+   **whatever this game did before flags existed**. Games did different things, so
+   this is not one rule - each game keeps its own:
+   - **BoxDead** read meaning from the tile's name. `barrel`, `drum`, `explosive` or
+     `tnt` → explosive (checked first, so "Explosive Barrel" is not a wall);
+     otherwise `wall`, `block`, `rock`, `stone`, `barrier`, `fence`, `crate`,
+     `pillar` or `obstacle` → solid. Case-insensitive substring match.
+   - **DreamQuest** reads its own `dreamquest.solid` and `dreamquest.solid_box`.
 
-   Matching is case-insensitive and on substrings.
+   Never apply another game's fallback. They disagree: BoxDead's keywords would turn
+   11 of DreamQuest's 128 tile types solid or explosive (`dungeon_wall`,
+   `marsh_stone`, `weapon_barrel`, ...) that DreamQuest has never treated that way.
 
-Rule 2 is what keeps a map saved before version 3 behaving exactly as it did. The
-editor applies the same inference when it opens such a map, shows the result in the
-Inspector, and writes it out as an explicit `flags` list on the next save - so after
-one save the name no longer decides anything.
+### How the editor writes `flags`
+
+The editor only writes a `flags` key once someone has actually decided what a tile
+means - an author set a flag, pressed **Keep**, or the map already had the key. For
+a tile nobody has decided on, it shows a guess from the name (BoxDead's keywords,
+marked as a guess) as a starting point, but **leaves the key off** when saving.
+
+So opening a map and saving it never changes what it means to any game. A tile only
+gains a `flags` key when an author puts one there.
 
 ### `collision`
 

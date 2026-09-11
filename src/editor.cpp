@@ -286,15 +286,16 @@ void Editor::LoadMX(){
         TileType & type = tile_types[tile.key()];
 
         // A "flags" key, even an empty one, is the map stating what the tile means,
-        // and is taken as-is. Only a map that never said anything - one saved before
-        // flags existed - gets the meaning suggested from its name, which keeps an old
-        // map behaving exactly as it did.
+        // and is taken as-is. A map that never said anything only gets a guess from
+        // the tile's name to show in the Inspector - left undeclared, so saving the
+        // map does not quietly turn that guess into something every game obeys.
         if (entry.contains("flags") && entry["flags"].is_array()){
             for (auto & flag : entry["flags"]){
                 if (flag.is_string()){
                     type.SetFlag(NormaliseTileFlag(flag.get<string>()), true);
                 }
             }
+            type.declared = true;
         }
         else {
             type.flags = SuggestFlagsFromName(tile.key());

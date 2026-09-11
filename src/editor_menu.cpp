@@ -252,11 +252,17 @@ void EditorMenu::HierarchyPanel(map<string, vector<GameTile *>> & tile_cache, ve
                 for (auto & flag : type->second.flags){
                     meaning += (meaning.empty() ? "" : ", ") + flag;
                 }
+                // A trailing "?" marks a guess from the name that has not been saved.
+                const bool guessed = !type->second.declared;
                 ImGui::SameLine();
-                ImGui::TextDisabled("[%s]", meaning.c_str());
+                ImGui::TextDisabled("[%s%s]", meaning.c_str(), guessed ? "?" : "");
                 // The panel is narrow, so a long list gets cut off; the tooltip always
                 // has all of it.
-                if (ImGui::IsItemHovered()){ImGui::SetTooltip("%s means: %s", entry.first.c_str(), meaning.c_str());}
+                if (ImGui::IsItemHovered()){
+                    ImGui::SetTooltip("%s %s: %s", entry.first.c_str(),
+                                      guessed ? "is guessed to mean (not saved)" : "means",
+                                      meaning.c_str());
+                }
             }
 
             if (open){
@@ -495,11 +501,25 @@ void EditorMenu::TileTypeEditor(map<string, TileType> & tile_types, const string
             ImGui::TextDisabled("Applies to every tile this brush places");
         }
 
+        // A guess from the name is only a starting point. It is not saved until the
+        // author changes a flag or keeps it as shown, so opening and saving a map
+        // never changes what it means to a game that did not guess from names.
+        if (!type.declared){
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.95f, 0.75f, 0.30f, 1.00f));
+            ImGui::TextWrapped("Guessed from the name. Not saved until you change a flag or keep it.");
+            ImGui::PopStyleColor();
+            if (ImGui::SmallButton("Keep")){
+                type.declared = true;
+            }
+            if (ImGui::IsItemHovered()){ImGui::SetTooltip("Save these flags to the map as shown");}
+        }
+
         // The flags a game already acts on.
         for (auto & known : kKnownTileFlags){
             bool on = type.HasFlag(known.first);
             if (ImGui::Checkbox(known.first.c_str(), &on)){
                 type.SetFlag(known.first, on);
+                type.declared = true;
             }
             if (ImGui::IsItemHovered()){ImGui::SetTooltip("%s", known.second.c_str());}
         }
@@ -520,6 +540,7 @@ void EditorMenu::TileTypeEditor(map<string, TileType> & tile_types, const string
 
             if (!keep){
                 type.flags.erase(type.flags.begin() + i);
+                type.declared = true;
             } else {
                 ++i;
             }
@@ -536,6 +557,7 @@ void EditorMenu::TileTypeEditor(map<string, TileType> & tile_types, const string
             string flag = NormaliseTileFlag(pending);
             if (!flag.empty()){
                 type.SetFlag(flag, true);
+                type.declared = true;
             }
             pending.clear();
         }

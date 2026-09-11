@@ -58,17 +58,21 @@ void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache,
 
         out["filepath"] = "exports/" + name + "/assets/" + key + ".bmp";
 
-        // What the tile means. Written for every entry, even when empty: an empty
-        // list is the author saying "this tile means nothing special", which a game
-        // must be able to tell apart from an older map that never said anything.
+        // What the tile means - written only once someone has actually said. An
+        // empty list from an author is kept: it says "this tile means nothing
+        // special". A mere guess from the tile's name is not written, and any
+        // "flags" key is left off, so the map still reads as one that never said
+        // anything and each game carries on reading it the way it always did.
         TileType type;
         auto found = tile_types.find(key);
         if (found != tile_types.end()){
             type = found->second;
-        } else {
-            type.flags = SuggestFlagsFromName(key);
         }
-        out["flags"] = type.flags;
+        if (type.declared){
+            out["flags"] = type.flags;
+        } else {
+            out.erase("flags");
+        }
 
         if (type.has_collision){
             out["collision"] = {type.collision[0], type.collision[1], type.collision[2], type.collision[3]};
