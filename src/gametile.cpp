@@ -3,8 +3,14 @@
 
 GameTile::GameTile(TextureCache * cache, string filepath, int xpos, int ypos, int w = 32, int h = 32){
 
-    filename = Split(filepath, '/')[1];
-    name = Split(filename, '.')[0];
+    // The name is the image's filename without its extension, taken from the *last*
+    // path segment. Taking segment [1] only worked for "resources/Lava.bmp": a tile
+    // imported from "exports/Level/assets/Lava.bmp" came out named "Level", so every
+    // tile in an imported map shared one name and saving merged them into one entry.
+    size_t slash = filepath.find_last_of("/\\");
+    filename = (slash == string::npos) ? filepath : filepath.substr(slash + 1);
+    size_t dot = filename.find_last_of('.');
+    name = (dot == string::npos) ? filename : filename.substr(0, dot);
     this->cache = cache;
     this->filepath = filepath;
 

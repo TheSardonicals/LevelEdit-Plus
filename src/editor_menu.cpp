@@ -1,5 +1,7 @@
 #include "editor_menu.h"
 
+#include <unordered_set>
+
 // Panels in the docked layout own their slot on screen, so the user cannot drag them out
 // of the layout or fold them away by accident.
 static const ImGuiWindowFlags PANEL_FLAGS = ImGuiWindowFlags_NoMove
@@ -21,7 +23,7 @@ EditorMenu::EditorMenu(int * width, int * height, ImVec4 * clear_color, Pointer 
     original_button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
 }
 
-void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile *>> & tile_cache, vector<GameTile *> & selected_tiles){
+void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile *>> & tile_cache, vector<GameTile *> & selected_tiles, map<string, TileType> & tile_types){
 
     MainMenuBar(ghost_tile, tile_cache, selected_tiles);
 
@@ -39,8 +41,8 @@ void EditorMenu::Process(GameTile * &ghost_tile, Camera * camera, map<string, ve
                             max(viewport->WorkSize.y - toolbar_height - status_height - project_height, 1.0f));
 
         Toolbar(ghost_tile, selected_tiles);
-        HierarchyPanel(tile_cache, selected_tiles);
-        InspectorPanel(selected_tiles, ghost_tile, camera);
+        HierarchyPanel(tile_cache, selected_tiles, tile_types);
+        InspectorPanel(selected_tiles, ghost_tile, camera, tile_cache, tile_types);
         ProjectPanel(ghost_tile);
         StatusBar(tile_cache, selected_tiles);
         SceneOutline();
@@ -215,7 +217,7 @@ void EditorMenu::Toolbar(GameTile * & ghost_tile, vector<GameTile *> & selected_
     ImGui::End();
 }
 
-void EditorMenu::HierarchyPanel(map<string, vector<GameTile *>> & tile_cache, vector<GameTile *> & selected_tiles){
+void EditorMenu::HierarchyPanel(map<string, vector<GameTile *>> & tile_cache, vector<GameTile *> & selected_tiles, map<string, TileType> & tile_types){
     const ImGuiViewport * viewport = ImGui::GetMainViewport();
 
     ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y + toolbar_height));
@@ -240,7 +242,24 @@ void EditorMenu::HierarchyPanel(map<string, vector<GameTile *>> & tile_cache, ve
 
         for (auto & entry : tile_cache){
             string header = entry.first + " (" + to_string(entry.second.size()) + ")";
-            if (ImGui::TreeNodeEx(header.c_str(), ImGuiTreeNodeFlags_DefaultOpen)){
+            bool open = ImGui::TreeNodeEx(header.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
+
+            // What the type means, beside its name, so the level can be read for
+            // behaviour at a glance instead of by selecting each type in turn.
+            auto type = tile_types.find(entry.first);
+            if (type != tile_types.end() && !type->second.flags.empty()){
+                string meaning;
+                for (auto & flag : type->second.flags){
+                    meaning += (meaning.empty() ? "" : ", ") + flag;
+                }
+                ImGui::SameLine();
+                ImGui::TextDisabled("[%s]", meaning.c_str());
+                // The panel is narrow, so a long list gets cut off; the tooltip always
+                // has all of it.
+                if (ImGui::IsItemHovered()){ImGui::SetTooltip("%s means: %s", entry.first.c_str(), meaning.c_str());}
+            }
+
+            if (open){
                 for (auto & tile : entry.second){
                     // The pointer is the identity here, so rows stay correct even when two
                     // tiles of the same type sit on the same spot.
@@ -278,7 +297,7 @@ void EditorMenu::HierarchyPanel(map<string, vector<GameTile *>> & tile_cache, ve
     ImGui::End();
 }
 
-void EditorMenu::InspectorPanel(vector<GameTile *> & selected_tiles, GameTile * ghost_tile, Camera * camera){
+void EditorMenu::InspectorPanel(vector<GameTile *> & selected_tiles, GameTile * ghost_tile, Camera * camera, map<string, vector<GameTile *>> & tile_cache, map<string, TileType> & tile_types){
     const ImGuiViewport * viewport = ImGui::GetMainViewport();
 
     ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x + viewport->WorkSize.x - inspector_width, viewport->WorkPos.y + toolbar_height));
@@ -360,6 +379,33 @@ void EditorMenu::InspectorPanel(vector<GameTile *> & selected_tiles, GameTile * 
             ImGui::PopID();
         }
 
+        // Types already given an editor this frame. A type can be both selected and
+        // the brush, and two editors for one type would collide on their widget IDs.
+        unordered_set<string> shown_types;
+
+        if (!selected_tiles.empty()){
+            // Every type the selection touches, found in one pass over the level against
+            // a set of the selected tiles. Searching the selection for each tile instead
+            // goes quadratic the moment someone selects a whole map.
+            unordered_set<GameTile *> chosen(selected_tiles.begin(), selected_tiles.end());
+            vector<string> touched;
+            for (auto & entry : tile_cache){
+                for (auto tile : entry.second){
+                    if (chosen.count(tile)){
+                        touched.push_back(entry.first);
+                        break;
+                    }
+                }
+            }
+
+            ImGui::Spacing();
+            ImGui::SeparatorText(touched.size() == 1 ? "Tile Type" : "Tile Types");
+            for (auto & key : touched){
+                TileTypeEditor(tile_types, key, static_cast<int>(tile_cache[key].size()));
+                shown_types.insert(key);
+            }
+        }
+
         if (!selected_tiles.empty()){
             ImGui::Spacing();
             ImGui::Separator();
@@ -414,6 +460,14 @@ void EditorMenu::InspectorPanel(vector<GameTile *> & selected_tiles, GameTile * 
             }
             if (ImGui::IsItemHovered()){ImGui::SetTooltip("Height every tile this brush places will stand at. [ and ] step it");}
             ImGui::PopID();
+
+            // What the brush's tiles will mean. Set it here and every tile laid with the
+            // brush already carries it - no going back to flag them afterwards.
+            if (!shown_types.count(ghost_tile->name)){
+                auto placed = tile_cache.find(ghost_tile->name);
+                int placed_count = (placed != tile_cache.end()) ? static_cast<int>(placed->second.size()) : -1;
+                TileTypeEditor(tile_types, ghost_tile->name, placed_count);
+            }
         }
 
         if (selected_tiles.empty() && !ghost_tile){
@@ -425,6 +479,79 @@ void EditorMenu::InspectorPanel(vector<GameTile *> & selected_tiles, GameTile * 
         }
     }
     ImGui::End();
+}
+
+void EditorMenu::TileTypeEditor(map<string, TileType> & tile_types, const string & key, int placed_count){
+    TileType & type = EnsureTileType(tile_types, key);
+
+    // Scoped by type, so two types open at once never share a widget.
+    ImGui::PushID(key.c_str());
+
+    if (ImGui::CollapsingHeader(key.c_str(), ImGuiTreeNodeFlags_DefaultOpen)){
+        // Flags belong to the type, not the tile, so say how far an edit reaches.
+        if (placed_count >= 0){
+            ImGui::TextDisabled("Applies to all %d placed", placed_count);
+        } else {
+            ImGui::TextDisabled("Applies to every tile this brush places");
+        }
+
+        // The flags a game already acts on.
+        for (auto & known : kKnownTileFlags){
+            bool on = type.HasFlag(known.first);
+            if (ImGui::Checkbox(known.first.c_str(), &on)){
+                type.SetFlag(known.first, on);
+            }
+            if (ImGui::IsItemHovered()){ImGui::SetTooltip("%s", known.second.c_str());}
+        }
+
+        // Everything else the author has given this type. The editor does not know
+        // what these mean - that is the point, a game does. Shown as ticked boxes like
+        // the known flags above, so every flag reads the same way; unticking one takes
+        // it off the type.
+        for (size_t i = 0; i < type.flags.size(); ){
+            if (IsKnownTileFlag(type.flags[i])){
+                ++i;
+                continue;
+            }
+
+            bool keep = true;
+            ImGui::Checkbox(type.flags[i].c_str(), &keep);
+            if (ImGui::IsItemHovered()){ImGui::SetTooltip("Custom flag. Untick to remove it");}
+
+            if (!keep){
+                type.flags.erase(type.flags.begin() + i);
+            } else {
+                ++i;
+            }
+        }
+
+        // Any meaning at all can be added. Normalised so "Blocks Shots" and
+        // "blocks_shots" are the same flag to every game that reads the map.
+        string & pending = new_flag_text[key];
+        ImGui::SetNextItemWidth(-60.0f);
+        bool entered = ImGui::InputTextWithHint("##new_flag", "add a flag", &pending, ImGuiInputTextFlags_EnterReturnsTrue);
+        ImGui::SameLine();
+        bool added = ImGui::Button("Add");
+        if (entered || added){
+            string flag = NormaliseTileFlag(pending);
+            if (!flag.empty()){
+                type.SetFlag(flag, true);
+            }
+            pending.clear();
+        }
+
+        // A box smaller than the art, relative to the top-left corner of the tile.
+        // Drawn in the scene around the selected tiles while it is on.
+        ImGui::Checkbox("Collision box", &type.has_collision);
+        if (ImGui::IsItemHovered()){ImGui::SetTooltip("Block with a box smaller than the art, relative to the top-left corner of the tile. Off blocks the whole tile");}
+        if (type.has_collision){
+            ImGui::InputInt4("x y w h", type.collision.data());
+            type.collision[2] = max(0, type.collision[2]);
+            type.collision[3] = max(0, type.collision[3]);
+        }
+    }
+
+    ImGui::PopID();
 }
 
 void EditorMenu::ProjectPanel(GameTile * & ghost_tile){

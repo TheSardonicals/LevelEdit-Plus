@@ -104,7 +104,7 @@ void Editor::Process()
             ImGui::NewFrame();
 
             SetKeyMapping();
-            gui->Process(ghost_tile, camera, tile_cache, selected_tiles);
+            gui->Process(ghost_tile, camera, tile_cache, selected_tiles, tile_types);
             keyboard->Process();
 
             // Deleting has to happen before anything else walks the tile cache this frame,
@@ -131,6 +131,8 @@ void Editor::Process()
                         // brush height up from there.
                         GameTile * placed = new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h);
                         placed->elevation = ghost_tile->elevation;
+
+                        EnsureTileType(tile_types, ghost_tile->name);
 
                         if (tile_cache.count(ghost_tile->name) == 0){
                             tile_cache[ghost_tile->name] = {placed};
@@ -240,7 +242,7 @@ void Editor::Process()
 
             if (gui->save_to_mx){
                 gui->saving_to_mx = false;  
-                json_handler->SaveToJson(gui->tileset_name, tile_cache);
+                json_handler->SaveToJson(gui->tileset_name, tile_cache, tile_types);
                 json_handler->ExportMX(tile_cache, gui->tileset_name);
                 //Reset the window to close or to show a text saying, 'Tileset Saved'.  
                 //Made tile a checkbox to have that constant availability of saving.
@@ -275,8 +277,36 @@ void Editor::LoadMX(){
         tile_cache.clear();
     }
 
+    // The meanings belong to the map being loaded, not whatever was open before it.
+    tile_types.clear();
+
     for (auto& tile : json_handler->json_blocks["tiles"].items()){
         //cout << tile.key() << endl;
+        const json & entry = tile.value();
+        TileType & type = tile_types[tile.key()];
+
+        // A "flags" key, even an empty one, is the map stating what the tile means,
+        // and is taken as-is. Only a map that never said anything - one saved before
+        // flags existed - gets the meaning suggested from its name, which keeps an old
+        // map behaving exactly as it did.
+        if (entry.contains("flags") && entry["flags"].is_array()){
+            for (auto & flag : entry["flags"]){
+                if (flag.is_string()){
+                    type.SetFlag(NormaliseTileFlag(flag.get<string>()), true);
+                }
+            }
+        }
+        else {
+            type.flags = SuggestFlagsFromName(tile.key());
+        }
+
+        if (entry.contains("collision") && entry["collision"].is_array() && entry["collision"].size() >= 4){
+            type.has_collision = true;
+            for (int i = 0; i < 4; ++i){
+                type.collision[i] = entry["collision"][i].get<int>();
+            }
+        }
+
         for (auto& locations : json_handler->json_blocks["tiles"][tile.key()]["locations"].items()){
             //cout << locations.value() << endl;
             //cout << json_handler->json_blocks["tiles"][tile.key()]["filepath"] << endl;
@@ -423,6 +453,34 @@ void Editor::Render(){
                 SDL_RenderFillRect(renderer, &marquee_rect);
                 SDL_SetRenderDrawColor(renderer, 255, 145, 0, 200);
                 SDL_RenderRect(renderer, &marquee_rect);
+            }
+
+            // Collision boxes for whatever is selected, so an author can see the box
+            // they are typing into the Inspector. Drawn at the footprint rather than
+            // the lifted top face, because the footprint is where the box blocks.
+            if (!selected_tiles.empty()){
+                const int cam_x = static_cast<int>(camera->xpos);
+                const int cam_y = static_cast<int>(camera->ypos);
+
+                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+                SDL_SetRenderDrawColor(renderer, 0, 220, 255, 230);
+
+                for (auto & entry : tile_cache){
+                    auto type = tile_types.find(entry.first);
+                    if (type == tile_types.end() || !type->second.has_collision) continue;
+
+                    const array<int, 4> & box = type->second.collision;
+                    for (auto tile : entry.second){
+                        if (!tile->selected) continue;
+                        // Relative to the quad's top-left corner, the same corner
+                        // GameTile::Render draws from.
+                        SDL_FRect box_rect = {static_cast<float>(tile->x - (tile->w/2) + box[0] + cam_x),
+                                              static_cast<float>(tile->y - (tile->h/2) + box[1] + cam_y),
+                                              static_cast<float>(box[2]),
+                                              static_cast<float>(box[3])};
+                        SDL_RenderRect(renderer, &box_rect);
+                    }
+                }
             }
 
             camera->Show(renderer);
