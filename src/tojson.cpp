@@ -30,30 +30,69 @@ void ToJson::ImportMX(string filepath){
     
 }
 
-void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache){
-    if (this->json_blocks["name"] != name){
-        this->json_blocks["name"] = name;
-    }
-    
-    // Locations are [x, y, w, h, height]. The height is a fifth element rather than a
-    // new object field on purpose: readers that only know the original four-element
-    // form index 0..3 and ignore the rest, so maps saved here still load in anything
-    // built against the old format, just flat.
+void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache, map<string, TileType> tile_types){
+    this->json_blocks["name"] = name;
     this->json_blocks["formatVersion"] = kMXFormatVersion;
 
-    for (auto it : tile_cache){
-        for (auto tile : it.second){
-            auto it_tiles = json_blocks["tiles"].find(tile->name);
-            if (it_tiles != json_blocks["tiles"].end() == true){
-                this->json_blocks["tiles"][tile->name]["locations"].push_back({tile->x, tile->y, tile->w, tile->h, tile->elevation});
+    // The "tiles" object is rebuilt from the editor's tiles on every save. It used to
+    // be appended to, which doubled every placement each time a map was saved again,
+    // and meant an imported map's placements were never replaced by the edited ones.
+    //
+    // Each entry starts from the one already in the file, though, so keys the editor
+    // does not know about survive a save. Top-level keys are never touched at all,
+    // which is what keeps a game's own block (DreamQuest's "dreamquest") intact when
+    // one of its maps is opened, edited and saved here.
+    json previous = (json_blocks.contains("tiles") && json_blocks["tiles"].is_object())
+                        ? json_blocks["tiles"] : json::object();
+    json tiles = json::object();
 
-            }else{
-                this->json_blocks["tiles"][tile->name]["filepath"] = "exports/" + name + "/assets/" + tile->name + ".bmp";
-                this->json_blocks["tiles"][tile->name]["locations"] = {{tile->x, tile->y, tile->w, tile->h, tile->elevation}};
-            }
+    // Keyed by the tile cache's key rather than by each tile's name: an imported
+    // map's key is the one it was written under, which need not match the image's
+    // filename.
+    for (auto & entry : tile_cache){
+        const string & key = entry.first;
+        if (entry.second.empty()) continue;
+
+        json out = (previous.contains(key) && previous[key].is_object())
+                       ? previous[key] : json::object();
+
+        out["filepath"] = "exports/" + name + "/assets/" + key + ".bmp";
+
+        // What the tile means - written only once someone has actually said. An
+        // empty list from an author is kept: it says "this tile means nothing
+        // special". A mere guess from the tile's name is not written, and any
+        // "flags" key is left off, so the map still reads as one that never said
+        // anything and each game carries on reading it the way it always did.
+        TileType type;
+        auto found = tile_types.find(key);
+        if (found != tile_types.end()){
+            type = found->second;
         }
+        if (type.declared){
+            out["flags"] = type.flags;
+        } else {
+            out.erase("flags");
+        }
+
+        if (type.has_collision){
+            out["collision"] = {type.collision[0], type.collision[1], type.collision[2], type.collision[3]};
+        } else {
+            out.erase("collision");
+        }
+
+        // Locations are [x, y, w, h, elevation]. The elevation is a fifth element
+        // rather than a new object field on purpose: readers that only know the
+        // original four-element form index 0..3 and ignore the rest.
+        json locations = json::array();
+        for (auto tile : entry.second){
+            locations.push_back({tile->x, tile->y, tile->w, tile->h, tile->elevation});
+        }
+        out["locations"] = locations;
+
+        tiles[key] = out;
     }
 
+    this->json_blocks["tiles"] = tiles;
 }
 
 //TODO @isaboll1, @Dexsidius: Create a 'SaveMXPProject' function and 'LoadMXProject' function, and modify the class
@@ -77,41 +116,38 @@ void ToJson::ExportMX(map<string, vector<GameTile *>> tile_cache, string filenam
     //
     // One copy per tile type rather than per placement: every placement of a tile
     // shares the same source .bmp, so copying per placement just re-copies the same
-    // file over and over. The destination filename has to match what SaveToJson wrote
-    // into "filepath", which is built from the tile's own name.
+    // file over and over. Each copy is named by the tile cache key, the same name
+    // SaveToJson writes into "filepath", so the saved map and the copied art always
+    // agree on what the file is called.
     //
     // copy() onto a directory is not used here: it reports "File exists" against an
     // existing destination directory on some standard library versions, so the export
     // silently produced an assets folder with nothing in it. copy_file() with an
     // explicit destination path does what was meant.
-    vector<string> copied;
     int copy_failures = 0;
 
     for (auto it : tile_cache){
-        for (auto tile : it.second){
-            if (find(copied.begin(), copied.end(), tile->name) != copied.end()){
-                continue;
-            }
-            copied.push_back(tile->name);
+        if (it.second.empty()) continue;
 
-            string destination = tile_dir + "/" + tile->name + ".bmp";
+        // Every placement of a type shares one image, so the first one stands in.
+        GameTile * tile = it.second[0];
+        string destination = tile_dir + "/" + it.first + ".bmp";
 
-            // Re-exporting a project should not trip over the assets a previous export
-            // already put there.
-            if (experimental::filesystem::exists(destination)){
-                continue;
-            }
+        // Re-exporting a project should not trip over the assets a previous export
+        // already put there.
+        if (experimental::filesystem::exists(destination)){
+            continue;
+        }
 
-            error_code error;
-            experimental::filesystem::copy_file(tile->filepath, destination, error);
+        error_code error;
+        experimental::filesystem::copy_file(tile->filepath, destination, error);
 
-            if (error){
-                // A tile whose art never made it across leaves an export the game
-                // cannot load, so this gets reported rather than quietly skipped.
-                cout << "couldn't copy " << tile->filepath << " -> " << destination
-                     << ": " << error.message() << endl;
-                copy_failures++;
-            }
+        if (error){
+            // A tile whose art never made it across leaves an export the game
+            // cannot load, so this gets reported rather than quietly skipped.
+            cout << "couldn't copy " << tile->filepath << " -> " << destination
+                 << ": " << error.message() << endl;
+            copy_failures++;
         }
     }
 

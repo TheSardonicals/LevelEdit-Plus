@@ -96,6 +96,12 @@ class Editor{
         float marquee_start_x = 0, marquee_start_y = 0;
         SDL_FRect marquee_rect = {};
         map<string, vector<GameTile *>> tile_cache;
+
+        // What each tile type means, keyed the same way as tile_cache. Kept apart
+        // from the placements because it belongs to the type: every Wall shares one
+        // set of flags. Survives a type's last tile being deleted, so placing it again
+        // in the same session picks its meaning back up.
+        map<string, TileType> tile_types;
         Camera * camera; 
         KeyboardManager * keyboard;
         ToJson * json_handler;
