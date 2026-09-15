@@ -311,6 +311,15 @@ void EditorMenu::InspectorPanel(vector<GameTile *> & selected_tiles, GameTile * 
             selected_tile->y = y_delta;
             selected_tile->w = w_increase;
             selected_tile->h = h_increase;
+
+            // How far the tile stands off the ground. Separate from Height above, which
+            // is the tile's own size, so this one is labelled for what it does.
+            ImGui::Spacing();
+            stand_height = selected_tile->elevation;
+            if (ImGui::InputInt("Stands Up", &stand_height)){
+                selected_tile->elevation = max(0, stand_height);
+            }
+            if (ImGui::IsItemHovered()){ImGui::SetTooltip("Pixels this tile stands off the floor. 0 is flat ground. [ and ] step it");}
             ImGui::PopID();
         }
         else if (selected_tiles.size() > 1){
@@ -342,6 +351,12 @@ void EditorMenu::InspectorPanel(vector<GameTile *> & selected_tiles, GameTile * 
             if (ImGui::InputInt("Height", &h_increase)){
                 for (auto & tile : selected_tiles){ tile->h = h_increase; }
             }
+
+            stand_height = selected_tiles[0]->elevation;
+            if (ImGui::InputInt("Stands Up", &stand_height)){
+                for (auto & tile : selected_tiles){ tile->elevation = max(0, stand_height); }
+            }
+            if (ImGui::IsItemHovered()){ImGui::SetTooltip("Raise the whole selection off the floor. [ and ] step it");}
             ImGui::PopID();
         }
 
@@ -390,6 +405,14 @@ void EditorMenu::InspectorPanel(vector<GameTile *> & selected_tiles, GameTile * 
             ImGui::InputInt("Height", &h_increase);
             ghost_tile->w = w_increase;
             ghost_tile->h = h_increase;
+
+            // Every tile placed with this brush is stamped at this height, so a wall can
+            // be laid down in one pass instead of raised afterwards.
+            stand_height = ghost_tile->elevation;
+            if (ImGui::InputInt("Stands Up", &stand_height)){
+                ghost_tile->elevation = max(0, stand_height);
+            }
+            if (ImGui::IsItemHovered()){ImGui::SetTooltip("Height every tile this brush places will stand at. [ and ] step it");}
             ImGui::PopID();
         }
 
@@ -442,7 +465,7 @@ void EditorMenu::StatusBar(map<string, vector<GameTile *>> & tile_cache, vector<
         }
 
         // Kept short enough to survive at the default window width.
-        ImGui::Text("%.1f FPS  |  Tiles: %d  |  Selected: %s  |  Drag: box  Ctrl+click: add  Del: delete  X: brush",
+        ImGui::Text("%.1f FPS  |  Tiles: %d  |  Selected: %s  |  Drag: box  Ctrl+click: add  [ ]: height  Del: delete  X: brush",
                     ImGui::GetIO().Framerate,
                     tile_count,
                     selection.c_str());
@@ -575,6 +598,8 @@ void EditorMenu::Dialogs(){
             ImGui::TextWrapped("With no brush held, click a tile to select it, drag a box to select several, or Ctrl+click to add one to the selection.");
             ImGui::TextWrapped("Ctrl+A selects the whole level, and clicking empty space clears the selection.");
             ImGui::TextWrapped("Press Del, or use the Delete button in the Inspector, to remove everything selected.");
+            ImGui::TextWrapped("Press ] to raise the selection off the floor and [ to lower it, or set Stands Up in the Inspector. A raised tile keeps the ground it was placed on, and draws a shaded side face so walls read as solid blocks.");
+            ImGui::TextWrapped("With nothing selected, [ and ] set the height the brush will place at.");
         }
         ImGui::End();
     }

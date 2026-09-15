@@ -97,6 +97,7 @@ class EditorMenu{
         int y_delta;
         int w_increase;
         int h_increase;
+        int stand_height;
 
         //  Layout Metrics
 

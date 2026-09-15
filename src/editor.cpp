@@ -126,13 +126,19 @@ void Editor::Process()
                 if (ghost_tile){
                   // TODO QOL: Add a pre-place highlight to show where user will be placing the selected block.
                     if (mouse->has_clicked){
+                        // The cursor marks where the tile meets the ground, so the new
+                        // tile takes the mouse position as its footprint and carries the
+                        // brush height up from there.
+                        GameTile * placed = new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h);
+                        placed->elevation = ghost_tile->elevation;
+
                         if (tile_cache.count(ghost_tile->name) == 0){
-                            tile_cache[ghost_tile->name] = {new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h)};
+                            tile_cache[ghost_tile->name] = {placed};
                         }
                         else{
-                            tile_cache[ghost_tile->name].push_back(new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h));
+                            tile_cache[ghost_tile->name].push_back(placed);
                         }
-                    }   
+                    }
                 } 
                 else {
                   // Functionality for a tile selection mode
@@ -274,15 +280,23 @@ void Editor::LoadMX(){
         for (auto& locations : json_handler->json_blocks["tiles"][tile.key()]["locations"].items()){
             //cout << locations.value() << endl;
             //cout << json_handler->json_blocks["tiles"][tile.key()]["filepath"] << endl;
+            GameTile * imported = new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3]);
+
+            // Height is the fifth element, and only format version 2 and up has one.
+            // A map saved before this existed loads flat rather than failing.
+            if (locations.value().size() > 4){
+                imported->elevation = locations.value()[4];
+            }
+
             if (tile_cache.count(tile.key()) == 0){
-                //cout << "New Import " << tile.key() << endl; 
-                tile_cache[tile.key().c_str()] = {new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3])};
+                //cout << "New Import " << tile.key() << endl;
+                tile_cache[tile.key().c_str()] = {imported};
                 //cout << tile_cache.count(tile.key()) << endl;
-            } 
+            }
             else{
                 //cout << "Adding to existing vector of " << tile.key() << endl;
-                tile_cache[tile.key().c_str()].push_back(new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3]));
-                
+                tile_cache[tile.key().c_str()].push_back(imported);
+
             }
         }
     }
@@ -382,10 +396,23 @@ void Editor::Render(){
             ImGui::Render();
             // Anything that should render before the imgui-based menu, render  underneath this line.
             if (tile_cache.size() > 0 || import_finish){
+                // Back to front by where each tile meets the ground, so a tall tile
+                // covers whatever stands behind it. Map iteration order groups by tile
+                // name, which says nothing about depth once tiles have elevation.
+                // Stable, so tiles sharing a ground line keep a fixed order instead of
+                // trading places between frames.
+                vector<GameTile *> draw_order;
                 for (auto tile_list: tile_cache){
                     for (auto tile: tile_list.second){
-                        tile->Render({static_cast<int>(camera->xpos), static_cast<int>(camera->ypos)});
+                        draw_order.push_back(tile);
                     }
+                }
+                stable_sort(draw_order.begin(), draw_order.end(), [](GameTile * a, GameTile * b){
+                    return a->GroundLine() < b->GroundLine();
+                });
+
+                for (auto tile: draw_order){
+                    tile->Render({static_cast<int>(camera->xpos), static_cast<int>(camera->ypos)});
                 }
             }
             // Rubber band, drawn over the tiles but under the GUI so it reads as part of
@@ -435,6 +462,27 @@ void Editor::SetKeyMapping(){
             // one deletion per press instead of one per frame the key is held.
             if (!typing && !selected_tiles.empty() && keyboard->KeyWasPressed(SDL_SCANCODE_DELETE)){
                 gui->delete_selection = true;
+            }
+
+            // Raise and lower whatever is selected. Works on the brush too, so the user
+            // can dial in a height before placing a run of walls. KeyWasPressed keeps it
+            // to one step per press.
+            if (!typing && keyboard->KeyWasPressed(SDL_SCANCODE_RIGHTBRACKET)){
+                for (auto tile : selected_tiles){
+                    tile->elevation += kHeightStep;
+                }
+                if (ghost_tile && selected_tiles.empty()){
+                    ghost_tile->elevation += kHeightStep;
+                }
+            }
+
+            if (!typing && keyboard->KeyWasPressed(SDL_SCANCODE_LEFTBRACKET)){
+                for (auto tile : selected_tiles){
+                    tile->elevation = max(0, tile->elevation - kHeightStep);
+                }
+                if (ghost_tile && selected_tiles.empty()){
+                    ghost_tile->elevation = max(0, ghost_tile->elevation - kHeightStep);
+                }
             }
 
             // Ctrl+A selects the whole level, Unity style.

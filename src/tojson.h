@@ -1,10 +1,13 @@
 #pragma once
 #include "json.hpp"
 #include "gametile.h"
+#include <algorithm>
 #include <iostream>
 #include <experimental/filesystem>
 #include <fstream>
 #include <iomanip>
+#include <system_error>
+#include <vector>
 
 using namespace std;
 using nlohmann::json;
@@ -14,7 +17,12 @@ using nlohmann::json;
 
 class ToJson{
 
-public: 
+public:
+// Bumped when the .mx layout changes. 1 was [x, y, w, h] locations with no height;
+// 2 adds the height as a fifth element. Readers of either version can load a v2 file,
+// so this is here to describe the file rather than to gate loading it.
+static constexpr int kMXFormatVersion = 2;
+
 ToJson();
 ~ToJson();
 
