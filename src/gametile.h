@@ -19,12 +19,26 @@ class GameTile{
         string filename;
         string filepath;
         int x, y, w = 32, h = 32;
+
+        // How far the tile stands up off the ground, in pixels. 0 is a flat floor
+        // tile. Anything taller draws its top face lifted by this much with a shaded
+        // side face filling the gap down to the footprint, which is what gives the
+        // top-down view its 2.5D look. The footprint itself never moves, so collision
+        // and placement stay where the level author put them.
+        int elevation = 0;
+
+        // The top face: what gets drawn and what the mouse picks against. The
+        // footprint sits `elevation` pixels below it.
         SDL_FRect rect = {};
         TextureCache * cache;
         SDL_Texture * texture;
 
         void Render(array<int, 2>, float alpha = 1);
         void SetPos(int, int);
+
+        // Bottom edge of the ground footprint, in world pixels. Tiles are drawn in
+        // order of this so a tall tile correctly covers whatever stands behind it.
+        float GroundLine() const;
 
         array<int, 2> GetPos();
         array<int, 4> GetInfo();

@@ -104,7 +104,7 @@ void Editor::Process()
             ImGui::NewFrame();
 
             SetKeyMapping();
-            gui->Process(ghost_tile, camera, tile_cache, selected_tiles);
+            gui->Process(ghost_tile, camera, tile_cache, selected_tiles, tile_types);
             keyboard->Process();
 
             // Deleting has to happen before anything else walks the tile cache this frame,
@@ -126,13 +126,21 @@ void Editor::Process()
                 if (ghost_tile){
                   // TODO QOL: Add a pre-place highlight to show where user will be placing the selected block.
                     if (mouse->has_clicked){
+                        // The cursor marks where the tile meets the ground, so the new
+                        // tile takes the mouse position as its footprint and carries the
+                        // brush height up from there.
+                        GameTile * placed = new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h);
+                        placed->elevation = ghost_tile->elevation;
+
+                        EnsureTileType(tile_types, ghost_tile->name);
+
                         if (tile_cache.count(ghost_tile->name) == 0){
-                            tile_cache[ghost_tile->name] = {new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h)};
+                            tile_cache[ghost_tile->name] = {placed};
                         }
                         else{
-                            tile_cache[ghost_tile->name].push_back(new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h));
+                            tile_cache[ghost_tile->name].push_back(placed);
                         }
-                    }   
+                    }
                 } 
                 else {
                   // Functionality for a tile selection mode
@@ -234,7 +242,7 @@ void Editor::Process()
 
             if (gui->save_to_mx){
                 gui->saving_to_mx = false;  
-                json_handler->SaveToJson(gui->tileset_name, tile_cache);
+                json_handler->SaveToJson(gui->tileset_name, tile_cache, tile_types);
                 json_handler->ExportMX(tile_cache, gui->tileset_name);
                 //Reset the window to close or to show a text saying, 'Tileset Saved'.  
                 //Made tile a checkbox to have that constant availability of saving.
@@ -269,20 +277,57 @@ void Editor::LoadMX(){
         tile_cache.clear();
     }
 
+    // The meanings belong to the map being loaded, not whatever was open before it.
+    tile_types.clear();
+
     for (auto& tile : json_handler->json_blocks["tiles"].items()){
         //cout << tile.key() << endl;
+        const json & entry = tile.value();
+        TileType & type = tile_types[tile.key()];
+
+        // A "flags" key, even an empty one, is the map stating what the tile means,
+        // and is taken as-is. A map that never said anything only gets a guess from
+        // the tile's name to show in the Inspector - left undeclared, so saving the
+        // map does not quietly turn that guess into something every game obeys.
+        if (entry.contains("flags") && entry["flags"].is_array()){
+            for (auto & flag : entry["flags"]){
+                if (flag.is_string()){
+                    type.SetFlag(NormaliseTileFlag(flag.get<string>()), true);
+                }
+            }
+            type.declared = true;
+        }
+        else {
+            type.flags = SuggestFlagsFromName(tile.key());
+        }
+
+        if (entry.contains("collision") && entry["collision"].is_array() && entry["collision"].size() >= 4){
+            type.has_collision = true;
+            for (int i = 0; i < 4; ++i){
+                type.collision[i] = entry["collision"][i].get<int>();
+            }
+        }
+
         for (auto& locations : json_handler->json_blocks["tiles"][tile.key()]["locations"].items()){
             //cout << locations.value() << endl;
             //cout << json_handler->json_blocks["tiles"][tile.key()]["filepath"] << endl;
+            GameTile * imported = new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3]);
+
+            // Height is the fifth element, and only format version 2 and up has one.
+            // A map saved before this existed loads flat rather than failing.
+            if (locations.value().size() > 4){
+                imported->elevation = locations.value()[4];
+            }
+
             if (tile_cache.count(tile.key()) == 0){
-                //cout << "New Import " << tile.key() << endl; 
-                tile_cache[tile.key().c_str()] = {new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3])};
+                //cout << "New Import " << tile.key() << endl;
+                tile_cache[tile.key().c_str()] = {imported};
                 //cout << tile_cache.count(tile.key()) << endl;
-            } 
+            }
             else{
                 //cout << "Adding to existing vector of " << tile.key() << endl;
-                tile_cache[tile.key().c_str()].push_back(new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3]));
-                
+                tile_cache[tile.key().c_str()].push_back(imported);
+
             }
         }
     }
@@ -382,10 +427,23 @@ void Editor::Render(){
             ImGui::Render();
             // Anything that should render before the imgui-based menu, render  underneath this line.
             if (tile_cache.size() > 0 || import_finish){
+                // Back to front by where each tile meets the ground, so a tall tile
+                // covers whatever stands behind it. Map iteration order groups by tile
+                // name, which says nothing about depth once tiles have elevation.
+                // Stable, so tiles sharing a ground line keep a fixed order instead of
+                // trading places between frames.
+                vector<GameTile *> draw_order;
                 for (auto tile_list: tile_cache){
                     for (auto tile: tile_list.second){
-                        tile->Render({static_cast<int>(camera->xpos), static_cast<int>(camera->ypos)});
+                        draw_order.push_back(tile);
                     }
+                }
+                stable_sort(draw_order.begin(), draw_order.end(), [](GameTile * a, GameTile * b){
+                    return a->GroundLine() < b->GroundLine();
+                });
+
+                for (auto tile: draw_order){
+                    tile->Render({static_cast<int>(camera->xpos), static_cast<int>(camera->ypos)});
                 }
             }
             // Rubber band, drawn over the tiles but under the GUI so it reads as part of
@@ -396,6 +454,34 @@ void Editor::Render(){
                 SDL_RenderFillRect(renderer, &marquee_rect);
                 SDL_SetRenderDrawColor(renderer, 255, 145, 0, 200);
                 SDL_RenderRect(renderer, &marquee_rect);
+            }
+
+            // Collision boxes for whatever is selected, so an author can see the box
+            // they are typing into the Inspector. Drawn at the footprint rather than
+            // the lifted top face, because the footprint is where the box blocks.
+            if (!selected_tiles.empty()){
+                const int cam_x = static_cast<int>(camera->xpos);
+                const int cam_y = static_cast<int>(camera->ypos);
+
+                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+                SDL_SetRenderDrawColor(renderer, 0, 220, 255, 230);
+
+                for (auto & entry : tile_cache){
+                    auto type = tile_types.find(entry.first);
+                    if (type == tile_types.end() || !type->second.has_collision) continue;
+
+                    const array<int, 4> & box = type->second.collision;
+                    for (auto tile : entry.second){
+                        if (!tile->selected) continue;
+                        // Relative to the quad's top-left corner, the same corner
+                        // GameTile::Render draws from.
+                        SDL_FRect box_rect = {static_cast<float>(tile->x - (tile->w/2) + box[0] + cam_x),
+                                              static_cast<float>(tile->y - (tile->h/2) + box[1] + cam_y),
+                                              static_cast<float>(box[2]),
+                                              static_cast<float>(box[3])};
+                        SDL_RenderRect(renderer, &box_rect);
+                    }
+                }
             }
 
             camera->Show(renderer);
@@ -435,6 +521,27 @@ void Editor::SetKeyMapping(){
             // one deletion per press instead of one per frame the key is held.
             if (!typing && !selected_tiles.empty() && keyboard->KeyWasPressed(SDL_SCANCODE_DELETE)){
                 gui->delete_selection = true;
+            }
+
+            // Raise and lower whatever is selected. Works on the brush too, so the user
+            // can dial in a height before placing a run of walls. KeyWasPressed keeps it
+            // to one step per press.
+            if (!typing && keyboard->KeyWasPressed(SDL_SCANCODE_RIGHTBRACKET)){
+                for (auto tile : selected_tiles){
+                    tile->elevation += kHeightStep;
+                }
+                if (ghost_tile && selected_tiles.empty()){
+                    ghost_tile->elevation += kHeightStep;
+                }
+            }
+
+            if (!typing && keyboard->KeyWasPressed(SDL_SCANCODE_LEFTBRACKET)){
+                for (auto tile : selected_tiles){
+                    tile->elevation = max(0, tile->elevation - kHeightStep);
+                }
+                if (ghost_tile && selected_tiles.empty()){
+                    ghost_tile->elevation = max(0, ghost_tile->elevation - kHeightStep);
+                }
             }
 
             // Ctrl+A selects the whole level, Unity style.

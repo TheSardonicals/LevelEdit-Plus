@@ -15,7 +15,7 @@ class EditorMenu{
         ~EditorMenu();
         // The tile cache and the selection are taken by reference now, so the panels can
         // browse the level and change what is selected instead of working off of a copy.
-        void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >> &, vector<GameTile *> &);
+        void Process(GameTile * &ghost_tile, Camera * camera, map<string, vector<GameTile * >> &, vector<GameTile *> &, map<string, TileType> &);
 
         // Window Functions
 
@@ -26,8 +26,14 @@ class EditorMenu{
         // leaves the middle of the screen free for the scene to be edited in.
         void MainMenuBar(GameTile * &, map<string, vector<GameTile *>> &, vector<GameTile *> &);
         void Toolbar(GameTile * &, vector<GameTile *> &);
-        void HierarchyPanel(map<string, vector<GameTile *>> &, vector<GameTile *> &);
-        void InspectorPanel(vector<GameTile *> &, GameTile *, Camera *);
+        void HierarchyPanel(map<string, vector<GameTile *>> &, vector<GameTile *> &, map<string, TileType> &);
+        void InspectorPanel(vector<GameTile *> &, GameTile *, Camera *, map<string, vector<GameTile *>> &, map<string, TileType> &);
+
+        // Edits what one tile type means: its flags and its collision box. Shared by
+        // every placement of the type, so the panel says how many tiles it touches.
+        // placed_count is -1 for a type that is only the brush so far.
+        void TileTypeEditor(map<string, TileType> &, const string & key, int placed_count);
+
         void ProjectPanel(GameTile * &);
         void StatusBar(map<string, vector<GameTile *>> &, vector<GameTile *> &);
         void SceneOutline();
@@ -64,6 +70,10 @@ class EditorMenu{
         bool tileset_import = false;
         bool tile_edit_mode = false;
 
+        // What is being typed into each tile type's "add a flag" box. Kept per type so
+        // two types open in the Inspector at once do not share one text field.
+        map<string, string> new_flag_text;
+
         // Raised by the UI when the user asks for the selection to be removed. The editor
         // owns every tile in the tile cache, so it is the one that does the deleting, the
         // same way it handles the save and import flags.
@@ -97,6 +107,7 @@ class EditorMenu{
         int y_delta;
         int w_increase;
         int h_increase;
+        int stand_height;
 
         //  Layout Metrics
 

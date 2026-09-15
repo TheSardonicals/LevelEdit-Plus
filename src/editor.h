@@ -72,6 +72,10 @@ class Editor{
 
         float button_cooldown = 1.0;
 
+        // Pixels the [ and ] keys raise or lower a tile by. A quarter of a 32px tile,
+        // so four presses stack up to one tile of height.
+        static constexpr int kHeightStep = 8;
+
         array<int, 2> tile_size = {32, 32};
         array<int, 2> pos_at_push = {0, 0};
 
@@ -92,6 +96,12 @@ class Editor{
         float marquee_start_x = 0, marquee_start_y = 0;
         SDL_FRect marquee_rect = {};
         map<string, vector<GameTile *>> tile_cache;
+
+        // What each tile type means, keyed the same way as tile_cache. Kept apart
+        // from the placements because it belongs to the type: every Wall shares one
+        // set of flags. Survives a type's last tile being deleted, so placing it again
+        // in the same session picks its meaning back up.
+        map<string, TileType> tile_types;
         Camera * camera; 
         KeyboardManager * keyboard;
         ToJson * json_handler;
