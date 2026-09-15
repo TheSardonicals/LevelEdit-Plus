@@ -108,6 +108,10 @@ class Editor{
 
 
         void SetupImGuiStyleColor();
+
+        // Resizes the camera border to the current render output, so it follows the
+        // window when it is resized, maximised or made fullscreen.
+        void FitCameraToWindow();
         void Process();
         void SetKeyMapping();
 };

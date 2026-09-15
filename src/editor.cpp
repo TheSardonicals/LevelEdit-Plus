@@ -47,6 +47,9 @@ int Editor::Start(int argc, char** argv){
     mouse = new Pointer();
     cache = new TextureCache(renderer);
     camera = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT, 3, 40);
+    // The window may not be the size it was asked for (a maximised restore, or a
+    // scaled display), so fit the border to what it actually is.
+    FitCameraToWindow();
     keyboard = new KeyboardManager();
     gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths,  cache);
     json_handler = new ToJson();
@@ -84,6 +87,12 @@ void Editor::Process()
             if (event.window.type == SDL_EVENT_WINDOW_RESIZED){
                 SCREEN_WIDTH = event.window.data1;
                 SCREEN_HEIGHT = event.window.data2;
+                FitCameraToWindow();
+            }
+            // Going fullscreen on a scaled display can change the pixel size without
+            // the window size changing, and the camera border is drawn in pixels.
+            if (event.window.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED){
+                FitCameraToWindow();
             }
         }
 
@@ -576,6 +585,20 @@ void Editor::SetKeyMapping(){
                 ghost_tile->SetPos(mouse->xpos , mouse->ypos);
             }
 
+}
+
+
+void Editor::FitCameraToWindow(){
+    // The border is drawn with SDL_RenderRect, which works in the renderer's
+    // pixels, so it is sized from the render output rather than from the window.
+    // The two only match at 100% display scaling (the window is created with
+    // SDL_WINDOW_HIGH_PIXEL_DENSITY); sized this way it hugs the edges at any scale.
+    int width = 0, height = 0;
+    if (!SDL_GetRenderOutputSize(renderer, &width, &height)){
+        width = SCREEN_WIDTH;
+        height = SCREEN_HEIGHT;
+    }
+    camera->Resize(static_cast<float>(width), static_cast<float>(height));
 }
 
 
