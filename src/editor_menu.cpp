@@ -444,7 +444,7 @@ void EditorMenu::InspectorPanel(vector<GameTile *> & selected_tiles, GameTile * 
         if (ghost_tile){
             ImGui::Spacing();
             ImGui::SeparatorText("Brush");
-            ImGui::Text("Name: %s", ghost_tile->name.c_str());
+            ImGui::Text("Name: %s", ghost_tile->key.c_str());
             ImGui::Text("X: %d", static_cast<int>(ghost_tile->x - camera->xpos));
             ImGui::Text("Y: %d", static_cast<int>(ghost_tile->y - camera->ypos));
 
@@ -469,10 +469,10 @@ void EditorMenu::InspectorPanel(vector<GameTile *> & selected_tiles, GameTile * 
 
             // What the brush's tiles will mean. Set it here and every tile laid with the
             // brush already carries it - no going back to flag them afterwards.
-            if (!shown_types.count(ghost_tile->name)){
-                auto placed = tile_cache.find(ghost_tile->name);
+            if (!shown_types.count(ghost_tile->key)){
+                auto placed = tile_cache.find(ghost_tile->key);
                 int placed_count = (placed != tile_cache.end()) ? static_cast<int>(placed->second.size()) : -1;
-                TileTypeEditor(tile_types, ghost_tile->name, placed_count);
+                TileTypeEditor(tile_types, ghost_tile->key, placed_count);
             }
         }
 
@@ -644,13 +644,13 @@ void EditorMenu::AssetBrowser(GameTile * & ghost_tile, ImVec2 button_size){
         if (ImGui::ImageButton("",(ImTextureID)texture, button_size, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), ImVec4(0.0f, 0.0f, 0.0f, 0.0f)))
         {
             // Handle setting ghost tile when button is clicked
-            if (ghost_tile == nullptr){
-                ghost_tile = new GameTile(cache, tile_paths[i][1], mouse->xpos, mouse->ypos, 32, 32);
-            }
-            else {
+            if (ghost_tile != nullptr){
                 delete ghost_tile;
-                ghost_tile = new GameTile(cache, tile_paths[i][1], mouse->xpos, mouse->ypos, 32, 32);
             }
+            ghost_tile = new GameTile(cache, tile_paths[i][1], mouse->xpos, mouse->ypos, 32, 32);
+            // The asset key, which is the tile's name plus any folders it sits in
+            // under resources/. Everything downstream files the tile under this.
+            ghost_tile->key = tile_paths[i][0];
         }
         if (ImGui::IsItemHovered()){
             ImGui::BeginTooltip();

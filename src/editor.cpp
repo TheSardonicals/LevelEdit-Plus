@@ -138,16 +138,17 @@ void Editor::Process()
                         // The cursor marks where the tile meets the ground, so the new
                         // tile takes the mouse position as its footprint and carries the
                         // brush height up from there.
-                        GameTile * placed = new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h);
+                        GameTile * placed = new GameTile(cache, tile_paths[ghost_tile->key], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h);
                         placed->elevation = ghost_tile->elevation;
+                        placed->key = ghost_tile->key;
 
-                        EnsureTileType(tile_types, ghost_tile->name);
+                        EnsureTileType(tile_types, ghost_tile->key);
 
-                        if (tile_cache.count(ghost_tile->name) == 0){
-                            tile_cache[ghost_tile->name] = {placed};
+                        if (tile_cache.count(ghost_tile->key) == 0){
+                            tile_cache[ghost_tile->key] = {placed};
                         }
                         else{
-                            tile_cache[ghost_tile->name].push_back(placed);
+                            tile_cache[ghost_tile->key].push_back(placed);
                         }
                     }
                 } 
@@ -321,6 +322,10 @@ void Editor::LoadMX(){
             //cout << locations.value() << endl;
             //cout << json_handler->json_blocks["tiles"][tile.key()]["filepath"] << endl;
             GameTile * imported = new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3]);
+
+            // Filed under the key the map wrote it as, which need not match the
+            // image's filename - it carries the asset's folders with it.
+            imported->key = tile.key();
 
             // Height is the fifth element, and only format version 2 and up has one.
             // A map saved before this existed loads flat rather than failing.

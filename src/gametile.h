@@ -18,6 +18,12 @@ class GameTile{
         string name;
         string filename;
         string filepath;
+
+        // What this tile is filed under: its asset key ("tiles/grass"), or the
+        // key it was imported under. `name` is only the image's filename, which
+        // is not enough once assets live in folders - two folders can each hold
+        // a "grass". Set by whoever creates the tile; defaults to the name.
+        string key;
         int x, y, w = 32, h = 32;
 
         // How far the tile stands up off the ground, in pixels. 0 is a flat floor

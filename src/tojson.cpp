@@ -56,7 +56,10 @@ void ToJson::SaveToJson(string name, map<string, vector<GameTile *>> tile_cache,
         json out = (previous.contains(key) && previous[key].is_object())
                        ? previous[key] : json::object();
 
-        out["filepath"] = "exports/" + name + "/assets/" + key + ".bmp";
+        // Keeps the source image's own extension, so a PNG tile stays a PNG in the
+        // export rather than being written as a .bmp that is not one. Folders in a
+        // key become part of the filename, because an export is one flat directory.
+        out["filepath"] = "exports/" + name + "/assets/" + AssetFileName(key, entry.second[0]->filepath);
 
         // What the tile means - written only once someone has actually said. An
         // empty list from an author is kept: it says "this tile means nothing
@@ -131,7 +134,7 @@ void ToJson::ExportMX(map<string, vector<GameTile *>> tile_cache, string filenam
 
         // Every placement of a type shares one image, so the first one stands in.
         GameTile * tile = it.second[0];
-        string destination = tile_dir + "/" + it.first + ".bmp";
+        string destination = tile_dir + "/" + AssetFileName(it.first, tile->filepath);
 
         // Re-exporting a project should not trip over the assets a previous export
         // already put there.
