@@ -266,7 +266,17 @@ void EditorMenu::HierarchyPanel(map<string, vector<GameTile *>> & tile_cache, ve
             }
 
             if (open){
-                for (auto & tile : entry.second){
+                // Only the rows scrolled into view are built. A row is cheap, but a
+                // map with tens of thousands of tiles has tens of thousands of them,
+                // and building the ones nobody can see cost more per frame than
+                // drawing the whole level did. Every row is one line of the same
+                // height, which is what the clipper needs to skip the rest.
+                ImGuiListClipper clipper;
+                clipper.Begin(static_cast<int>(entry.second.size()));
+
+                while (clipper.Step()){
+                for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++){
+                    GameTile * tile = entry.second[row];
                     // The pointer is the identity here, so rows stay correct even when two
                     // tiles of the same type sit on the same spot.
                     ImGui::PushID(tile);
@@ -295,6 +305,7 @@ void EditorMenu::HierarchyPanel(map<string, vector<GameTile *>> & tile_cache, ve
                         ImGui::EndPopup();
                     }
                     ImGui::PopID();
+                }
                 }
                 ImGui::TreePop();
             }

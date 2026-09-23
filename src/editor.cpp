@@ -446,9 +446,26 @@ void Editor::Render(){
                 // name, which says nothing about depth once tiles have elevation.
                 // Stable, so tiles sharing a ground line keep a fixed order instead of
                 // trading places between frames.
+                // Tiles off the edge of the window are dropped here rather than handed
+                // to SDL to clip away: a map is usually far larger than the view, and
+                // the ones nobody can see cost a draw call each. They are dropped
+                // before the sort, so that shrinks with them.
+                //
+                // The bounds match what GameTile::Render draws: the top face lifted by
+                // the elevation, plus the side face filling the gap back down to the
+                // footprint.
+                const int cam_x = static_cast<int>(camera->xpos);
+                const int cam_y = static_cast<int>(camera->ypos);
+
                 vector<GameTile *> draw_order;
                 for (auto tile_list: tile_cache){
                     for (auto tile: tile_list.second){
+                        const int left = (tile->x - (tile->w/2)) + cam_x;
+                        const int top = (tile->y - (tile->h/2)) + cam_y - tile->elevation;
+
+                        if (left + tile->w <= 0 || left >= output_width) continue;
+                        if (top + tile->h + tile->elevation <= 0 || top >= output_height) continue;
+
                         draw_order.push_back(tile);
                     }
                 }
@@ -603,6 +620,9 @@ void Editor::FitCameraToWindow(){
         width = SCREEN_WIDTH;
         height = SCREEN_HEIGHT;
     }
+
+    output_width = width;
+    output_height = height;
     camera->Resize(static_cast<float>(width), static_cast<float>(height));
 }
 
