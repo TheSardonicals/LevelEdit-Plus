@@ -47,6 +47,11 @@ class Editor{
         SDL_Surface * icon;
         
         int SCREEN_WIDTH = 1280, SCREEN_HEIGHT = 720;
+
+        // The render output, in pixels, which is the space tiles are drawn in. Kept
+        // by FitCameraToWindow so the renderer can drop tiles that fall outside it
+        // without asking SDL for the size every frame.
+        int output_width = 1280, output_height = 720;
         
         SDL_WindowFlags WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
         //SDL_Render RENDERER_FLAGS = SDL_RENDERER_PRESENTVSYNC;
@@ -108,6 +113,10 @@ class Editor{
 
 
         void SetupImGuiStyleColor();
+
+        // Resizes the camera border to the current render output, so it follows the
+        // window when it is resized, maximised or made fullscreen.
+        void FitCameraToWindow();
         void Process();
         void SetKeyMapping();
 };

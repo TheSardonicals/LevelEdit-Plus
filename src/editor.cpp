@@ -47,6 +47,9 @@ int Editor::Start(int argc, char** argv){
     mouse = new Pointer();
     cache = new TextureCache(renderer);
     camera = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT, 3, 40);
+    // The window may not be the size it was asked for (a maximised restore, or a
+    // scaled display), so fit the border to what it actually is.
+    FitCameraToWindow();
     keyboard = new KeyboardManager();
     gui = new EditorMenu(&SCREEN_WIDTH, &SCREEN_HEIGHT, &clear_color, mouse, &tile_paths,  cache);
     json_handler = new ToJson();
@@ -84,6 +87,12 @@ void Editor::Process()
             if (event.window.type == SDL_EVENT_WINDOW_RESIZED){
                 SCREEN_WIDTH = event.window.data1;
                 SCREEN_HEIGHT = event.window.data2;
+                FitCameraToWindow();
+            }
+            // Going fullscreen on a scaled display can change the pixel size without
+            // the window size changing, and the camera border is drawn in pixels.
+            if (event.window.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED){
+                FitCameraToWindow();
             }
         }
 
@@ -129,16 +138,17 @@ void Editor::Process()
                         // The cursor marks where the tile meets the ground, so the new
                         // tile takes the mouse position as its footprint and carries the
                         // brush height up from there.
-                        GameTile * placed = new GameTile(cache, tile_paths[ghost_tile->name], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h);
+                        GameTile * placed = new GameTile(cache, tile_paths[ghost_tile->key], mouse->xpos - camera->xpos, mouse->ypos - camera->ypos, ghost_tile->w, ghost_tile->h);
                         placed->elevation = ghost_tile->elevation;
+                        placed->key = ghost_tile->key;
 
-                        EnsureTileType(tile_types, ghost_tile->name);
+                        EnsureTileType(tile_types, ghost_tile->key);
 
-                        if (tile_cache.count(ghost_tile->name) == 0){
-                            tile_cache[ghost_tile->name] = {placed};
+                        if (tile_cache.count(ghost_tile->key) == 0){
+                            tile_cache[ghost_tile->key] = {placed};
                         }
                         else{
-                            tile_cache[ghost_tile->name].push_back(placed);
+                            tile_cache[ghost_tile->key].push_back(placed);
                         }
                     }
                 } 
@@ -313,6 +323,10 @@ void Editor::LoadMX(){
             //cout << json_handler->json_blocks["tiles"][tile.key()]["filepath"] << endl;
             GameTile * imported = new GameTile(cache, json_handler->json_blocks["tiles"][tile.key()]["filepath"], locations.value()[0], locations.value()[1], locations.value()[2], locations.value()[3]);
 
+            // Filed under the key the map wrote it as, which need not match the
+            // image's filename - it carries the asset's folders with it.
+            imported->key = tile.key();
+
             // Height is the fifth element, and only format version 2 and up has one.
             // A map saved before this existed loads flat rather than failing.
             if (locations.value().size() > 4){
@@ -432,9 +446,26 @@ void Editor::Render(){
                 // name, which says nothing about depth once tiles have elevation.
                 // Stable, so tiles sharing a ground line keep a fixed order instead of
                 // trading places between frames.
+                // Tiles off the edge of the window are dropped here rather than handed
+                // to SDL to clip away: a map is usually far larger than the view, and
+                // the ones nobody can see cost a draw call each. They are dropped
+                // before the sort, so that shrinks with them.
+                //
+                // The bounds match what GameTile::Render draws: the top face lifted by
+                // the elevation, plus the side face filling the gap back down to the
+                // footprint.
+                const int cam_x = static_cast<int>(camera->xpos);
+                const int cam_y = static_cast<int>(camera->ypos);
+
                 vector<GameTile *> draw_order;
                 for (auto tile_list: tile_cache){
                     for (auto tile: tile_list.second){
+                        const int left = (tile->x - (tile->w/2)) + cam_x;
+                        const int top = (tile->y - (tile->h/2)) + cam_y - tile->elevation;
+
+                        if (left + tile->w <= 0 || left >= output_width) continue;
+                        if (top + tile->h + tile->elevation <= 0 || top >= output_height) continue;
+
                         draw_order.push_back(tile);
                     }
                 }
@@ -576,6 +607,23 @@ void Editor::SetKeyMapping(){
                 ghost_tile->SetPos(mouse->xpos , mouse->ypos);
             }
 
+}
+
+
+void Editor::FitCameraToWindow(){
+    // The border is drawn with SDL_RenderRect, which works in the renderer's
+    // pixels, so it is sized from the render output rather than from the window.
+    // The two only match at 100% display scaling (the window is created with
+    // SDL_WINDOW_HIGH_PIXEL_DENSITY); sized this way it hugs the edges at any scale.
+    int width = 0, height = 0;
+    if (!SDL_GetRenderOutputSize(renderer, &width, &height)){
+        width = SCREEN_WIDTH;
+        height = SCREEN_HEIGHT;
+    }
+
+    output_width = width;
+    output_height = height;
+    camera->Resize(static_cast<float>(width), static_cast<float>(height));
 }
 
 

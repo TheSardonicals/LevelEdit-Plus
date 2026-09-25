@@ -11,6 +11,11 @@ GameTile::GameTile(TextureCache * cache, string filepath, int xpos, int ypos, in
     filename = (slash == string::npos) ? filepath : filepath.substr(slash + 1);
     size_t dot = filename.find_last_of('.');
     name = (dot == string::npos) ? filename : filename.substr(0, dot);
+
+    // Whoever creates the tile overwrites this with the asset key it belongs to.
+    // Falling back to the name keeps a tile made without one working exactly as
+    // it did when every asset sat directly in resources/.
+    key = name;
     this->cache = cache;
     this->filepath = filepath;
 
